@@ -1,0 +1,11 @@
+﻿[
+   {
+      "ColumnPatternReplaceWith": "",
+      "ColumnRegexPattern": "",
+      "SchemaName": "dbo",
+      "TablePatternReplaceWith": "",
+      "TableRegexPattern": "",
+      "Tables": [ ],
+      "UseSchemaName": false
+   }
+]

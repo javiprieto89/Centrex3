@@ -1,0 +1,57 @@
+using System;
+using System.Data;
+using Microsoft.VisualBasic.CompilerServices;
+
+namespace Centrex
+{
+    public partial class frm_detalle_asoc_produccion
+    {
+        private int id_item;
+        private int id_produccion;
+        private DataTable dt_cantidades_items_asociados;
+
+        public frm_detalle_asoc_produccion()
+        {
+
+            // Esta llamada es exigida por el diseñador.
+            InitializeComponent();
+
+            // Agregue cualquier inicialización después de la llamada a InitializeComponent().
+
+        }
+
+        public frm_detalle_asoc_produccion(int _id_item, int _id_produccion = -1)
+        {
+
+            // Esta llamada es exigida por el diseñador.
+            InitializeComponent();
+
+            // Agregue cualquier inicialización después de la llamada a InitializeComponent().
+            id_item = _id_item;
+            id_produccion = _id_produccion;
+        }
+        private void frm_detalle_asoc_produccion_Load(object sender, EventArgs e)
+        {
+            if (id_produccion != -1)
+            {
+                dt_cantidades_items_asociados = asocitems.Traer_Cantidades_Enviadas_Items_Asociados_Default_Produccion(id_item.ToString(), id_produccion);
+                dg_view.ReadOnly = true;
+                cmd_ok.Enabled = false;
+            }
+            else
+            {
+                dt_cantidades_items_asociados = asocitems.Traer_Cantidades_Enviadas_Items_Asociados_Default_Produccion(id_item.ToString());
+            }
+
+            dg_view.DataSource = dt_cantidades_items_asociados;
+        }
+
+        private void cmd_ok_Click(object sender, EventArgs e)
+        {
+            foreach (DataRow row in dt_cantidades_items_asociados.Rows)
+                producciones.addItemAsocProducciontmp(Conversions.ToInteger(row[4]), Conversions.ToInteger(row[5]), Conversions.ToInteger(row[6]), Conversions.ToInteger(row[3]));
+
+            closeandupdate(this);
+        }
+    }
+}

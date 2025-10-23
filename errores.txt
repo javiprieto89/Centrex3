@@ -1,0 +1,502 @@
+Severity	Code	Description	Project	File	Line	Suppression State
+Error	BC30109	'Form' is a class type and cannot be used as an expression.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	3	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	17	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	17	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	26	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	26	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	28	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	29	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	30	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	31	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	32	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	33	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	35	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	36	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	37	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	40	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	41	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	44	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	63	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	67	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	77	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	88	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	89	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	92	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	95	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	97	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	102	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	103	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	106	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	109	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	111	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	116	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	117	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	120	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	123	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	125	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	179	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	180	Active
+Error	BC30311	Value of type 'itemImpuesto' cannot be converted to 'ItemImpuestoEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	194	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	204	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	206	Active
+Error	BC30451	'id_marca_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	207	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	208	Active
+Error	BC30451	'id_proveedor_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	209	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	273	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	274	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	277	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	281	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_item.vb	282	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	48	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	49	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	51	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	52	Active
+Error	BC30451	'agregaitem' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	54	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	60	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	61	Active
+Error	BC30451	'agregaitem' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	62	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	76	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	77	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	79	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	80	Active
+Error	BC30451	'agregaitem' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	82	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	88	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	89	Active
+Error	BC30451	'agregaitem' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	90	Active
+Error	BC30311	Value of type 'comprobante' cannot be converted to 'ComprobanteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	92	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	99	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	101	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	107	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	108	Active
+Error	BC30109	'Form' is a class type and cannot be used as an expression.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	118	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	121	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	123	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	124	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	127	Active
+Error	BC30451	'id_comprobante_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	132	Active
+Error	BC30451	'id_cliente_pedido_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	137	Active
+Error	BC30451	'id_cliente_pedido_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	138	Active
+Error	BC30451	'id_cliente_pedido_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	139	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	152	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	152	Active
+Error	BC30451	'terminarpedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	152	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	159	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	162	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	164	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	165	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	171	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	173	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	189	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	192	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	193	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	194	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	195	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	197	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	198	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	199	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	200	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	203	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	206	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	210	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	219	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	220	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	254	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	254	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	277	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	281	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	285	Active
+Error	BC30311	Value of type 'ItemEntity' cannot be converted to 'item'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	373	Active
+Error	BC30311	Value of type 'item' cannot be converted to 'ItemEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	388	Active
+Error	BC30456	'id_item' is not a member of 'ItemEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	389	Active
+Error	BC30311	Value of type 'item' cannot be converted to 'ItemEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	394	Active
+Error	BC30311	Value of type 'item' cannot be converted to 'ItemEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	396	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	400	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	402	Active
+Error	BC30311	Value of type 'pedido' cannot be converted to 'PedidoEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	406	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	412	Active
+Error	BC30311	Value of type 'pedido' cannot be converted to 'PedidoEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	417	Active
+Error	BC30311	Value of type 'PedidoEntity' cannot be converted to 'String'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	418	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	434	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	435	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	438	Active
+Error	BC30451	'facturar' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	442	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	452	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	454	Active
+Error	BC30451	'imprimirFactura' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	482	Active
+Error	BC30311	Value of type 'pedido' cannot be converted to 'Integer'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	492	Active
+Error	BC30057	Too many arguments to 'Public Function CerrarPedido(idPedido As Integer) As Boolean'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	492	Active
+Error	BC30451	'id_comprobante_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	497	Active
+Error	BC30451	'id_cliente_pedido_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	498	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	529	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	530	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	533	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	536	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	536	Active
+Error	BC30451	'id_cliente_pedido_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	536	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	537	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	548	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	551	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	552	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	553	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	554	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	555	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	557	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	557	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	561	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	563	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	564	Active
+Error	BC30451	'edita_item' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	572	Active
+Error	BC30311	Value of type 'comprobante' cannot be converted to 'ComprobanteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	574	Active
+Error	BC30311	Value of type 'comprobante' cannot be converted to 'ComprobanteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	600	Active
+Error	BC30311	Value of type 'ItemEntity' cannot be converted to 'item'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	612	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	614	Active
+Error	BC30451	'recargaPrecios' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	615	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	615	Active
+Error	BC30451	'recargaPrecios' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	617	Active
+Error	BC30311	Value of type 'comprobante' cannot be converted to 'ComprobanteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	620	Active
+Error	BC30311	Value of type 'comprobante' cannot be converted to 'ComprobanteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	631	Active
+Error	BC30311	Value of type 'comprobante' cannot be converted to 'ComprobanteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	638	Active
+Error	BC30451	'comprobantePresupuesto_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	640	Active
+Error	BC30311	Value of type 'comprobante' cannot be converted to 'ComprobanteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	675	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	680	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	683	Active
+Error	BC30311	Value of type 'comprobante' cannot be converted to 'ComprobanteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	689	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	766	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	767	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	770	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	773	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	884	Active
+Error	BC30451	'id_comprobante_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	889	Active
+Error	BC30451	'id_comprobante_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	890	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	899	Active
+Error	BC30451	'Ultima_CC_Pedido_Cliente' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	909	Active
+Error	BC30451	'agregaitem' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	935	Active
+Error	BC30451	'agregaitem' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	938	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	967	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	968	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	971	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	973	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	995	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	998	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	999	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1003	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1004	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1007	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1009	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1014	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1029	Active
+Error	BC30455	Argument not specified for parameter 'idUsuarioActual' of 'Public Function DuplicarPedido(idPedido As Integer, idUsuarioActual As Integer) As Boolean'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1036	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1037	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1038	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1039	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1040	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1041	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1042	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Agregar\add_pedido.vb	1043	Active
+Warning		The 'configuration' element is not declared.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\App.config	2	
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\bancos.vb	10	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\bancos.vb	40	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\bancos.vb	60	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\bancos.vb	87	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	10	Active
+Error	BC30456	'Cajas' is not a member of 'CentrexDbContext'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	11	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	32	Active
+Error	BC30456	'Cajas' is not a member of 'CentrexDbContext'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	39	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	51	Active
+Error	BC30456	'Cajas' is not a member of 'CentrexDbContext'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	52	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	77	Active
+Error	BC30456	'Cajas' is not a member of 'CentrexDbContext'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	78	Active
+Error	BC30456	'Cajas' is not a member of 'CentrexDbContext'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	81	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	100	Active
+Error	BC30456	'EsCaso' is not a member of 'PedidoEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	107	Active
+Error	BC30456	'EsCaso' is not a member of 'PedidoEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	109	Active
+Error	BC30456	'Cajas' is not a member of 'CentrexDbContext'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	120	Active
+Error	BC36599	Range variable name can be inferred only from a simple or qualified name with no arguments.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cajas.vb	122	Active
+Error	BC30002	Type 'TmpCobroRetencionEntity' is not defined.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Models\CentrexDbContext.vb	43	Active
+Error	BC30002	Type 'PrecioEntity' is not defined.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Models\CentrexDbContext.vb	45	Active
+Error	BC30002	Type 'LocalidadEntity' is not defined.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Models\CentrexDbContext.vb	47	Active
+Error	BC30002	Type 'ModoMiPymeEntity' is not defined.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Models\CentrexDbContext.vb	61	Active
+Error	BC30002	Type 'TmpOrdenCompraItemEntity' is not defined.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Models\CentrexDbContext.vb	67	Active
+Error	BC30002	Type 'BancoCuentaTipoEntity' is not defined.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Models\CentrexDbContext.vb	78	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\clientes.vb	10	Active
+Error	BC30456	'IdPaisFiscal' is not a member of 'ClienteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\clientes.vb	24	Active
+Error	BC30456	'IdPaisEntrega' is not a member of 'ClienteEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\clientes.vb	29	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\clientes.vb	53	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\clientes.vb	91	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\clientes.vb	136	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\clientes.vb	155	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\clientes.vb	171	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	18	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	18	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	18	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	18	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	25	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	70	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	70	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	70	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	70	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	96	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	111	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	111	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	111	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	111	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	153	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	153	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	153	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	153	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	159	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	169	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	185	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	185	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	185	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	185	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	191	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	195	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	210	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	210	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	210	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	210	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	216	Active
+Error	BC30451	'ID_CH_CARTERA' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	220	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	224	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	239	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	239	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	239	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	239	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	245	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	249	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	264	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	264	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	264	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	264	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	270	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	274	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	289	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	289	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	289	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	289	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	295	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	307	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	337	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	337	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	337	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	337	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	344	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	379	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	379	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	379	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	379	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	386	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	419	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	419	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	419	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	419	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\cobros.vb	426	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	17	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	57	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	79	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	108	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	108	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	108	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	108	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	114	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	130	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	147	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	177	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	177	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	177	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	177	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	184	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	207	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	237	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	237	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	237	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	237	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	244	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	283	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	283	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	283	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	283	Active
+Error	BC30451	'CN' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\comprobantes.vb	289	Active
+Error	BC30451	'cuit_emisor_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\frm_pruebas_afip.vb	15	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Busqueda\frm_ultimo_comprobante.vb	3	Active
+Error	BC30451	'consultaUltimoComprobante' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Busqueda\frm_ultimo_comprobante.vb	23	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	23	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	48	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	66	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	97	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	124	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	125	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	176	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	177	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	248	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	279	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	323	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	324	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	476	Active
+Error	BC30456	'TempPedidosItems' is not a member of 'CentrexDbContext'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	840	Active
+Error	BC32023	Expression is of type '?', which is not a collection type.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	841	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	863	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	886	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	910	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\generales.vb	971	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Busqueda\info_fc.vb	4	Active
+Error	BC30451	'Consultar_Comprobante' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\Busqueda\info_fc.vb	22	Active
+Error	BC30456	'TempPedidosItems' is not a member of 'CentrexDbContext'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\items.vb	41	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\itemsImpuestos.vb	9	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\itemsImpuestos.vb	28	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\itemsImpuestos.vb	47	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\itemsImpuestos.vb	80	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	39	Active
+Error	BC30451	'comprobantePresupuesto_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	45	Active
+Error	BC30451	'id_comprobante_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	46	Active
+Error	BC30451	'id_tipoDocumento_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	47	Active
+Error	BC30451	'id_tipoComprobante_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	48	Active
+Error	BC30451	'id_cliente_pedido_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	49	Active
+Error	BC30451	'id_pais_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	50	Active
+Error	BC30451	'id_provincia_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	51	Active
+Error	BC30451	'id_marca_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	52	Active
+Error	BC30451	'id_proveedor_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	53	Active
+Error	BC30451	'cuit_emisor_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	55	Active
+Error	BC30451	'id_condicion_compra_default' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	56	Active
+Error	BC30451	'STR_COMPROBANTES_CONTABLES' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	57	Active
+Error	BC30451	'versiondb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	60	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	62	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	62	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	62	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	62	Active
+Error	BC30451	'depuracion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	63	Active
+Error	BC30451	'depuracion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	66	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	69	Active
+Error	BC30451	'depuracion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	75	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	79	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	81	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	82	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	86	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	86	Active
+Error	BC30451	'usuariodb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	86	Active
+Error	BC30451	'passdb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	86	Active
+Error	BC30451	'configuracion_regional' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	92	Active
+Error	BC30451	'modificacionesDB' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	95	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	95	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	101	Active
+Error	BC30451	'depuracion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	101	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	127	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	135	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	145	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	145	Active
+Error	BC30451	'depuracion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	145	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	148	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	150	Active
+Error	BC30562	'borrarTmpProduccion' is ambiguous between declarations in Modules 'Centrex.generales, Centrex.producciones'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	154	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	154	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	155	Active
+Error	BC30451	'frmCambios' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	175	Active
+Error	BC30451	'serversql' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	186	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	186	Active
+Error	BC30451	'versiondb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	186	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	187	Active
+Error	BC30451	'tabla_vieja' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	225	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	225	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	226	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	251	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	289	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	289	Active
+Error	BC30451	'tabla_vieja' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	289	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	290	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	292	Active
+Error	BC30451	'basedb' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	321	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	321	Active
+Error	BC30451	'tabla_vieja' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	321	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	327	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	414	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	416	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	436	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	441	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	443	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	453	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	460	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	469	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	473	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	473	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	476	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	489	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	490	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	492	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	494	Active
+Error	BC30311	Value of type 'pedido' cannot be converted to 'Integer'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	504	Active
+Error	BC30057	Too many arguments to 'Public Function CerrarPedido(idPedido As Integer) As Boolean'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	504	Active
+Error	BC30311	Value of type 'ItemEntity' cannot be converted to 'item'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	530	Active
+Error	BC30311	Value of type 'item' cannot be converted to 'ItemEntity'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	538	Active
+Error	BC30451	'showrpt' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	543	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	557	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	558	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	559	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	563	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	590	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	590	Active
+Error	BC30451	'pc' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	590	Active
+Error	BC30451	'depuracion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	590	Active
+Error	BC30451	'modificacionesDB' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	597	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	610	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	610	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	615	Active
+Error	BC30451	'borrado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	768	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	768	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	770	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	772	Active
+Error	BC30451	'activo' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	772	Active
+Error	BC30451	'depuracion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	779	Active
+Error	BC30451	'depuracion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	782	Active
+Error	BC30390	'producciones.Private Function GetDbContext() As CentrexDbContext' is not accessible in this context because it is 'Private'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	806	Active
+Error	BC30451	'itXPage' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	915	Active
+Error	BC30451	'itXPage' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	916	Active
+Error	BC30451	'itXPage' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	923	Active
+Error	BC30451	'itXPage' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	936	Active
+Error	BC30451	'itXPage' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	943	Active
+Error	BC30455	Argument not specified for parameter 'idUsuarioActual' of 'Public Function DuplicarPedido(idPedido As Integer, idUsuarioActual As Integer) As Boolean'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	1006	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	1010	Active
+Error	BC30451	'edita_pedido' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	1011	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	1011	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	1012	Active
+Error	BC30451	'edicion' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	1016	Active
+Error	BC30451	'tabla' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\Formularios\main.vb	1029	Active
+Error	BC30456	'Where' is not a member of 'DbSet(Of TmpOrdenCompraItemEntity)'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	150	Active
+Error	BC32023	Expression is of type '?', which is not a collection type.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	153	Active
+Error	BC30002	Type 'TmpOrdenCompraItemEntity' is not defined.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	188	Active
+Error	BC30456	'FirstOrDefault' is not a member of 'DbSet(Of TmpOrdenCompraItemEntity)'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	199	Active
+Error	BC30456	'Where' is not a member of 'DbSet(Of TmpOrdenCompraItemEntity)'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	232	Active
+Error	BC32023	Expression is of type '?', which is not a collection type.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	236	Active
+Error	BC36604	Late binding operations cannot be converted to an expression tree.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	242	Active
+Error	BC36604	Late binding operations cannot be converted to an expression tree.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	242	Active
+Error	BC30456	'Where' is not a member of 'DbSet(Of TmpOrdenCompraItemEntity)'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	269	Active
+Error	BC32023	Expression is of type '?', which is not a collection type.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	273	Active
+Error	BC36604	Late binding operations cannot be converted to an expression tree.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	276	Active
+Error	BC36604	Late binding operations cannot be converted to an expression tree.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	276	Active
+Error	BC30002	Type 'TmpOrdenCompraItemEntity' is not defined.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	304	Active
+Error	BC30456	'Where' is not a member of 'IQueryable'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	335	Active
+Error	BC30456	'Where' is not a member of 'IQueryable'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	338	Active
+Error	BC30456	'Where' is not a member of 'IQueryable'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	342	Active
+Error	BC30456	'FirstOrDefault' is not a member of 'IQueryable'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	345	Active
+Error	BC30456	'Where' is not a member of 'IQueryable'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	367	Active
+Error	BC30456	'Where' is not a member of 'IQueryable'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	370	Active
+Error	BC30456	'Where' is not a member of 'IQueryable'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	374	Active
+Error	BC30456	'FirstOrDefault' is not a member of 'IQueryable'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	377	Active
+Error	BC30451	'showrpt' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	394	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	395	Active
+Error	BC30451	'id' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	396	Active
+Error	BC30456	'Where' is not a member of 'DbSet(Of TmpOrdenCompraItemEntity)'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	408	Active
+Error	BC32023	Expression is of type '?', which is not a collection type.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	418	Active
+Error	BC32023	Expression is of type '?', which is not a collection type.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	427	Active
+Error	BC32023	Expression is of type '?', which is not a collection type.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	450	Active
+Error	BC36604	Late binding operations cannot be converted to an expression tree.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	458	Active
+Error	BC36604	Late binding operations cannot be converted to an expression tree.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	458	Active
+Error	BC30456	'FirstOrDefault' is not a member of 'DbSet(Of TmpOrdenCompraItemEntity)'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	491	Active
+Error	BC30456	'Where' is not a member of 'DbSet(Of TmpOrdenCompraItemEntity)'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	529	Active
+Error	BC32023	Expression is of type '?', which is not a collection type.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	533	Active
+Error	BC30456	'FirstOrDefault' is not a member of 'DbSet(Of TmpOrdenCompraItemEntity)'.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\ordenesCompras.vb	538	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\produccion.vb	165	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\produccion.vb	210	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\produccion.vb	256	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\produccion.vb	368	Active
+Error	BC30451	'usuario_logueado' is not declared. It may be inaccessible due to its protection level.	Centrex	S:\Users\Javi\Desktop\Centrex 2.0 - copia\funciones\produccion.vb	406	Active

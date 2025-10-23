@@ -1,0 +1,242 @@
+﻿{
+   "CodeGenerationMode": 5,
+   "ContextClassName": "CentrexDbContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "MinimumProductVersion": "2.6.1186",
+   "ModelNamespace": null,
+   "OutputContextPath": "Models",
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Centrex",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[cheques_a_cobrar]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[dbo].[datos_empresa]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[factura_cabecera]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[factura_detalle]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[presupuesto_cabecera]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[produccion_cabecera]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[produccion_detalle]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[remito_cabecera]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[remito_detalle]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_cerrarComprobanteCompra]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_cierre_diario]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_cobro_cabecera]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_comprobanteCompra_cabecera]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_comprobanteCompra_detalle_conceptos]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_comprobanteCompra_detalle_impuestos]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_comprobanteCompra_detalle_items]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_consulta_CC_Cliente]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_consulta_CC_Proveedor]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_detalle_cobros_cheques]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_detalle_cobros_fc_importes]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_detalle_cobros_retenciones]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_detalle_cobros_transferencias]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_detalle_pagos_cheques]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_detalle_pagos_fc_importes]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_detalle_pagos_transferencias]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertAsocItemsProduccionTMP]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertCobro]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertComprobanteCompra]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertImpuesto]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertItemsOCTMP]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertItemsProduccionTMP]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertItemsTMP]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertPago]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertTmpCobroRetencion]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_insertTmpTransferencia]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_pago_cabecera]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_proforma_cabecera]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_proforma_detalle]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_updateAsocItemsProduccionTMP]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_updateComprobanteCompra]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_updateItemsOCTMP]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_updateItemsProduccionTMP]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_updateItemsTMP]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[CalculoComprobante]",
+         "ObjectType": 2
+      },
+      {
+         "Name": "[dbo].[CantidadConLetra]",
+         "ObjectType": 2
+      },
+      {
+         "Name": "[dbo].[idultimoingreso]",
+         "ObjectType": 2
+      },
+      {
+         "Name": "[dbo].[idUltimoPresupuesto]",
+         "ObjectType": 2
+      },
+      {
+         "Name": "[dbo].[mascaraCUIT]",
+         "ObjectType": 2
+      },
+      {
+         "Name": "[dbo].[milesArgentinos]",
+         "ObjectType": 2
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": true,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": false,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": false,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": true,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": true,
+   "UseNodaTime": false,
+   "UseNullableReferences": true,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": true,
+   "UseT4Split": false
+}

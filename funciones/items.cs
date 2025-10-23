@@ -1,0 +1,216 @@
+﻿using System;
+using System.Data;
+using System.Linq;
+using System.Xml.Linq;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+using Centrex.Models;
+
+namespace Centrex
+{
+
+    static class mitem
+    {
+        // ************************************ FUNCIONES DE ITEMS ***************************
+        public static ItemEntity info_item(int id_item)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).FirstOrDefault(i => i.IdItem == Conversions.ToInteger(id_item));
+
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message.ToString());
+                return null;
+            }
+        }
+
+        public static ItemEntity info_itemDesc(string descript)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).FirstOrDefault(i => i.Descript == descript);
+
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message.ToString());
+                return null;
+            }
+        }
+
+        public static bool info_itemtmp(string _idItem, int _idUsuario, Guid _idUnico)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    int idItemInt = Conversions.ToInteger(_idItem);
+
+                    bool exists = context.TmpPedidoItemEntity.Any(t => t.IdItem == idItemInt && t.IdUsuario == _idUsuario && t.IdUnico == _idUnico);
+
+                    return exists;
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message.ToString());
+                return false;
+            }
+        }
+
+        public static bool additem(ItemEntity it)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    context.ItemEntity.Add(it);
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message);
+                return false;
+            }
+        }
+
+        public static bool addItemIVA(ItemImpuestoEntity ii)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    context.ItemImpuestoEntity.Add(ii);
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message);
+                return false;
+            }
+        }
+
+        public static ItemEntity infoItem_lastItem()
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).OrderByDescending(i => i.IdItem).FirstOrDefault();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message.ToString());
+                return null;
+            }
+        }
+
+        public static bool updateitem(ItemEntity it, bool borra = false)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    var itemEntity = context.ItemEntity.FirstOrDefault(i => i.IdItem == it.IdItem);
+
+                    if (itemEntity is not null)
+                    {
+                        if (borra == true)
+                        {
+                            // Solo actualizar el campo activo
+                            itemEntity.Activo = false;
+                        }
+                        else
+                        {
+                            // Actualizar todos los campos
+                            context.Entry(itemEntity).CurrentValues.SetValues(it);
+                        }
+
+                        context.SaveChanges();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message);
+                return false;
+            }
+        }
+
+        public static bool borraritem(ItemEntity it)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    var itemEntity = context.ItemEntity.FirstOrDefault(i => i.IdItem == it.IdItem);
+
+                    if (itemEntity is not null)
+                    {
+                        context.ItemEntity.Remove(itemEntity);
+                        context.SaveChanges();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message.ToString());
+                return false;
+            }
+        }
+
+        public static int existeitem(string i)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    var itemEntity = context.ItemEntity.FirstOrDefault(item => item.Item.Contains(i));
+
+                    if (itemEntity is not null)
+                    {
+                        return itemEntity.IdItem;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message.ToString());
+                return -1;
+            }
+        }
+        // ************************************ FUNCIONES DE ITEMS ***************************
+    }
+}
