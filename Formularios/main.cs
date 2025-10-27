@@ -169,7 +169,7 @@ namespace Centrex
                 var withBlock = My.MyProject.Application.Info.Version;
                 tss_version.Text = "Versión: " + My.MyProject.Application.Info.Version.Major.ToString() + "." + My.MyProject.Application.Info.Version.Minor.ToString() + "." + My.MyProject.Application.Info.Version.Revision.ToString();
                 tss_dbInfo.Text = "ServerSQL: " + VariablesGlobales.serversql + " - DB: " + VariablesGlobales.basedb + " - Ver.DB: " + VariablesGlobales.versiondb;
-                tss_usuario_logueado.Text = "Usuario logueado: " + VariablesGlobales.usuario_logueado.nombre;
+                tss_usuario_logueado.Text = "Usuario logueado: " + VariablesGlobales.usuario_logueado.Nombre;
             }
             tss_hora.Text = "Hora: " + Conversions.ToString(DateAndTime.TimeOfDay);
 

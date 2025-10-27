@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
@@ -16,9 +17,19 @@ namespace Centrex
             var encripta = new EncriptarType();
             var up = new usuario_perfil();
 
+            var ordenPerfiles = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
             var argcombo = cmb_perfil;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_perfil, nombre FROM perfiles ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_perfil"));
+            generales.Cargar_Combo(
+                ref argcombo,
+                entidad: "PerfilEntity",
+                displaymember: "Nombre",
+                valuemember: "IdPerfil",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenPerfiles);
             cmb_perfil = argcombo;
+            cmb_perfil.SelectedIndex = -1;
             cmb_perfil.Text = "Seleccione un perfil...";
 
             chk_activo.Checked = true;

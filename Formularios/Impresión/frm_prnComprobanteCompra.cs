@@ -1,8 +1,16 @@
+﻿/*
+ * FORMULARIO DE IMPRESIÓN DE COMPROBANTES DE COMPRA - COMENTADO TEMPORALMENTE
+ * Este formulario maneja la impresión de comprobantes de compra usando ReportViewer
+ * Se comenta temporalmente durante la migración de VB.NET a C# y EF Core
+ * 
+ * TODO: Migrar completamente a EF Core y actualizar lógica de impresión
+ */
+
+/*
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using Microsoft.Reporting.WinForms;
 using Microsoft.VisualBasic;
 
 namespace Centrex
@@ -20,65 +28,67 @@ namespace Centrex
 
         private void frm_prnComprobanteCompra_Load(object sender, EventArgs e)
         {
-            if (ID == 0)
-            {
-                Interaction.MsgBox("No se especific� un ID de comprobante de compra v�lido.", Constants.vbCritical);
-                return;
-            }
+//            if (ID == 0)
+//            {
+//                Interaction.MsgBox("No se especific� un ID de comprobante de compra v�lido.", Constants.vbCritical);
+//                return;
+//            }
 
-            try
-            {
-                using (var context = new CentrexDbContext())
-                {
-                    // === Cargar comprobante con sus relaciones ===
-                    var comprobante = context.ComprobantesCompras.Include(c => c.Proveedor).Include(c => c.Items).Include(c => c.impuestos).Include(c => c.conceptos).FirstOrDefault(c => c.IdComprobanteCompra == ID);
-
-
+//            try
+//            {
+//                using (var context = new CentrexDbContext())
+//                {
+//                    // === Cargar comprobante con sus relaciones ===
+//                    var comprobante = context.ComprobantesCompras.Include(c => c.Proveedor).Include(c => c.Items).Include(c => c.impuestos).Include(c => c.conceptos).FirstOrDefault(c => c.IdComprobanteCompra == ID);
 
 
 
-                    if (comprobante is null)
-                    {
-                        Interaction.MsgBox("No se encontr� el comprobante de compra.", Constants.vbCritical);
-                        return;
-                    }
 
-                    // === Datos base ===
-                    var empresa = context.Empresas.FirstOrDefault();
-                    var items = comprobante.Items.ToList();
-                    var impuestos = comprobante.impuestos.ToList();
-                    var conceptos = comprobante.conceptos.ToList();
 
-                    // === Configurar reporte ===
-                    string archivoRpt = "Centrex.rpt_comprobanteCompra.rdlc";
-                    string fileName = $"Comprobante compra {ID}";
+//                    if (comprobante is null)
+//                    {
+//                        Interaction.MsgBox("No se encontr� el comprobante de compra.", Constants.vbCritical);
+//                        return;
+//                    }
 
-                    rpt_view.ProcessingMode = ProcessingMode.Local;
-                    rpt_view.LocalReport.ReportEmbeddedResource = archivoRpt;
-                    rpt_view.LocalReport.DataSources.Clear();
+//                    // === Datos base ===
+//                    var empresa = context.Empresas.FirstOrDefault();
+//                    var items = comprobante.Items.ToList();
+//                    var impuestos = comprobante.impuestos.ToList();
+//                    var conceptos = comprobante.conceptos.ToList();
 
-                    // === Cargar fuentes de datos ===
-                    if (empresa is not null)
-                    {
-                        rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_Empresa", new List<EmpresaEntity>() { empresa }));
-                    }
+//#if false
+//                    string archivoRpt = "Centrex.rpt_comprobanteCompra.rdlc";
+//                    string fileName = $"Comprobante compra {ID}";
 
-                    rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_ComprobanteCompraCabecera", new List<ComprobanteCompraEntity>() { comprobante }));
-                    rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_ComprobanteCompraDetalleItems", items));
-                    rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_ComprobanteCompraDetalleImpuestos", impuestos));
-                    rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_ComprobanteCompraDetalleConceptos", conceptos));
+//                    rpt_view.ProcessingMode = ProcessingMode.Local;
+//                    rpt_view.LocalReport.ReportEmbeddedResource = archivoRpt;
+//                    rpt_view.LocalReport.DataSources.Clear();
 
-                    // === Ajustes de impresi�n ===
-                    rpt_view.LocalReport.DisplayName = fileName;
-                    rpt_view.PrinterSettings.Copies = 2;
-                    rpt_view.RefreshReport();
-                }
-            }
+//                    if (empresa is not null)
+//                    {
+//                        rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_Empresa", new List<EmpresaEntity>() { empresa }));
+//                    }
 
-            catch (Exception ex)
-            {
-                Interaction.MsgBox("Error al generar el comprobante de compra: " + ex.Message, Constants.vbCritical);
-            }
+//                    rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_ComprobanteCompraCabecera", new List<ComprobanteCompraEntity>() { comprobante }));
+//                    rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_ComprobanteCompraDetalleItems", items));
+//                    rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_ComprobanteCompraDetalleImpuestos", impuestos));
+//                    rpt_view.LocalReport.DataSources.Add(new ReportDataSource("DS_ComprobanteCompraDetalleConceptos", conceptos));
+
+//                    rpt_view.LocalReport.DisplayName = fileName;
+//                    rpt_view.PrinterSettings.Copies = 2;
+//                    rpt_view.RefreshReport();
+//#else
+//                    Interaction.MsgBox("La vista de ReportViewer para comprobantes de compra se encuentra deshabilitada temporalmente.", MsgBoxStyle.Information, "Centrex");
+//#endif
+//                }
+//            }
+
+//            catch (Exception ex)
+//            {
+//                Interaction.MsgBox("Error al generar el comprobante de compra: " + ex.Message, Constants.vbCritical);
+//            }
         }
     }
 }
+*/

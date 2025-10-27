@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
@@ -29,27 +29,27 @@ namespace Centrex
                     if (string.IsNullOrEmpty(id_ordenCompra))
                     {
                         // Obtener la última orden de compra
-                        ordenEntity = context.OrdenesCompras.OrderByDescending(o => o.id_ordenCompra).FirstOrDefault();
+                        ordenEntity = context.OrdenCompraEntity.OrderByDescending(o => o.IdOrdenCompra).FirstOrDefault();
 
                     }
                     else
                     {
                         // Obtener orden específica
                         int idOrden = Conversions.ToInteger(id_ordenCompra);
-                        ordenEntity = context.OrdenesCompras.FirstOrDefault(o => o.id_ordenCompra == idOrden);
+                        ordenEntity = context.OrdenCompraEntity.FirstOrDefault(o => o.IdOrdenCompra == idOrden);
                     }
 
                     if (ordenEntity is not null)
                     {
                         // Calcular subtotal, iva y total desde los items
-                        var items = context.OrdenesComprasItems.Where(i => i.id_ordenCompra == ordenEntity.id_ordenCompra).ToList();
+                        var items = context.OrdenCompraItemEntity.Where(i => i.IdOrdenCompra == ordenEntity.IdOrdenCompra).ToList();
 
 
-                        decimal subtotal = items.Sum(i => i.cantidad * i.precio);
+                        decimal subtotal = items.Sum(i => i.Cantidad * i.Precio);
                         decimal iva = 0m;
                         decimal total = subtotal + iva;
 
-                        tmp.id_ordenCompra = Conversions.ToInteger(ordenEntity.id_ordenCompra.ToString());
+                        tmp.id_ordenCompra = Conversions.ToInteger(ordenEntity.IdOrdenCompra.ToString());
                         tmp.IdProveedor = Conversions.ToInteger(ordenEntity.IdProveedor.HasValue ? ordenEntity.IdProveedor.Value.ToString() : "0");
                         tmp.fecha_carga = ordenEntity.fecha.ToString("dd/MM/yyyy");
                         tmp.fecha_comprobante = ordenEntity.fecha.ToString("dd/MM/yyyy");
@@ -111,7 +111,7 @@ namespace Centrex
                     nuevaOrden.observaciones = oc.notas ?? "";
                     nuevaOrden.activo = true;
 
-                    context.OrdenesCompras.Add(nuevaOrden);
+                    context.OrdenCompraEntity.Add(nuevaOrden);
                     context.SaveChanges();
 
                     return true;
@@ -134,7 +134,7 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     int idOrden = oc.id_ordenCompra;
-                    var ordenEntity = context.OrdenesCompras.FirstOrDefault(o => o.id_ordenCompra == idOrden);
+                    var ordenEntity = context.OrdenCompraEntity.FirstOrDefault(o => o.id_ordenCompra == idOrden);
 
                     if (ordenEntity is null)
                     {
@@ -191,22 +191,22 @@ namespace Centrex
                     int idOrden = oc.id_ordenCompra;
 
                     // Borrar items temporales
-                    var tmpItems = context.TmpOrdenCompraItems.AsQueryable().Where(t => t.IdOrdenCompra == idOrden).ToList();
+                    var tmpItemEntity = context.TmpOcItemEntity.AsQueryable().Where(t => t.IdOrdenCompra == idOrden).ToList();
 
-                    foreach (var item in tmpItems)
-                        context.TmpOrdenCompraItems.Remove((TmpOCItemEntity)item);
+                    foreach (var item in tmpItemEntity)
+                        context.TmpOcItemEntity.Remove((TmpOCItemEntity)item);
 
                     // Borrar items de la orden
-                    var items = context.OrdenesComprasItems.Where(i => i.IdOrdenCompra == idOrden).ToList();
+                    var items = context.OrdenCompraItemEntity.Where(i => i.IdOrdenCompra == idOrden).ToList();
 
                     foreach (var item in items)
-                        context.OrdenesComprasItems.Remove((OrdenCompraItemEntity)item);
+                        context.OrdenCompraItemEntity.Remove((OrdenCompraItemEntity)item);
 
                     // Borrar orden
-                    var ordenEntity = context.OrdenesCompras.FirstOrDefault(o => o.IdOrdenCompra == idOrden);
+                    var ordenEntity = context.OrdenCompraEntity.FirstOrDefault(o => o.IdOrdenCompra == idOrden);
                     if (ordenEntity is not null)
                     {
-                        context.OrdenesCompras.Remove(ordenEntity);
+                        context.OrdenCompraEntity.Remove(ordenEntity);
                     }
 
                     context.SaveChanges();
@@ -240,12 +240,12 @@ namespace Centrex
                         nuevoTmpItem.Descript = i.descript;
                         nuevoTmpItem.CantidadRecibida = 0;
 
-                        context.TmpOrdenCompraItems.Add(nuevoTmpItem);
+                        context.TmpOcItemEntity.Add(nuevoTmpItem);
                     }
                     else
                     {
                         // Actualizar item temporal existente
-                        var tmpItem = context.TmpOrdenCompraItems.AsQueryable().FirstOrDefault(t => t.IdTmpOcItem == id_tmpOCItem);
+                        var tmpItem = context.TmpOcItemEntity.AsQueryable().FirstOrDefault(t => t.IdTmpOcItem == id_tmpOCItem);
                         if (tmpItem is not null)
                         {
                             tmpItem.IdItem = i.id_item;
@@ -287,17 +287,17 @@ namespace Centrex
                     }
 
                     // Obtener items temporales activos
-                    var tmpItems = context.TmpOrdenCompraItems.AsQueryable().Where(t => t.activo == true).ToList();
+                    var tmpItemEntity = context.TmpOcItemEntity.AsQueryable().Where(t => t.activo == true).ToList();
 
 
-                    foreach (var tmpItem in tmpItems)
+                    foreach (var tmpItem in tmpItemEntity)
                     {
                         bool existe = false;
 
                         // Si tiene IdOcItem, buscar y actualizar
                         if (tmpItem.IdOcItem.HasValue && tmpItem.IdOcItem.Value > 0)
                         {
-                            var itemExistente = context.OrdenesComprasItems.FirstOrDefault(oi => oi.IdOrdenCompraItem == tmpItem.IdOcItem.Value && oi.IdOrdenCompra == id_ordenCompra);
+                            var itemExistente = context.OrdenCompraItemEntity.FirstOrDefault(oi => oi.IdOrdenCompraItem == tmpItem.IdOcItem.Value && oi.IdOrdenCompra == id_ordenCompra);
 
                             if (itemExistente is not null)
                             {
@@ -319,25 +319,25 @@ namespace Centrex
                             nuevoItem.precio = tmpItem.precio;
                             nuevoItem.Observaciones = tmpItem.descript;
 
-                            context.OrdenesComprasItems.Add(nuevoItem);
+                            context.OrdenCompraItemEntity.Add(nuevoItem);
                         }
                     }
 
                     context.SaveChanges();
 
                     // Borrar items que están en la BD pero marcados como inactivos en temporal
-                    var tmpItemsInactivos = context.TmpOrdenCompraItems.AsQueryable().Where(t => (t.activo is { } arg1 ? arg1 == false : (bool?)null) && t.IdOrdenCompra == id_ordenCompra).ToList();
+                    var tmpItemEntityInactivos = context.TmpOcItemEntity.AsQueryable().Where(t => (t.activo is { } arg1 ? arg1 == false : (bool?)null) && t.IdOrdenCompra == id_ordenCompra).ToList();
 
 
-                    foreach (var tmpInactivo in tmpItemsInactivos)
+                    foreach (var tmpInactivo in tmpItemEntityInactivos)
                     {
                         if (Conversions.ToBoolean(((dynamic)tmpInactivo).id_ocItem.HasValue))
                         {
-                            var itemABorrar = context.OrdenesComprasItems.FirstOrDefault(oi => Operators.ConditionalCompareObjectEqual(oi.id_ordenCompraItem, tmpInactivo.id_ocItem.Value, false));
+                            var itemABorrar = context.OrdenCompraItemEntity.FirstOrDefault(oi => Operators.ConditionalCompareObjectEqual(oi.id_ordenCompraItem, tmpInactivo.id_ocItem.Value, false));
 
                             if (itemABorrar is not null)
                             {
-                                context.OrdenesComprasItems.Remove(itemABorrar);
+                                context.OrdenCompraItemEntity.Remove(itemABorrar);
                             }
                         }
                     }
@@ -362,7 +362,7 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var items = context.OrdenesComprasItems.Where(i => i.id_ordenCompra == id_ordenCompra).ToList();
+                    var items = context.OrdenCompraItemEntity.Where(i => i.id_ordenCompra == id_ordenCompra).ToList();
 
 
                     foreach (var item in items)
@@ -377,7 +377,7 @@ namespace Centrex
                         tmpItem.descript = item.observaciones;
                         tmpItem.cantidad_recibida = 0; // No existe en la entidad OrdenCompraItem
 
-                        context.TmpOrdenCompraItems.Add(tmpItem);
+                        context.TmpOcItemEntity.Add(tmpItem);
                     }
 
                     context.SaveChanges();
@@ -400,19 +400,19 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var query = context.TmpOrdenCompraItems.AsQueryable();
+                    var query = context.TmpOcItemEntity.AsQueryable();
 
                     // Aplicar filtros
-                    query = query.Where(t => t.id_item == id_item);
+                    query = query.Where(t => t.IdItem == id_item);
 
                     if (id != -1)
                     {
-                        query = query.Where(t => t.id_ordenCompra == id);
+                        query = query.Where(t => t.IdOrdenCompra == id);
                     }
 
                     if (id_tmpOCItem != -1)
                     {
-                        query = query.Where(t => t.id_tmpOCItem == id_tmpOCItem);
+                        query = query.Where(t => t.IdTmpOcitem == id_tmpOCItem);
                     }
 
                     var tmpItem = query.FirstOrDefault();
@@ -442,26 +442,26 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var query = context.TmpOrdenCompraItems.AsQueryable();
+                    var query = context.TmpOcItemEntity.AsQueryable();
 
                     // Aplicar filtros
-                    query = query.Where(t => t.id_item == id_item);
+                    query = query.Where(t => t.IdItem == id_item);
 
                     if (id != -1)
                     {
-                        query = query.Where(t => t.id_ordenCompra == id);
+                        query = query.Where(t => t.IdOrdenCompra == id);
                     }
 
                     if (id_tmpOCItem != -1)
                     {
-                        query = query.Where(t => t.id_tmpOCItem == id_tmpOCItem);
+                        query = query.Where(t => t.IdTmpOcitem == id_tmpOCItem);
                     }
 
                     var tmpItem = query.FirstOrDefault();
 
                     if (tmpItem is not null)
                     {
-                        return (double)tmpItem.precio;
+                        return (double)tmpItem.Precio;
                     }
                     else
                     {
@@ -496,16 +496,16 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     // Obtener items temporales activos
-                    var tmpItems = context.TmpOrdenCompraItems.AsQueryable().Where(t => t.activo == true).OrderBy(t => t.IdTmpOcItem).ToList();
+                    var tmpItemEntity = context.TmpOcItemEntity.AsQueryable().Where(t => t.activo == true).OrderBy(t => t.IdTmpOcItem).ToList();
 
 
 
                     double subtotal = 0d;
-                    double totalImpuestos = 0d;
+                    double totalImpuestoEntity = 0d;
                     double total = 0d;
 
                     // Calcular subtotal
-                    foreach (var tmpItem in tmpItems)
+                    foreach (var tmpItem in tmpItemEntity)
                     {
                         decimal cantidad = Conversions.ToDecimal(((dynamic)tmpItem).Cantidad);
                         decimal precio = Conversions.ToDecimal(((dynamic)tmpItem).Precio);
@@ -515,19 +515,19 @@ namespace Centrex
                     txt_totalOriginal.Text = subtotal.ToString();
 
                     // Calcular impuestos
-                    foreach (var tmpItem in tmpItems)
+                    foreach (var tmpItem in tmpItemEntity)
                     {
                         decimal precio = Conversions.ToDecimal(((dynamic)tmpItem).Precio);
                         decimal cantidad = Conversions.ToDecimal(((dynamic)tmpItem).cantidad);
-                        double impuestosItem = ordenesCompras.calculaImpuestosItem(((dynamic)tmpItem).id_tmpOCItem.ToString(), Conversions.ToBoolean(((dynamic)tmpItem).id_item.HasValue) ? ((dynamic)tmpItem).id_item.Value.ToString() : "0");
+                        double impuestosItem = ordenesCompras.calculaImpuestoEntityItem(((dynamic)tmpItem).id_tmpOCItem.ToString(), Conversions.ToBoolean(((dynamic)tmpItem).id_item.HasValue) ? ((dynamic)tmpItem).id_item.Value.ToString() : "0");
                         double totalImpuestoItem = impuestosItem * (double)(precio * cantidad) / 100d;
-                        totalImpuestos += totalImpuestoItem;
+                        totalImpuestoEntity += totalImpuestoItem;
                     }
 
-                    total = subtotal + totalImpuestos;
+                    total = subtotal + totalImpuestoEntity;
 
                     txt_subTotal.Text = Math.Round(subtotal, 2).ToString();
-                    txt_impuestos.Text = Math.Round(totalImpuestos, 2).ToString();
+                    txt_impuestos.Text = Math.Round(totalImpuestoEntity, 2).ToString();
                     txt_total.Text = Math.Round(total, 2).ToString();
 
                     // Cargar DataGrid
@@ -539,7 +539,7 @@ namespace Centrex
                     dt.Columns.Add("Precio", typeof(decimal));
                     dt.Columns.Add("Subtotal", typeof(decimal));
 
-                    foreach (var tmpItem in tmpItems)
+                    foreach (var tmpItem in tmpItemEntity)
                     {
                         var row = dt.NewRow();
                         row["ID"] = ((dynamic)tmpItem).id_tmpOCItem.ToString() + "-" + (Conversions.ToBoolean(((dynamic)tmpItem).id_item.HasValue) ? ((dynamic)tmpItem).id_item.Value.ToString() : "0");
@@ -549,10 +549,10 @@ namespace Centrex
                         string descripcion = Conversions.ToString(((dynamic)tmpItem).descript);
                         if (Conversions.ToBoolean(((dynamic)tmpItem).id_item.HasValue && Operators.ConditionalCompareObjectGreater(((dynamic)tmpItem).id_item.Value, 0, false)))
                         {
-                            var itemEntity = context.Items.FirstOrDefault(i => Operators.ConditionalCompareObjectEqual(i.IdItem, tmpItem.id_item.Value, false));
+                            var itemEntity = context.ItemEntity.FirstOrDefault(i => Operators.ConditionalCompareObjectEqual(i.IdItem, tmpItem.IdItem.Value, false));
                             if (itemEntity is not null)
                             {
-                                descripcion = itemEntity.descript;
+                                descripcion = itemEntity.Descript;
                             }
                         }
 
@@ -578,7 +578,7 @@ namespace Centrex
         /// <summary>
     /// Calcula los impuestos totales de un item usando Entity Framework
     /// </summary>
-        public static double calculaImpuestosItem(string id_tmpOCItem, string id_item)
+        public static double calculaImpuestoEntityItem(string id_tmpOCItem, string id_item)
         {
             try
             {
@@ -588,7 +588,7 @@ namespace Centrex
                     int idTmpInt = Conversions.ToInteger(id_tmpOCItem);
 
                     // Verificar que el item temporal existe
-                    var tmpItem = context.TmpOrdenCompraItems.AsQueryable().FirstOrDefault(t => t.IdTmpOcItem == idTmpInt && t.IdItem == idItemInt && (t.activo is { } arg2 ? arg2 == true : (bool?)null));
+                    var tmpItem = context.TmpOcItemEntity.AsQueryable().FirstOrDefault(t => t.IdTmpOcitem == idTmpInt && t.IdItem == idItemInt && (t.Activo is { } arg2 ? arg2 == true : (bool?)null));
 
                     if (tmpItem is null)
                     {
@@ -596,16 +596,16 @@ namespace Centrex
                     }
 
                     // Obtener impuestos del item
-                    var impuestos = context.ItemsImpuestos.Where(ii => ii.IdItem == idItemInt && ii.activo == true).Join(context.Impuestos, ii => ii.IdImpuesto, i => i.IdImpuesto, (ii, i) => new { i.Porcentaje }).ToList();
+                    var impuestos = context.ItemImpuestoEntity.Where(ii => ii.IdItem == idItemInt && ii.Activo == true).Join(context.ImpuestoEntity, ii => ii.IdImpuesto, i => i.IdImpuesto, (ii, i) => new { i.Porcentaje }).ToList();
 
 
 
-                    double totalImpuestos = 0d;
+                    double totalImpuestoEntity = 0d;
 
                     foreach (var imp in impuestos)
-                        totalImpuestos = Conversions.ToDouble(totalImpuestos + ((dynamic)imp).Porcentaje);
+                        totalImpuestoEntity = Conversions.ToDouble(totalImpuestoEntity + ((dynamic)imp).Porcentaje);
 
-                    return totalImpuestos;
+                    return totalImpuestoEntity;
                 }
             }
             catch (Exception ex)
@@ -627,20 +627,20 @@ namespace Centrex
                     if (id_tmpOCItem_seleccionado == -1)
                     {
                         // Borrar todos los items inactivos
-                        var itemsInactivos = context.TmpOrdenCompraItems.AsQueryable().Where(t => t.activo == false).ToList();
+                        var itemsInactivos = context.TmpOcItemEntity.AsQueryable().Where(t => t.Activo == false).ToList();
 
 
                         foreach (var item in itemsInactivos)
-                            context.TmpOrdenCompraItems.Remove(item);
+                            context.TmpOcItemEntity.Remove(item);
                     }
                     else
                     {
                         // Marcar como inactivo un item específico
-                        var tmpItem = context.TmpOrdenCompraItems.AsQueryable().FirstOrDefault(t => t.IdTmpOcItem == id_tmpOCItem_seleccionado);
+                        var tmpItem = context.TmpOcItemEntity.AsQueryable().FirstOrDefault(t => t.IdTmpOcitem == id_tmpOCItem_seleccionado);
 
                         if (tmpItem is not null)
                         {
-                            tmpItem.activo = false;
+                            tmpItem.Activo = false;
                         }
                     }
 

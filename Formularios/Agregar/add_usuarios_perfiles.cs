@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 
@@ -13,16 +16,48 @@ namespace Centrex
         }
         private void add_usuarios_perfiles_Load(object sender, EventArgs e)
         {
-            // Cargo todos los usuarios
-            var argcombo = cmb_usuarios;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_usuario, CONCAT(usuario, ' - ', nombre) AS 'nombre' FROM usuarios ORDER BY usuario ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_usuario"));
-            cmb_usuarios = argcombo;
-            cmb_usuarios.Text = "Selecione un permiso...";
+            // Cargo todos los usuarios con descripción combinada
+            try
+            {
+                using var ctx = new CentrexDbContext();
+                var usuarios = ctx.UsuarioEntity
+                    .AsNoTracking()
+                    .OrderBy(u => u.Usuario)
+                    .Select(u => new
+                    {
+                        IdUsuario = u.IdUsuario,
+                        Descripcion = u.Usuario + " - " + u.Nombre
+                    })
+                    .ToList();
+
+                cmb_usuarios.DataSource = usuarios;
+                cmb_usuarios.DisplayMember = "Descripcion";
+                cmb_usuarios.ValueMember = "IdUsuario";
+                cmb_usuarios.SelectedIndex = -1;
+                cmb_usuarios.Text = "Seleccione un usuario...";
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al cargar usuarios: {ex.Message}", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                cmb_usuarios.DataSource = null;
+                cmb_usuarios.Items.Clear();
+            }
+
             // Cargo todos los perfiles
+            var ordenPerfiles = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
             var argcombo1 = cmb_perfiles;
-            generales.Cargar_Combo(ref argcombo1, "SELECT id_perfil, nombre FROM perfiles ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_perfil"));
+            generales.Cargar_Combo(
+                ref argcombo1,
+                entidad: "PerfilEntity",
+                displaymember: "Nombre",
+                valuemember: "IdPerfil",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenPerfiles);
             cmb_perfiles = argcombo1;
-            cmb_usuarios.Text = "Selecione un perfil...";
+            cmb_perfiles.SelectedIndex = -1;
+            cmb_perfiles.Text = "Seleccione un perfil...";
 
 
             if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
@@ -75,7 +110,10 @@ namespace Centrex
 
             if (chk_secuencia.Checked == true)
             {
-                cmb_perfiles.Text = "Selecione un perfil...";
+                cmb_usuarios.SelectedIndex = -1;
+                cmb_usuarios.Text = "Seleccione un usuario...";
+                cmb_perfiles.SelectedIndex = -1;
+                cmb_perfiles.Text = "Seleccione un perfil...";
             }
             else
             {

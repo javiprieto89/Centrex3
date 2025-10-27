@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
@@ -32,10 +33,12 @@ namespace Centrex
                     withBlock.Telefono = txt_telefono.Text;
                     withBlock.Celular = txt_celular.Text;
                     withBlock.Email = txt_email.Text;
+                    withBlock.IdPaisFiscal = ToNullableInt(cmb_paisFiscal.SelectedValue);
                     withBlock.IdProvinciaFiscal = ToNullableInt(cmb_provinciaFiscal.SelectedValue);
                     withBlock.DireccionFiscal = txt_direccionFiscal.Text;
                     withBlock.LocalidadFiscal = txt_localidadFiscal.Text;
                     withBlock.CpFiscal = txt_cpFiscal.Text;
+                    withBlock.IdPaisEntrega = ToNullableInt(cmb_paisEntrega.SelectedValue);
                     withBlock.IdProvinciaEntrega = ToNullableInt(cmb_provinciaEntrega.SelectedValue);
                     withBlock.DireccionEntrega = txt_direccionEntrega.Text;
                     withBlock.LocalidadEntrega = txt_localidadEntrega.Text;
@@ -65,7 +68,10 @@ namespace Centrex
             cl.Telefono = txt_telefono.Text;
             cl.Celular = txt_celular.Text;
             cl.Email = txt_email.Text;
+            cl.IdPaisFiscal = ToNullableInt(cmb_paisFiscal.SelectedValue);
+            cl.IdPaisEntrega = ToNullableInt(cmb_paisEntrega.SelectedValue);
             cl.IdProvinciaFiscal = ToNullableInt(cmb_provinciaFiscal.SelectedValue);
+            cl.IdProvinciaEntrega = ToNullableInt(cmb_provinciaEntrega.SelectedValue);            
             cl.DireccionFiscal = txt_direccionFiscal.Text;
             cl.LocalidadFiscal = txt_localidadFiscal.Text;
             cl.CpFiscal = txt_cpFiscal.Text;
@@ -73,6 +79,7 @@ namespace Centrex
             // If cmb_provinciaEntrega.Text = "" Then .id_provincia_entrega = cmb_provinciaFiscal.SelectedValue Else .id_provincia_entrega = cmb_provinciaEntrega.SelectedValue
             if (string.IsNullOrEmpty(txt_direccionEntrega.Text))
             {
+                cl.IdPaisEntrega = cl.IdPaisFiscal;
                 cl.IdProvinciaEntrega = cl.IdProvinciaFiscal;
                 cl.DireccionEntrega = txt_direccionFiscal.Text;
                 cl.LocalidadEntrega = txt_localidadFiscal.Text;
@@ -80,6 +87,7 @@ namespace Centrex
             }
             else
             {
+                cl.IdPaisFiscal = ToNullableInt(cmb_paisFiscal.SelectedValue);
                 cl.IdProvinciaEntrega = ToNullableInt(cmb_provinciaEntrega.SelectedValue);
                 cl.DireccionEntrega = txt_direccionEntrega.Text;
                 cl.LocalidadEntrega = txt_localidadEntrega.Text;
@@ -117,12 +125,28 @@ namespace Centrex
                 txt_celular.Text = "";
                 txt_email.Text = "";
                 cmb_paisFiscal.SelectedValue = VariablesGlobales.id_pais_default;
-                cmb_provinciaFiscal.SelectedValue = VariablesGlobales.id_provincia_default;
+                CargarProvinciasPorPais(ref cmb_provinciaFiscal, cmb_paisFiscal.SelectedValue);
+                if (VariablesGlobales.id_provincia_default > 0 && cmb_provinciaFiscal.Items.Count > 0)
+                {
+                    cmb_provinciaFiscal.SelectedValue = VariablesGlobales.id_provincia_default;
+                }
+                else
+                {
+                    cmb_provinciaFiscal.SelectedIndex = -1;
+                }
                 txt_direccionFiscal.Text = "";
                 txt_localidadFiscal.Text = "";
                 txt_cpFiscal.Text = "";
                 cmb_paisEntrega.SelectedValue = VariablesGlobales.id_pais_default;
-                cmb_provinciaEntrega.SelectedValue = VariablesGlobales.id_provincia_default;
+                CargarProvinciasPorPais(ref cmb_provinciaEntrega, cmb_paisEntrega.SelectedValue);
+                if (VariablesGlobales.id_provincia_default > 0 && cmb_provinciaEntrega.Items.Count > 0)
+                {
+                    cmb_provinciaEntrega.SelectedValue = VariablesGlobales.id_provincia_default;
+                }
+                else
+                {
+                    cmb_provinciaEntrega.SelectedIndex = -1;
+                }
                 txt_direccionEntrega.Text = "";
                 txt_localidadEntrega.Text = "";
                 txt_cpEntrega.Text = "";
@@ -151,39 +175,83 @@ namespace Centrex
 
         private void add_cliente_Load(object sender, EventArgs e)
         {
-            // Cargo todos los paises de dirección fiscal
-            var argcombo = cmb_paisFiscal;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_pais, pais FROM paises ORDER BY pais ASC", VariablesGlobales.basedb, "pais", Conversions.ToInteger("id_pais"));
-            cmb_paisFiscal = argcombo;
+            var ordenPais = OrdenAscendente("Pais");
+            var ordenProvincia = OrdenAscendente("Provincia");
+            var ordenClaseFiscal = OrdenAscendente("Descript");
+            var ordenDocumento = OrdenAscendente("Documento");
 
-            // Cargo todas las provincias de direccion fiscal
-            var argcombo1 = cmb_provinciaFiscal;
-            generales.Cargar_Combo(ref argcombo1, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + cmb_paisFiscal.SelectedValue.ToString() + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
-            cmb_provinciaFiscal = argcombo1;
+            generales.Cargar_Combo(
+                ref cmb_paisFiscal,
+                entidad: "PaisEntity",
+                displaymember: "Pais",
+                valuemember: "IdPais",
+                predet: -1,
+                soloActivos: false,
+                orden: ordenPais);
 
-            // Cargo todos los paises de dirección de entrega
-            var argcombo2 = cmb_paisEntrega;
-            generales.Cargar_Combo(ref argcombo2, "SELECT id_pais, pais FROM paises ORDER BY pais ASC", VariablesGlobales.basedb, "pais", Conversions.ToInteger("id_pais"));
-            cmb_paisEntrega = argcombo2;
-            cmb_paisEntrega.Text = "";
+            if (VariablesGlobales.id_pais_default > 0 && cmb_paisFiscal.Items.Count > 0)
+            {
+                cmb_paisFiscal.SelectedValue = VariablesGlobales.id_pais_default;
+            }
 
-            // Cargo todas las provincias de direccion de entrega
-            var argcombo3 = cmb_provinciaEntrega;
-            generales.Cargar_Combo(ref argcombo3, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + cmb_paisEntrega.SelectedValue.ToString() + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
-            cmb_provinciaEntrega = argcombo3;
-            cmb_provinciaEntrega.Text = "";
+            CargarProvinciasPorPais(ref cmb_provinciaFiscal, cmb_paisFiscal.SelectedValue, ordenProvincia);
+            if (VariablesGlobales.id_provincia_default > 0 && cmb_provinciaFiscal.Items.Count > 0)
+            {
+                cmb_provinciaFiscal.SelectedValue = VariablesGlobales.id_provincia_default;
+            }
 
-            // Cargo todos las clases fiscales
-            var argcombo4 = cmb_claseFiscal;
-            generales.Cargar_Combo(ref argcombo4, "SELECT id_claseFiscal, descript FROM sys_ClasesFiscales ORDER BY descript ASC", VariablesGlobales.basedb, "descript", Conversions.ToInteger("id_claseFiscal"));
-            cmb_claseFiscal = argcombo4;
+            generales.Cargar_Combo(
+                ref cmb_paisEntrega,
+                entidad: "PaisEntity",
+                displaymember: "Pais",
+                valuemember: "IdPais",
+                predet: -1,
+                soloActivos: false,
+                orden: ordenPais);
+
+            if (VariablesGlobales.id_pais_default > 0 && cmb_paisEntrega.Items.Count > 0)
+            {
+                cmb_paisEntrega.SelectedValue = VariablesGlobales.id_pais_default;
+            }
+            else
+            {
+                cmb_paisEntrega.SelectedIndex = -1;
+            }
+
+            CargarProvinciasPorPais(ref cmb_provinciaEntrega, cmb_paisEntrega.SelectedValue, ordenProvincia);
+            if (cmb_paisEntrega.SelectedIndex == -1)
+            {
+                cmb_provinciaEntrega.DataSource = null;
+                cmb_provinciaEntrega.Items.Clear();
+                cmb_provinciaEntrega.SelectedIndex = -1;
+            }
+            else if (VariablesGlobales.id_provincia_default > 0 && cmb_provinciaEntrega.Items.Count > 0)
+            {
+                cmb_provinciaEntrega.SelectedValue = VariablesGlobales.id_provincia_default;
+            }
+
+            generales.Cargar_Combo(
+                ref cmb_claseFiscal,
+                entidad: "SysClaseFiscalEntity",
+                displaymember: "Descript",
+                valuemember: "IdClaseFiscal",
+                predet: -1,
+                soloActivos: false,
+                orden: ordenClaseFiscal);
             cmb_claseFiscal.Text = "Seleccione una clase fiscal...";
 
-            // Cargo todos los tipos de documentos
-            var argcombo5 = cmb_tipoDocumento;
-            generales.Cargar_Combo(ref argcombo5, "SELECT id_tipoDocumento, documento FROM tipos_documentos ORDER BY documento ASC", VariablesGlobales.basedb, "documento", Conversions.ToInteger("id_tipoDocumento"));
-            cmb_tipoDocumento = argcombo5;
-            cmb_tipoDocumento.SelectedValue = VariablesGlobales.id_tipoDocumento_default;
+            generales.Cargar_Combo(
+                ref cmb_tipoDocumento,
+                entidad: "TipoDocumentoEntity",
+                displaymember: "Documento",
+                valuemember: "IdTipoDocumento",
+                predet: -1,
+                soloActivos: true,
+                orden: ordenDocumento);
+            if (VariablesGlobales.id_tipoDocumento_default > 0)
+            {
+                cmb_tipoDocumento.SelectedValue = VariablesGlobales.id_tipoDocumento_default;
+            }
             cmb_tipoDocumento_SelectionChangeCommitted(null, null);
 
             // Me.ActiveControl = Me.txt_razonSocial
@@ -284,18 +352,14 @@ namespace Centrex
 
         private void cmb_paisFiscal_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            // Cargo todas las provincias de direccion de fiscal
-            var argcombo = cmb_provinciaFiscal;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + cmb_paisFiscal.SelectedValue.ToString() + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
-            cmb_provinciaFiscal = argcombo;
+            var ordenProvincia = OrdenAscendente("Provincia");
+            CargarProvinciasPorPais(ref cmb_provinciaFiscal, cmb_paisFiscal.SelectedValue, ordenProvincia);
         }
 
         private void cmb_paisEntrega_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            // Cargo todas las provincias de direccion de entrega
-            var argcombo = cmb_provinciaEntrega;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + cmb_paisEntrega.SelectedValue.ToString() + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
-            cmb_provinciaEntrega = argcombo;
+            var ordenProvincia = OrdenAscendente("Provincia");
+            CargarProvinciasPorPais(ref cmb_provinciaEntrega, cmb_paisEntrega.SelectedValue, ordenProvincia);
         }
 
         private void txt_taxNumber_KeyPress(object sender, KeyPressEventArgs e)
@@ -425,26 +489,63 @@ namespace Centrex
             }
         }
 
+        private static List<Tuple<string, bool>> OrdenAscendente(string columna)
+        {
+            return new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
+        }
+
+        private void CargarProvinciasPorPais(ref ComboBox comboProvincia, object? idPaisValue, List<Tuple<string, bool>>? orden = null)
+        {
+            if (idPaisValue is null || idPaisValue == DBNull.Value || !int.TryParse(idPaisValue.ToString(), out var idPais))
+            {
+                comboProvincia.DataSource = null;
+                comboProvincia.Items.Clear();
+                comboProvincia.SelectedIndex = -1;
+                return;
+            }
+
+            orden ??= OrdenAscendente("Provincia");
+
+            var filtros = new Dictionary<string, object>
+            {
+                ["IdPais"] = idPais
+            };
+
+            generales.Cargar_Combo(
+                ref comboProvincia,
+                entidad: "ProvinciaEntity",
+                displaymember: "Provincia",
+                valuemember: "IdProvincia",
+                predet: -1,
+                soloActivos: false,
+                filtros: filtros,
+                orden: orden);
+        }
+
         private void SeleccionarPaisYProvincia(ComboBox cmbPais, ref ComboBox cmbProvincia, int? idProvincia)
         {
             if (idProvincia is null)
             {
                 cmbPais.SelectedIndex = -1;
+                cmbProvincia.DataSource = null;
+                cmbProvincia.Items.Clear();
                 cmbProvincia.SelectedIndex = -1;
                 return;
             }
 
             using var context = GetDbContext();
-            var provincia = context.Provincias.AsNoTracking().FirstOrDefault(p => p.IdProvincia == idProvincia.Value);
+            var provincia = context.ProvinciaEntity.AsNoTracking().FirstOrDefault(p => p.IdProvincia == idProvincia.Value);
             if (provincia is null)
             {
+                cmbProvincia.DataSource = null;
+                cmbProvincia.Items.Clear();
                 cmbProvincia.SelectedIndex = -1;
                 return;
             }
 
             cmbPais.SelectedValue = provincia.IdPais;
-
-            generales.Cargar_Combo(ref cmbProvincia, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + provincia.IdPais + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
+            var ordenProvincia = OrdenAscendente("Provincia");
+            CargarProvinciasPorPais(ref cmbProvincia, provincia.IdPais, ordenProvincia);
             cmbProvincia.SelectedValue = provincia.IdProvincia;
         }
     }

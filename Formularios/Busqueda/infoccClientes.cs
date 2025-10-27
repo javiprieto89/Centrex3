@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
@@ -25,15 +26,19 @@ namespace Centrex
 
         private void ccClientes_Load(object sender, EventArgs e)
         {
-            string sqlstr;
-
             // form = Me ' Comentado para evitar error de compilación
 
             // Cargo el combo con todos los clientes
-            sqlstr = "SELECT c.id_cliente AS 'id_cliente', c.razon_social AS 'razon_social' FROM clientes AS c WHERE c.activo = '1' ORDER BY c.razon_social ASC";
-            var argcombo = cmb_cliente;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "razon_social", Conversions.ToInteger("id_cliente"));
-            cmb_cliente = argcombo;
+            var ordenClientes = new List<Tuple<string, bool>> { Tuple.Create("RazonSocial", true) };
+            generales.Cargar_Combo(
+                ref cmb_cliente,
+                entidad: "ClienteEntity",
+                displaymember: "RazonSocial",
+                valuemember: "IdCliente",
+                predet: -1,
+                soloActivos: true,
+                orden: ordenClientes);
+            cmb_cliente.SelectedIndex = -1;
             cmb_cliente.Text = "Seleccione un cliente...";
 
             pExportXLS.Enabled = false;
@@ -139,22 +144,38 @@ namespace Centrex
 
         private void cmb_cliente_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            string sqlstr;
+            if (cmb_cliente.SelectedValue is null)
+            {
+                cmb_cc.DataSource = null;
+                cmb_cc.Items.Clear();
+                cmb_cc.Text = "Seleccione una cuenta corriente...";
+                cmb_cc.Enabled = false;
+                return;
+            }
 
-            // Cargo el combo con todas las cuentas corrientes del cliente seleccionado
-            sqlstr = "SELECT cc.id_cc AS 'id_cc', cc.nombre AS 'nombre' FROM cc_clientes AS cc WHERE cc.id_cliente = '" + cmb_cliente.SelectedValue.ToString() + "' AND cc.activo = '1' ORDER BY cc.nombre ASC";
-            var argcombo = cmb_cc;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_cc"));
-            cmb_cc = argcombo;
+            var filtros = new Dictionary<string, object>
+            {
+                ["IdCliente"] = Conversions.ToInteger(cmb_cliente.SelectedValue)
+            };
+            var ordenCc = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
+            generales.Cargar_Combo(
+                ref cmb_cc,
+                entidad: "CcClienteEntity",
+                displaymember: "Nombre",
+                valuemember: "IdCc",
+                predet: -1,
+                soloActivos: true,
+                filtros: filtros,
+                orden: ordenCc);
             cmb_cc.Text = "Seleccione una cuenta corriente...";
+            cmb_cc.SelectedIndex = -1;
 
-            cmb_cc.Enabled = true;
+            cmb_cc.Enabled = cmb_cc.Items.Count > 0;
             ActiveControl = cmb_cc;
 
             if (cmb_cc.Items.Count == 1)
             {
                 cmb_cc.SelectedIndex = 0;
-                cmb_cc.Text = ccClientes.info_ccCliente(Conversions.ToInteger(cmb_cc.SelectedValue)).nombre;
             }
         }
 

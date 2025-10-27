@@ -1,7 +1,7 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -11,25 +11,17 @@ namespace Centrex
         {
             InitializeComponent();
         }
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+            new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
+
         private void add_ccProveedor_Load(object sender, EventArgs e)
         {
-            string sqlstr;
-
             // form = Me ' Comentado para evitar error de compilación
             txt_saldo.Text = "0";
             chk_activo.Checked = true;
 
-            // Cargo el combo con todos los proveedores
-            sqlstr = "SELECT p.id_proveedor AS 'id_proveedor', p.razon_social AS 'razon_social' FROM proveedores AS p WHERE p.activo = '1' ORDER BY p.razon_social ASC";
-            var argcombo = cmb_proveedor;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "razon_social", Conversions.ToInteger("id_proveedor"));
-            cmb_proveedor = argcombo;
-
-            // Cargo el combo con todas las monedas
-            sqlstr = "SELECT id_moneda, moneda FROM sysMoneda ORDER BY moneda ASC";
-            var argcombo1 = cmb_moneda;
-            generales.Cargar_Combo(ref argcombo1, sqlstr, VariablesGlobales.basedb, "moneda", Conversions.ToInteger("id_moneda"));
-            cmb_moneda = argcombo1;
+            CargarProveedores();
+            CargarMonedas();
 
             if (VariablesGlobales.edicion | VariablesGlobales.borrado)
             {
@@ -48,7 +40,9 @@ namespace Centrex
             }
             else
             {
-                cmb_proveedor.Text = "Seleccione un Proveedor...";
+                cmb_proveedor.SelectedIndex = -1;
+                cmb_proveedor.Text = "Seleccione un proveedor...";
+                cmb_moneda.SelectedIndex = -1;
                 cmb_moneda.Text = "Seleccione una moneda...";
             }
 
@@ -89,12 +83,12 @@ namespace Centrex
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            if (cmb_proveedor.Text == "Seleccione un proveedor...")
+            if (cmb_proveedor.SelectedValue is null)
             {
                 Interaction.MsgBox("El campo 'Proveedor' es obligatorio y está vacio", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
-            else if (cmb_moneda.Text == "Seleccione una moneda...")
+            else if (cmb_moneda.SelectedValue is null)
             {
                 Interaction.MsgBox("El campo 'Moneda' es obligatorio y está vacio", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
@@ -107,10 +101,10 @@ namespace Centrex
 
             var tmp = new ccProveedor();
 
-            tmp.IdProveedor = Conversions.ToInteger(cmb_proveedor.SelectedValue);
-            tmp.IdMoneda = Conversions.ToInteger(cmb_moneda.SelectedValue);
+            tmp.IdProveedor = Convert.ToInt32(cmb_proveedor.SelectedValue);
+            tmp.IdMoneda = Convert.ToInt32(cmb_moneda.SelectedValue);
             tmp.Nombre = txt_nombre.Text;
-            tmp.Saldo = Conversions.ToDecimal(txt_saldo.Text);
+            tmp.Saldo = Convert.ToDecimal(txt_saldo.Text);
             tmp.Activo = chk_activo.Checked;
 
             if (VariablesGlobales.edicion == true)
@@ -130,11 +124,13 @@ namespace Centrex
 
             if (chk_secuencia.Checked)
             {
-                cmb_proveedor.Text = "Seleccione un proveedor...";
-                cmb_moneda.Text = "Seleccione una moneda...";
                 txt_nombre.Text = "";
                 txt_saldo.Text = "0";
                 chk_activo.Checked = true;
+                cmb_proveedor.SelectedIndex = -1;
+                cmb_proveedor.Text = "Seleccione un proveedor...";
+                cmb_moneda.SelectedIndex = -1;
+                cmb_moneda.Text = "Seleccione una moneda...";
                 ActiveControl = cmb_proveedor;
             }
             else
@@ -164,6 +160,34 @@ namespace Centrex
             var argcmb = cmb_proveedor;
             generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
             cmb_proveedor = argcmb;
+        }
+
+        private void CargarProveedores()
+        {
+            var orden = OrdenAsc("RazonSocial");
+            generales.Cargar_Combo(
+                ref cmb_proveedor,
+                entidad: "ProveedorEntity",
+                displaymember: "RazonSocial",
+                valuemember: "IdProveedor",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: orden);
+        }
+
+        private void CargarMonedas()
+        {
+            var orden = OrdenAsc("Moneda");
+            generales.Cargar_Combo(
+                ref cmb_moneda,
+                entidad: "SysMonedaEntity",
+                displaymember: "Moneda",
+                valuemember: "IdMoneda",
+                predet: -1,
+                soloActivos: false,
+                filtros: null,
+                orden: orden);
         }
     }
 }

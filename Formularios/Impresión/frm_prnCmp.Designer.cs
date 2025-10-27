@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,20 +6,33 @@ using System.Windows.Forms;
 
 namespace Centrex
 {
-    [Microsoft.VisualBasic.CompilerServices.DesignerGenerated()]
     public partial class frm_prnCmp : Form
     {
+        private bool _exPRE;
+        private bool _imprimePRN;
 
-        // Form reemplaza a Dispose para limpiar la lista de componentes.
-        [DebuggerNonUserCode()]
+        // 🔹 Constructor por defecto (requerido por el diseñador)
+        public frm_prnCmp()
+        {
+            InitializeComponent();
+        }
+
+        // 🔹 Constructor con parámetros (para llamadas como new frm_prnCmp(true, false))
+        public frm_prnCmp(bool esPresupuesto, bool imprimeRemito)
+        {
+            InitializeComponent();
+            _exPRE = esPresupuesto;
+            _imprimePRN = imprimeRemito;
+        }
+
+        // 🔹 Limpieza de recursos
+        [DebuggerNonUserCode]
         protected override void Dispose(bool disposing)
         {
             try
             {
-                if (disposing && components is not null)
-                {
+                if (disposing && components != null)
                     components.Dispose();
-                }
             }
             finally
             {
@@ -27,17 +40,14 @@ namespace Centrex
             }
         }
 
-        // Requerido por el Diseñador de Windows Forms
+        // 🔹 Diseñador (auto-generado)
         private System.ComponentModel.IContainer components;
 
-        // NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
-        // Se puede modificar usando el Diseñador de Windows Forms.  
-        // No lo modifique con el editor de código.
-        [DebuggerStepThrough()]
+        [DebuggerStepThrough]
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            ReportViewer1 = new Microsoft.Reporting.WinForms.ReportViewer();
+            ReportViewer1 = new Panel();
             DbCentrexDataSet = new dbCentrexDataSet();
             Factura_cabeceraBindingSource = new BindingSource(components);
             Factura_cabeceraTableAdapter = new dbCentrexDataSetTableAdapters.factura_cabeceraTableAdapter();
@@ -46,77 +56,60 @@ namespace Centrex
             Factura_detalleTableAdapter = new dbCentrexDataSetTableAdapters.factura_detalleTableAdapter();
             Datos_empresaBindingSource = new BindingSource(components);
             Datos_empresaTableAdapter = new dbCentrexDataSetTableAdapters.datos_empresaTableAdapter();
+
             ((System.ComponentModel.ISupportInitialize)DbCentrexDataSet).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Factura_cabeceraBindingSource).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Factura_detalleBindingSource).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Datos_empresaBindingSource).BeginInit();
             SuspendLayout();
-            // 
-            // ReportViewer1
-            // 
+
+            // Panel principal
             ReportViewer1.Dock = DockStyle.Fill;
             ReportViewer1.Location = new Point(0, 0);
             ReportViewer1.Name = "ReportViewer1";
-            ReportViewer1.PageCountMode = Microsoft.Reporting.WinForms.PageCountMode.Actual;
             ReportViewer1.Size = new Size(930, 733);
             ReportViewer1.TabIndex = 0;
-            // 
-            // DbCentrexDataSet
-            // 
+
+            // Dataset
             DbCentrexDataSet.DataSetName = "dbCentrexDataSet";
             DbCentrexDataSet.SchemaSerializationMode = SchemaSerializationMode.IncludeSchema;
-            // 
-            // Factura_cabeceraBindingSource
-            // 
+
+            // BindingSources
             Factura_cabeceraBindingSource.DataMember = "factura_cabecera";
             Factura_cabeceraBindingSource.DataSource = DbCentrexDataSet;
-            // 
-            // Factura_cabeceraTableAdapter
-            // 
-            Factura_cabeceraTableAdapter.ClearBeforeFill = true;
-            // 
-            // TableAdapterManager
-            // 
-            TableAdapterManager.BackupDataSetBeforeUpdate = false;
-            TableAdapterManager.Connection = null;
-            TableAdapterManager.UpdateOrder = dbCentrexDataSetTableAdapters.TableAdapterManager.UpdateOrderOption.InsertUpdateDelete;
-            // 
-            // Factura_detalleBindingSource
-            // 
+
             Factura_detalleBindingSource.DataMember = "factura_detalle";
             Factura_detalleBindingSource.DataSource = DbCentrexDataSet;
-            // 
-            // Factura_detalleTableAdapter
-            // 
-            Factura_detalleTableAdapter.ClearBeforeFill = true;
-            // 
-            // Datos_empresaBindingSource
-            // 
+
             Datos_empresaBindingSource.DataMember = "datos_empresa";
             Datos_empresaBindingSource.DataSource = DbCentrexDataSet;
-            // 
-            // Datos_empresaTableAdapter
-            // 
+
+            // TableAdapters
+            Factura_cabeceraTableAdapter.ClearBeforeFill = true;
+            Factura_detalleTableAdapter.ClearBeforeFill = true;
             Datos_empresaTableAdapter.ClearBeforeFill = true;
-            // 
-            // frm_prnCmp
-            // 
+
+            TableAdapterManager.BackupDataSetBeforeUpdate = false;
+            TableAdapterManager.UpdateOrder =
+                dbCentrexDataSetTableAdapters.TableAdapterManager.UpdateOrderOption.InsertUpdateDelete;
+
+            // Propiedades del formulario
             AutoScaleDimensions = new SizeF(6.0f, 13.0f);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(930, 733);
             Controls.Add(ReportViewer1);
             Name = "frm_prnCmp";
             Text = "Impresión";
+
             ((System.ComponentModel.ISupportInitialize)DbCentrexDataSet).EndInit();
             ((System.ComponentModel.ISupportInitialize)Factura_cabeceraBindingSource).EndInit();
             ((System.ComponentModel.ISupportInitialize)Factura_detalleBindingSource).EndInit();
             ((System.ComponentModel.ISupportInitialize)Datos_empresaBindingSource).EndInit();
-            Load += new EventHandler(frm_reportes_Load);
-            FormClosing += new FormClosingEventHandler(frm_reportes_FormClosing);
             ResumeLayout(false);
-
         }
-        internal Microsoft.Reporting.WinForms.ReportViewer ReportViewer1;
+
+        // 🔹 Controles internos
+        internal Panel ReportViewer1;
         internal dbCentrexDataSet DbCentrexDataSet;
         internal BindingSource Factura_cabeceraBindingSource;
         internal dbCentrexDataSetTableAdapters.factura_cabeceraTableAdapter Factura_cabeceraTableAdapter;
@@ -127,5 +120,3 @@ namespace Centrex
         internal dbCentrexDataSetTableAdapters.datos_empresaTableAdapter Datos_empresaTableAdapter;
     }
 }
-
-

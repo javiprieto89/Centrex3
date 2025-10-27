@@ -21,16 +21,16 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var ccEntity = context.CcProveedores.FirstOrDefault(cc => cc.IdCc == id_cc);
+                    var ccEntity = context.CcProveedorEntity.FirstOrDefault(cc => cc.IdCc == id_cc);
 
                     if (ccEntity is not null)
                     {
                         tmp.id_cc = ccEntity.IdCc.ToString();
                         tmp.IdProveedor = ccEntity.IdProveedor.ToString();
                         tmp.id_moneda = ccEntity.IdMoneda.ToString();
-                        tmp.nombre = ccEntity.nombre;
-                        tmp.saldo = Conversions.ToDouble(ccEntity.saldo.ToString());
-                        tmp.activo = ccEntity.activo;
+                        tmp.nombre = ccEntity.Nombre;
+                        tmp.saldo = Conversions.ToDouble(ccEntity.Saldo.ToString());
+                        tmp.activo = ccEntity.Activo;
                     }
                     else
                     {
@@ -58,12 +58,12 @@ namespace Centrex
                     {
                         IdProveedor = cc.IdProveedor,
                         IdMoneda = cc.id_moneda,
-                        nombre = cc.nombre,
-                        saldo = (decimal)cc.saldo,
-                        activo = cc.activo
+                        Nombre = cc.nombre,
+                        Saldo = (decimal)cc.saldo,
+                        Activo = cc.activo
                     };
 
-                    context.CcProveedores.Add(ccEntity);
+                    context.CcProveedorEntity.Add(ccEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -81,7 +81,7 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var ccEntity = context.CcProveedores.FirstOrDefault(c => c.IdCc == cc.id_cc);
+                    var ccEntity = context.CcProveedorEntity.FirstOrDefault(c => c.IdCc == cc.id_cc);
 
                     if (ccEntity is not null)
                     {
@@ -120,11 +120,11 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var ccEntity = context.CcProveedores.FirstOrDefault(c => c.IdCc == cc.id_cc);
+                    var ccEntity = context.CcProveedorEntity.FirstOrDefault(c => c.IdCc == cc.id_cc);
 
                     if (ccEntity is not null)
                     {
-                        context.CcProveedores.Remove(ccEntity);
+                        context.CcProveedorEntity.Remove(ccEntity);
                         context.SaveChanges();
                         return true;
                     }

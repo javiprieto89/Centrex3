@@ -18,11 +18,12 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).FirstOrDefault(i => i.IdItem == Conversions.ToInteger(id_item));
-
-
-
-                }
+                    return context.ItemEntity
+    .Include(i => i.IdMarcaNavigation)
+.Include(i => i.IdTipoNavigation)
+        .Include(i => i.IdProveedorNavigation)
+  .FirstOrDefault(i => i.IdItem == id_item);
+ }
             }
             catch (Exception ex)
             {
@@ -37,18 +38,19 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).FirstOrDefault(i => i.Descript == descript);
-
-
-
-                }
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox(ex.Message.ToString());
-                return null;
-            }
-        }
+                    return context.ItemEntity
+   .Include(i => i.IdMarcaNavigation)
+     .Include(i => i.IdTipoNavigation)
+         .Include(i => i.IdProveedorNavigation)
+   .FirstOrDefault(i => i.Descript == descript);
+         }
+   }
+   catch (Exception ex)
+     {
+   Interaction.MsgBox(ex.Message.ToString());
+        return null;
+  }
+ }
 
         public static bool info_itemtmp(string _idItem, int _idUsuario, Guid _idUnico)
         {
@@ -112,16 +114,20 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).OrderByDescending(i => i.IdItem).FirstOrDefault();
-
-                }
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox(ex.Message.ToString());
-                return null;
-            }
-        }
+                    return context.ItemEntity
+.Include(i => i.IdMarcaNavigation)
+      .Include(i => i.IdTipoNavigation)
+      .Include(i => i.IdProveedorNavigation)
+         .OrderByDescending(i => i.IdItem)
+   .FirstOrDefault();
+    }
+    }
+      catch (Exception ex)
+   {
+         Interaction.MsgBox(ex.Message.ToString());
+    return null;
+  }
+    }
 
         public static bool updateitem(ItemEntity it, bool borra = false)
         {

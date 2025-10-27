@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
@@ -13,16 +14,37 @@ namespace Centrex
         }
         private void add_permisos_perfiles_Load(object sender, EventArgs e)
         {
+            var ordenNombre = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
+
             // Cargo todos los permisos
-            var argcombo = cmb_perfiles;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_permiso, nombre FROM permisos ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_permiso"));
-            cmb_perfiles = argcombo;
-            cmb_perfiles.Text = "Selecione un permiso...";
+            var argPermisos = cmb_permisos;
+            generales.Cargar_Combo(
+                ref argPermisos,
+                entidad: "PermisoEntity",
+                displaymember: "Nombre",
+                valuemember: "IdPermiso",
+                predet: -1,
+                soloActivos: false,
+                filtros: null,
+                orden: ordenNombre);
+            cmb_permisos = argPermisos;
+            cmb_permisos.SelectedIndex = -1;
+            cmb_permisos.Text = "Seleccione un permiso...";
+
             // Cargo todos los perfiles
-            var argcombo1 = cmb_perfiles;
-            generales.Cargar_Combo(ref argcombo1, "SELECT id_perfil, nombre FROM perfiles ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_perfil"));
-            cmb_perfiles = argcombo1;
-            cmb_perfiles.Text = "Selecione un perfil...";
+            var argPerfiles = cmb_perfiles;
+            generales.Cargar_Combo(
+                ref argPerfiles,
+                entidad: "PerfilEntity",
+                displaymember: "Nombre",
+                valuemember: "IdPerfil",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenNombre);
+            cmb_perfiles = argPerfiles;
+            cmb_perfiles.SelectedIndex = -1;
+            cmb_perfiles.Text = "Seleccione un perfil...";
 
 
             if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)

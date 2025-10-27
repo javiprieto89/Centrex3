@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -12,25 +12,35 @@ namespace Centrex
             InitializeComponent();
         }
 
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+            new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
+
         private void grilla_resultados_Load(object sender, EventArgs e)
         {
-            var argcombo = cmb_consultas;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_consulta, nombre FROM consultas_personalizadas ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_consulta"));
-            cmb_consultas = argcombo;
-            cmb_consultas.SelectedValue = 0;
+            var orden = OrdenAsc("Nombre");
+            generales.Cargar_Combo(
+                ref cmb_consultas,
+                entidad: "ConsultaPersonalizadaEntity",
+                displaymember: "Nombre",
+                valuemember: "IdConsulta",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: orden);
+            cmb_consultas.SelectedIndex = -1;
             cmb_consultas.Text = "Elija una consulta...";
         }
 
         private void cmd_ejecutar_Click(object sender, EventArgs e)
         {
             var c = new consultaP();
-            if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(cmb_consultas.SelectedValue, 0, false)))
+            if (cmb_consultas.SelectedValue is null)
             {
                 Interaction.MsgBox("Debe elegir una consulta para ejecutar", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
 
-            c = consultas.info_consulta(Conversions.ToInteger(cmb_consultas.SelectedValue));
+            c = consultas.info_consulta(Convert.ToInt32(cmb_consultas.SelectedValue));
 
             var argdataGrid = dg_view_resultados;
             int argnRegs = 0;

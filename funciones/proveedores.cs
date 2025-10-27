@@ -6,8 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Centrex.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Centrex
 {
@@ -27,47 +26,55 @@ namespace Centrex
 
             try
             {
-                using (var context = new CentrexDbContext())
+                using (var context = GetDbContext())
                 {
                     int id;
                     int.TryParse(id_proveedor, out id);
 
-                    var proveedorEntity = context.Proveedores.FirstOrDefault(p => p.IdProveedor == id);
+                    var proveedorEntity = context.ProveedorEntity
+                        .Include(p => p.IdProvinciaFiscalNavigation)
+                        .Include(p => p.IdProvinciaEntregaNavigation)
+                        .Include(p => p.IdPaisFiscalNavigation)
+                        .Include(p => p.IdPaisEntregaNavigation)
+                        .FirstOrDefault(p => p.IdProveedor == id);
 
                     if (proveedorEntity is not null)
                     {
-                        tmp.IdProveedor = proveedorEntity.IdProveedor.ToString();
-                        tmp.razon_social = proveedorEntity.razon_social;
-                        tmp.taxNumber = proveedorEntity.taxNumber;
-                        tmp.contacto = proveedorEntity.contacto;
-                        tmp.telefono = proveedorEntity.telefono;
-                        tmp.celular = proveedorEntity.celular;
-                        tmp.email = proveedorEntity.email;
-                        tmp.id_provincia_fiscal = proveedorEntity.IdProvinciaFiscal.HasValue ? proveedorEntity.IdProvinciaFiscal.Value : -1;
-                        tmp.direccion_fiscal = proveedorEntity.direccion_fiscal;
-                        tmp.localidad_fiscal = proveedorEntity.localidad_fiscal;
-                        tmp.cp_fiscal = proveedorEntity.cp_fiscal;
-                        tmp.id_provincia_entrega = proveedorEntity.IdProvinciaEntrega.HasValue ? proveedorEntity.IdProvinciaEntrega.Value : -1;
-                        tmp.direccion_entrega = proveedorEntity.direccion_entrega;
-                        tmp.localidad_entrega = proveedorEntity.localidad_entrega;
-                        tmp.cp_entrega = proveedorEntity.cp_entrega;
-                        tmp.notas = proveedorEntity.notas;
-                        tmp.esInscripto = proveedorEntity.esInscripto;
-                        tmp.vendedor = proveedorEntity.vendedor;
-                        tmp.activo = proveedorEntity.activo;
-                        tmp.id_tipoDocumento = proveedorEntity.IdTipoDocumento;
-                        tmp.id_claseFiscal = proveedorEntity.IdClaseFiscal.HasValue ? proveedorEntity.IdClaseFiscal.Value : -1;
+                        tmp.IdProveedor = proveedorEntity.IdProveedor;
+                        tmp.RazonSocial = proveedorEntity.RazonSocial;
+                        tmp.TaxNumber = proveedorEntity.TaxNumber;
+                        tmp.Contacto = proveedorEntity.Contacto;
+                        tmp.Telefono = proveedorEntity.Telefono;
+                        tmp.Celular = proveedorEntity.Celular;
+                        tmp.Email = proveedorEntity.Email;
+                        tmp.IdProvinciaFiscal = proveedorEntity.IdProvinciaFiscal.HasValue ? proveedorEntity.IdProvinciaFiscal.Value : -1;
+                        tmp.DireccionFiscal = proveedorEntity.DireccionFiscal;
+                        tmp.LocalidadFiscal = proveedorEntity.LocalidadFiscal;
+                        tmp.CpFiscal = proveedorEntity.CpFiscal;
+                        tmp.IdProvinciaEntrega = proveedorEntity.IdProvinciaEntrega.HasValue ? proveedorEntity.IdProvinciaEntrega.Value : -1;
+                        tmp.DireccionEntrega = proveedorEntity.DireccionEntrega;
+                        tmp.LocalidadEntrega = proveedorEntity.LocalidadEntrega;
+                        tmp.CpEntrega = proveedorEntity.CpEntrega;
+                        tmp.Notas = proveedorEntity.Notas;
+                        tmp.EsInscripto = proveedorEntity.EsInscripto;
+                        tmp.Vendedor = proveedorEntity.Vendedor;
+                        tmp.Activo = proveedorEntity.Activo;
+                        tmp.IdTipoDocumento = proveedorEntity.IdTipoDocumento;
+                        tmp.IdClaseFiscal = proveedorEntity.IdClaseFiscal.HasValue ? proveedorEntity.IdClaseFiscal.Value : -1;
+                        tmp.IdPaisFiscal = proveedorEntity.IdPaisFiscal;
+                        tmp.IdPaisEntrega = proveedorEntity.IdPaisEntrega;
+
                     }
                     else
                     {
-                        tmp.razon_social = "error";
+                        tmp.RazonSocial = "error";
                     }
                 }
             }
             catch (Exception ex)
             {
                 Interaction.MsgBox("Error en info_proveedor: " + ex.Message);
-                tmp.razon_social = "error";
+                tmp.RazonSocial = "error";
             }
 
             return tmp;
@@ -80,33 +87,35 @@ namespace Centrex
         {
             try
             {
-                using (var context = new CentrexDbContext())
+                using (var context = GetDbContext())
                 {
                     var proveedorEntity = new ProveedorEntity()
                     {
-                        razon_social = pr.razon_social,
-                        taxNumber = pr.taxNumber,
-                        contacto = pr.contacto,
-                        telefono = pr.telefono,
-                        celular = pr.celular,
-                        email = pr.email,
-                        IdProvinciaFiscal = pr.id_provincia_fiscal,
-                        direccion_fiscal = pr.direccion_fiscal,
-                        localidad_fiscal = pr.localidad_fiscal,
-                        cp_fiscal = pr.cp_fiscal,
-                        IdProvinciaEntrega = pr.id_provincia_entrega,
-                        direccion_entrega = pr.direccion_entrega,
-                        localidad_entrega = pr.localidad_entrega,
-                        cp_entrega = pr.cp_entrega,
-                        notas = pr.notas,
-                        esInscripto = pr.esInscripto,
-                        vendedor = pr.vendedor,
-                        activo = pr.activo,
-                        IdTipoDocumento = pr.id_tipoDocumento,
-                        IdClaseFiscal = pr.id_claseFiscal
+                        RazonSocial = pr.RazonSocial,
+                        TaxNumber = pr.TaxNumber,
+                        Contacto = pr.Contacto,
+                        Telefono = pr.Telefono,
+                        Celular = pr.Celular,
+                        Email = pr.Email,
+                        IdProvinciaFiscal = pr.IdProvinciaFiscal,
+                        DireccionFiscal = pr.DireccionFiscal,
+                        LocalidadFiscal = pr.LocalidadFiscal,
+                        CpFiscal = pr.CpFiscal,
+                        IdProvinciaEntrega = pr.IdProvinciaEntrega,
+                        DireccionEntrega = pr.DireccionEntrega,
+                        LocalidadEntrega = pr.LocalidadEntrega,
+                        CpEntrega = pr.CpEntrega,
+                        Notas = pr.Notas,
+                        EsInscripto = pr.EsInscripto,
+                        Vendedor = pr.Vendedor,
+                        Activo = pr.Activo,
+                        IdTipoDocumento = pr.IdTipoDocumento,
+                        IdClaseFiscal = pr.IdClaseFiscal,
+                        IdPaisFiscal = pr.IdPaisFiscal,
+                        IdPaisEntrega = pr.IdPaisEntrega
                     };
 
-                    context.Proveedores.Add(proveedorEntity);
+                    context.ProveedorEntity.Add(proveedorEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -125,38 +134,40 @@ namespace Centrex
         {
             try
             {
-                using (var context = new CentrexDbContext())
+                using (var context = GetDbContext())
                 {
-                    var proveedorEntity = context.Proveedores.FirstOrDefault(p => p.IdProveedor == pr.IdProveedor);
+                    var proveedorEntity = context.ProveedorEntity.FirstOrDefault(p => p.IdProveedor == pr.IdProveedor);
 
                     if (proveedorEntity is not null)
                     {
                         if (borra)
                         {
-                            proveedorEntity.activo = false;
+                            proveedorEntity.Activo = false;
                         }
                         else
                         {
-                            proveedorEntity.razon_social = pr.razon_social;
-                            proveedorEntity.taxNumber = pr.taxNumber;
-                            proveedorEntity.contacto = pr.contacto;
-                            proveedorEntity.telefono = pr.telefono;
-                            proveedorEntity.celular = pr.celular;
-                            proveedorEntity.email = pr.email;
-                            proveedorEntity.IdProvinciaFiscal = pr.id_provincia_fiscal;
-                            proveedorEntity.direccion_fiscal = pr.direccion_fiscal;
-                            proveedorEntity.localidad_fiscal = pr.localidad_fiscal;
-                            proveedorEntity.cp_fiscal = pr.cp_fiscal;
-                            proveedorEntity.IdProvinciaEntrega = pr.id_provincia_entrega;
-                            proveedorEntity.direccion_entrega = pr.direccion_entrega;
-                            proveedorEntity.localidad_entrega = pr.localidad_entrega;
-                            proveedorEntity.cp_entrega = pr.cp_entrega;
-                            proveedorEntity.notas = pr.notas;
-                            proveedorEntity.esInscripto = pr.esInscripto;
-                            proveedorEntity.vendedor = pr.vendedor;
-                            proveedorEntity.activo = pr.activo;
-                            proveedorEntity.IdTipoDocumento = pr.id_tipoDocumento;
-                            proveedorEntity.IdClaseFiscal = pr.id_claseFiscal;
+                            proveedorEntity.RazonSocial = pr.RazonSocial;
+                            proveedorEntity.TaxNumber = pr.TaxNumber;
+                            proveedorEntity.Contacto = pr.Contacto;
+                            proveedorEntity.Telefono = pr.Telefono;
+                            proveedorEntity.Celular = pr.Celular;
+                            proveedorEntity.Email = pr.Email;
+                            proveedorEntity.IdProvinciaFiscal = pr.IdProvinciaFiscal;
+                            proveedorEntity.DireccionFiscal = pr.DireccionFiscal;
+                            proveedorEntity.LocalidadFiscal = pr.LocalidadFiscal;
+                            proveedorEntity.CpFiscal = pr.CpFiscal;
+                            proveedorEntity.IdProvinciaEntrega = pr.IdProvinciaEntrega;
+                            proveedorEntity.DireccionEntrega = pr.DireccionEntrega;
+                            proveedorEntity.LocalidadEntrega = pr.LocalidadEntrega;
+                            proveedorEntity.CpEntrega = pr.CpEntrega;
+                            proveedorEntity.Notas = pr.Notas;
+                            proveedorEntity.EsInscripto = pr.EsInscripto;
+                            proveedorEntity.Vendedor = pr.Vendedor;
+                            proveedorEntity.Activo = pr.Activo;
+                            proveedorEntity.IdTipoDocumento = pr.IdTipoDocumento;
+                            proveedorEntity.IdClaseFiscal = pr.IdClaseFiscal;
+                            proveedorEntity.IdPaisFiscal = pr.IdPaisFiscal;
+                            proveedorEntity.IdPaisEntrega = pr.IdPaisEntrega;
                         }
 
                         context.SaveChanges();
@@ -182,13 +193,13 @@ namespace Centrex
         {
             try
             {
-                using (var context = new CentrexDbContext())
+                using (var context = GetDbContext())
                 {
-                    var proveedorEntity = context.Proveedores.FirstOrDefault(p => p.IdProveedor == pr.IdProveedor);
+                    var proveedorEntity = context.ProveedorEntity.FirstOrDefault(p => p.IdProveedor == pr.IdProveedor);
 
                     if (proveedorEntity is not null)
                     {
-                        context.Proveedores.Remove(proveedorEntity);
+                        context.ProveedorEntity.Remove(proveedorEntity);
                         context.SaveChanges();
                         return true;
                     }
@@ -210,69 +221,46 @@ namespace Centrex
         // ===========================================
         public static void consultaCcProveedor(ref DataGridView dataGrid, int id_proveedor, int id_Cc, DateTime fecha_desde, DateTime fecha_hasta, int desde, ref int nRegs, ref int tPaginas, int pagina, ref TextBox txtnPage, bool traerTodo)
         {
-
-            var datatable = new DataTable();
-            DataGridViewColumn oldSortColumn = null;
-            var oldSortDir = default(ListSortDirection);
-
-            // Guardar el orden de las columnas
-            oldSortColumn = dataGrid.SortedColumn;
-            if (dataGrid.SortedColumn is not null)
-            {
-                oldSortDir = dataGrid.SortOrder == (int)System.Data.SqlClient.SortOrder.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending;
-            }
-
-            dataGrid.Columns.Clear();
-
             try
             {
-                using (var context = new CentrexDbContext())
+                using (var context = GetDbContext())
                 {
-                    // Parámetros del stored procedure
-                    SqlParameter[] spParams = new[] { new SqlParameter("@id_proveedor", id_proveedor), new SqlParameter("@id_cc", id_Cc), new SqlParameter("@fecha_desde", fecha_desde), new SqlParameter("@fecha_hasta", fecha_hasta) };
+                    // Usar el Stored Procedure del contexto EF Core
+                    var results = context.Procedures.SP_consulta_CC_ProveedorAsync(
+                        id_proveedor, 
+                        id_Cc, 
+                        fecha_desde.ToString("yyyy-MM-dd"), 
+                        fecha_hasta.ToString("yyyy-MM-dd")
+                    ).Result;
 
-                    // Ejecutar SP y obtener lista
-                    var results = context.Database.SqlQuery<object>("EXEC SP_consulta_CC_Proveedor @id_proveedor, @id_cc, @fecha_desde, @fecha_hasta", spParams).ToList();
-
-                    if (results.Count > 0)
+                    if (results != null && results.Count > 0)
                     {
-                        datatable = ConvertToDataTable(results);
+                        // Crear DataGridQueryResult para usar el sistema completo
+                        var queryResult = new DataGridQueryResult
+                        {
+                            Query = results.AsQueryable(),
+                            EsMaterializada = true,
+                            DataMaterializada = results,
+                            ColumnasOcultar = new List<string> { "ID" }
+                        };
 
+                        // Usar el sistema LoadDataGridDynamic de forma síncrona
+                        LoadDataGridDynamic.LoadDataGridWithEntityAsync(dataGrid, queryResult).Wait();
+
+                        // Configurar paginación
                         if (!traerTodo)
                         {
-                            nRegs = datatable.Rows.Count;
+                            nRegs = results.Count;
                             tPaginas = (int)Math.Round(Math.Ceiling(nRegs / (double)VariablesGlobales.itXPage));
                             txtnPage.Text = pagina + " / " + tPaginas;
-
-                            // Paginación manual
-                            var pagedTable = datatable.Clone();
-                            for (int i = desde, loopTo = Math.Min(desde + VariablesGlobales.itXPage - 1, nRegs - 1); i <= loopTo; i++)
-                                pagedTable.ImportRow(datatable.Rows[i]);
-                            datatable = pagedTable;
                         }
                     }
+                    else
+                    {
+                        // Limpiar grid si no hay datos
+                        dataGrid.DataSource = null;
+                    }
                 }
-
-                // Configurar el DataGrid
-                dataGrid.DataSource = datatable;
-                dataGrid.RowsDefaultCellStyle.BackColor = Color.White;
-                dataGrid.AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue;
-
-                if (dataGrid.Rows.Count > 0)
-                {
-                    dataGrid.AutoSizeColumnsMode = (DataGridViewAutoSizeColumnsMode)DataGridViewAutoSizeColumnMode.AllCells;
-                }
-                else
-                {
-                    dataGrid.AutoSizeColumnsMode = (DataGridViewAutoSizeColumnsMode)DataGridViewAutoSizeColumnMode.None;
-                }
-
-                if (oldSortColumn is not null)
-                {
-                    dataGrid.Sort(dataGrid.Columns[oldSortColumn.Name], oldSortDir);
-                }
-
-                dataGrid.Refresh();
             }
             catch (Exception ex)
             {
@@ -281,34 +269,9 @@ namespace Centrex
         }
 
         // ===========================================
-        // FUNCIÓN: ConvertToDataTable (helper)
+        // FUNCIÓN: ConvertToDataTable (helper) - ELIMINADA
+        // Ya existe en LoadDataGridDynamic.cs
         // ===========================================
-        private static DataTable ConvertToDataTable<T>(List<T> list)
-        {
-            var table = new DataTable();
-            if (list is null || list.Count == 0)
-                return table;
-
-            System.Reflection.PropertyInfo[] properties = typeof(T).GetProperties();
-
-            // Crear columnas según las propiedades del tipo T
-            foreach (var prop in properties)
-            {
-                var columnType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-                table.Columns.Add(prop.Name, columnType);
-            }
-
-            // Rellenar filas
-            foreach (var item in list)
-            {
-                var row = table.NewRow();
-                foreach (var prop in properties)
-                    row[prop.Name] = prop.GetValue(item, null) ?? DBNull.Value;
-                table.Rows.Add(row);
-            }
-
-            return table;
-        }
 
 
     }

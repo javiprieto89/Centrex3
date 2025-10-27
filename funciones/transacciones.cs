@@ -23,22 +23,22 @@ namespace Centrex
                     int id = 0;
                     int.TryParse(id_transaccion, out id);
 
-                    var transaccionEntity = context.Transacciones.FirstOrDefault(t => t.IdTransaccion == id);
+                    var transaccionEntity = context.TransaccionEntity.FirstOrDefault(t => t.IdTransaccion == id);
 
                     if (transaccionEntity is not null)
                     {
-                        tmp.id_transaccion = transaccionEntity.IdTransaccion.ToString();
-                        tmp.fecha = Conversions.ToString(transaccionEntity.fecha.ToString()[Conversions.ToInteger("dd/MM/yyyy")]);
-                        tmp.id_pedido = Conversions.ToInteger(transaccionEntity.IdPedido.HasValue ? transaccionEntity.IdPedido.Value.ToString() : "-1");
-                        tmp.id_comprobanteCompra = Conversions.ToInteger(transaccionEntity.IdComprobanteCompra.HasValue ? transaccionEntity.IdComprobanteCompra.Value.ToString() : "-1");
-                        tmp.id_cobro = Conversions.ToInteger(transaccionEntity.IdCobro.HasValue ? transaccionEntity.IdCobro.Value.ToString() : "-1");
-                        tmp.id_pago = Conversions.ToInteger(transaccionEntity.IdPago.HasValue ? transaccionEntity.IdPago.Value.ToString() : "-1");
-                        tmp.id_tipoComprobante = Conversions.ToInteger(transaccionEntity.IdTipoComprobante.HasValue ? transaccionEntity.IdTipoComprobante.Value.ToString() : "-1");
-                        tmp.numeroComprobante = transaccionEntity.numeroComprobante.HasValue ? transaccionEntity.numeroComprobante.Value.ToString() : "";
-                        tmp.puntoVenta = Conversions.ToInteger(transaccionEntity.puntoVenta.HasValue ? transaccionEntity.puntoVenta.Value.ToString() : "");
-                        tmp.total = Conversions.ToDouble(transaccionEntity.total.HasValue ? transaccionEntity.total.Value.ToString("0.000") : "0.000");
-                        tmp.id_cc = Conversions.ToInteger(transaccionEntity.IdCc.HasValue ? transaccionEntity.IdCc.Value.ToString() : "-1");
-                        tmp.id_cliente = Conversions.ToInteger(transaccionEntity.IdCliente.HasValue ? transaccionEntity.IdCliente.Value.ToString() : "-1");
+                        tmp.IdTransaccion = transaccionEntity.IdTransaccion.ToString();
+                        tmp.Fecha = Conversions.ToString(transaccionEntity.Fecha.ToString("dd/MM/yyyy"));
+                        tmp.IdPedido = Conversions.ToInteger(transaccionEntity.IdPedido.HasValue ? transaccionEntity.IdPedido.Value.ToString() : "-1");
+                        tmp.IdComprobanteCompra = Conversions.ToInteger(transaccionEntity.IdComprobanteCompra.HasValue ? transaccionEntity.IdComprobanteCompra.Value.ToString() : "-1");
+                        tmp.IdCobro = Conversions.ToInteger(transaccionEntity.IdCobro.HasValue ? transaccionEntity.IdCobro.Value.ToString() : "-1");
+                        tmp.IdPago = Conversions.ToInteger(transaccionEntity.IdPago.HasValue ? transaccionEntity.IdPago.Value.ToString() : "-1");
+                        tmp.IdTipoComprobante = Conversions.ToInteger(transaccionEntity.IdTipoComprobante.HasValue ? transaccionEntity.IdTipoComprobante.Value.ToString() : "-1");
+                        tmp.NumeroComprobante = transaccionEntity.NumeroComprobante.HasValue ? transaccionEntity.NumeroComprobante.Value.ToString() : "";
+                        tmp.PuntoVenta = Conversions.ToInteger(transaccionEntity.PuntoVenta.HasValue ? transaccionEntity.PuntoVenta.Value.ToString() : "");
+                        tmp.Total = Conversions.ToDouble(transaccionEntity.Total.HasValue ? transaccionEntity.Total.Value.ToString("0.000") : "0.000");
+                        tmp.IdCc = Conversions.ToInteger(transaccionEntity.IdCc.HasValue ? transaccionEntity.IdCc.Value.ToString() : "-1");
+                        tmp.IdCliente = Conversions.ToInteger(transaccionEntity.IdCliente.HasValue ? transaccionEntity.IdCliente.Value.ToString() : "-1");
                         tmp.IdProveedor = Conversions.ToInteger(transaccionEntity.IdProveedor.HasValue ? transaccionEntity.IdProveedor.Value.ToString() : "-1");
                     }
                 }
@@ -63,19 +63,19 @@ namespace Centrex
                 {
                     var nuevaTransaccion = new TransaccionEntity()
                     {
-                        fecha = DateTime.ParseExact(t.fecha, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
-                        IdPedido = string.IsNullOrEmpty(t.id_pedido.ToString()) ? default : t.id_pedido,
-                        IdTipoComprobante = string.IsNullOrEmpty(t.id_tipoComprobante.ToString()) ? default : t.id_tipoComprobante,
-                        numeroComprobante = string.IsNullOrEmpty(t.numeroComprobante) ? default : Conversions.ToInteger(t.numeroComprobante),
-                        puntoVenta = string.IsNullOrEmpty(t.puntoVenta.ToString()) ? default : t.puntoVenta,
-                        total = string.IsNullOrEmpty(t.total.ToString()) ? 0m : (decimal)t.total,
-                        IdCc = string.IsNullOrEmpty(t.id_cc.ToString()) ? default : t.id_cc,
-                        IdCliente = string.IsNullOrEmpty(t.id_cliente.ToString()) ? default : t.id_cliente,
-                        IdCobro = string.IsNullOrEmpty(t.id_cobro.ToString()) ? default : t.id_cobro,
-                        IdPago = string.IsNullOrEmpty(t.id_pago.ToString()) ? default : t.id_pago
+                        Fecha = DateOnly.FromDateTime(DateTime.ParseExact(t.Fecha, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)),
+                        IdPedido = string.IsNullOrEmpty(t.IdPedido.ToString()) ? default : t.IdPedido,
+                        IdTipoComprobante = string.IsNullOrEmpty(t.IdTipoComprobante.ToString()) ? default : t.IdTipoComprobante,
+                        NumeroComprobante = string.IsNullOrEmpty(t.NumeroComprobante) ? default : Conversions.ToInteger(t.NumeroComprobante),
+                        PuntoVenta = string.IsNullOrEmpty(t.PuntoVenta.ToString()) ? default : t.PuntoVenta,
+                        Total = string.IsNullOrEmpty(t.Total.ToString()) ? 0m : (decimal)t.Total,
+                        IdCc = string.IsNullOrEmpty(t.IdCc.ToString()) ? default : t.IdCc,
+                        IdCliente = string.IsNullOrEmpty(t.IdCliente.ToString()) ? default : t.IdCliente,
+                        IdCobro = string.IsNullOrEmpty(t.IdCobro.ToString()) ? default : t.IdCobro,
+                        IdPago = string.IsNullOrEmpty(t.IdPago.ToString()) ? default : t.IdPago
                     };
 
-                    context.Transacciones.Add(nuevaTransaccion);
+                    context.TransaccionEntity.Add(nuevaTransaccion);
                     context.SaveChanges();
                     return true;
                 }
@@ -98,19 +98,19 @@ namespace Centrex
                 {
                     var nuevaTransaccion = new TransaccionEntity()
                     {
-                        fecha = DateTime.ParseExact(t.fecha, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                        Fecha = DateOnly.FromDateTime(DateTime.ParseExact(t.fecha, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)),
                         IdComprobanteCompra = string.IsNullOrEmpty(t.id_comprobanteCompra.ToString()) ? default : t.id_comprobanteCompra,
                         IdTipoComprobante = string.IsNullOrEmpty(t.id_tipoComprobante.ToString()) ? default : t.id_tipoComprobante,
-                        numeroComprobante = string.IsNullOrEmpty(t.numeroComprobante) ? default : Conversions.ToInteger(t.numeroComprobante),
-                        puntoVenta = string.IsNullOrEmpty(t.puntoVenta.ToString()) ? default : t.puntoVenta,
-                        total = string.IsNullOrEmpty(t.total.ToString()) ? 0m : (decimal)t.total,
+                        NumeroComprobante = string.IsNullOrEmpty(t.numeroComprobante) ? default : Conversions.ToInteger(t.numeroComprobante),
+                        PuntoVenta = string.IsNullOrEmpty(t.puntoVenta.ToString()) ? default : t.puntoVenta,
+                        Total = string.IsNullOrEmpty(t.total.ToString()) ? 0m : (decimal)t.total,
                         IdCc = string.IsNullOrEmpty(t.id_cc.ToString()) ? default : t.id_cc,
                         IdProveedor = string.IsNullOrEmpty(t.IdProveedor.ToString()) ? default : t.IdProveedor,
                         IdCobro = string.IsNullOrEmpty(t.id_cobro.ToString()) ? default : t.id_cobro,
                         IdPago = string.IsNullOrEmpty(t.id_pago.ToString()) ? default : t.id_pago
                     };
 
-                    context.Transacciones.Add(nuevaTransaccion);
+                    context.TransaccionEntity.Add(nuevaTransaccion);
                     context.SaveChanges();
                     return true;
                 }

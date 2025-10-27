@@ -83,16 +83,16 @@ namespace Centrex
             if (VariablesGlobales.agregaitem == true)
             {
                 txt_cantidad.Text = 1.ToString();
-                txt_precio.Text = VariablesGlobales.edita_item.precio_lista.ToString();
+                txt_precio.Text = VariablesGlobales.edita_item.PrecioLista.ToString();
             }
             else if (produccion)
             {
-                txt_cantidad.Text = producciones.askCantidadCargadaProduccion(VariablesGlobales.edita_item.id_item, -1, VariablesGlobales.edita_item.IdItemTemporal).ToString();
+                txt_cantidad.Text = producciones.askCantidadCargadaProduccion(VariablesGlobales.edita_item.IdItem, -1, VariablesGlobales.edita_item.IdItemTemporal).ToString();
             }
             else if (ordenCompra)
             {
-                txt_cantidad.Text = ordenesCompras.askCantidadCargadaOC(VariablesGlobales.edita_item.id_item, id_tmpOCItem: VariablesGlobales.edita_item.IdItemTemporal).ToString();
-                txt_precio.Text = ordenesCompras.askPrecioCargadoOC(VariablesGlobales.edita_item.id_item, id_tmpOCItem: VariablesGlobales.edita_item.IdItemTemporal).ToString();
+                txt_cantidad.Text = ordenesCompras.askCantidadCargadaOC(VariablesGlobales.edita_item.IdItem, id_tmpOCItem: VariablesGlobales.edita_item.IdItemTemporal).ToString();
+                txt_precio.Text = ordenesCompras.askPrecioCargadoOC(VariablesGlobales.edita_item.IdItem, id_tmpOCItem: VariablesGlobales.edita_item.IdItemTemporal).ToString();
             }
             else if (comprobanteCompra)
             {
@@ -100,8 +100,8 @@ namespace Centrex
 
             else
             {
-                txt_cantidad.Text = Pedidos.askCantidadCargada(VariablesGlobales.edita_item.id_item, -1, "tmppedidos_items", idUsuario, idUnico).ToString();
-                txt_precio.Text = Pedidos.askPreciocargado(VariablesGlobales.edita_item.id_item, -1, "tmppedidos_items", idUsuario, idUnico).ToString();
+                txt_cantidad.Text = Pedidos.askCantidadCargada(VariablesGlobales.edita_item.IdItem, -1, "tmppedidos_items", idUsuario, idUnico).ToString();
+                txt_precio.Text = Pedidos.askPreciocargado(VariablesGlobales.edita_item.IdItem, -1, "tmppedidos_items", idUsuario, idUnico).ToString();
             }
         }
 
@@ -130,9 +130,9 @@ namespace Centrex
 
             if (!produccion & !ordenCompra & !comprobanteCompra)
             {
-                if (VariablesGlobales.edita_item.cantidad - Conversions.ToDouble(txt_cantidad.Text) is { } arg1 && arg1 < 0)
+                if (VariablesGlobales.edita_item.Cantidad - Conversions.ToDouble(txt_cantidad.Text) is { } arg1 && arg1 < 0)
                 {
-                    Interaction.MsgBox("No hay " + txt_cantidad.Text + " " + VariablesGlobales.edita_item.item.ToString() + " hay solo " + VariablesGlobales.edita_item.cantidad.ToString() + ".", Constants.vbExclamation);
+                    Interaction.MsgBox("No hay " + txt_cantidad.Text + " " + VariablesGlobales.edita_item.Item.ToString() + " hay solo " + VariablesGlobales.edita_item.Cantidad.ToString() + ".", Constants.vbExclamation);
                     // MsgBox("No hay " + txt_cantidad.Text + " " + VariablesGlobales.edita_item.item.ToString + " hay solo " + VariablesGlobales.edita_item.cantidad.ToString + ", ingrese una nueva cantidad o cancele", vbExclamation)
                     // Exit Sub
                 }
@@ -165,7 +165,7 @@ namespace Centrex
             else if (comprobanteCompra)
             {
                 // Es un comprobante de compra
-                comprobantes_compras.add_item_comprobanteCompra(id_comprobanteCompra, VariablesGlobales.edita_item.id_item, Conversions.ToInteger(txt_cantidad.Text), Conversions.ToDouble(txt_precio.Text));
+                comprobantes_compras.add_item_comprobanteCompra(id_comprobanteCompra, VariablesGlobales.edita_item.IdItem, Conversions.ToInteger(txt_cantidad.Text), Conversions.ToDouble(txt_precio.Text));
             }
             // Pedido normal
             else if (!VariablesGlobales.agregaitem)

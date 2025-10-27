@@ -142,8 +142,11 @@ namespace Centrex
         private void psearch_retencion_Click(object sender, EventArgs e)
         {
             // Reutiliza tu formulario de búsqueda general
-            var frmSearch = new search(Conversions.ToInteger("retenciones"));
+            string tmpTabla = VariablesGlobales.tabla;
+            VariablesGlobales.tabla = "retenciones";
+            var frmSearch = new search("retenciones");
             frmSearch.ShowDialog();
+            VariablesGlobales.tabla = tmpTabla;
 
             if (frmSearch.SelectedIndex > 0)
             {

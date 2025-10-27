@@ -18,19 +18,19 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var usuarioEntity = context.Usuarios.FirstOrDefault(u => u.IdUsuario == id_usuario);
+                    var usuarioEntity = context.UsuarioEntity.FirstOrDefault(u => u.IdUsuario == id_usuario);
 
                     if (usuarioEntity is not null)
                     {
                         tmp.IdUsuario = usuarioEntity.IdUsuario;
-                        tmp.usuario = usuarioEntity.usuario;
-                        tmp.password = usuarioEntity.password;
-                        tmp.nombre = usuarioEntity.nombre;
-                        tmp.activo = usuarioEntity.activo;
+                        tmp.Usuario = usuarioEntity.Usuario;
+                        tmp.Password = usuarioEntity.Password;
+                        tmp.Nombre = usuarioEntity.Nombre;
+                        tmp.Activo = usuarioEntity.Activo;
                     }
                     else
                     {
-                        tmp.usuario = "error";
+                        tmp.Usuario = "error";
                     }
                 }
             }
@@ -54,24 +54,24 @@ namespace Centrex
 
                     if (exacto)
                     {
-                        usuarioEntity = context.Usuarios.FirstOrDefault(u => u.usuario == usuario);
+                        usuarioEntity = context.UsuarioEntity.FirstOrDefault(u => u.Usuario == usuario);
                     }
                     else
                     {
-                        usuarioEntity = context.Usuarios.FirstOrDefault(u => u.usuario.Contains(usuario));
+                        usuarioEntity = context.UsuarioEntity.FirstOrDefault(u => u.Usuario.Contains(usuario));
                     }
 
                     if (usuarioEntity is not null)
                     {
                         tmp.IdUsuario = usuarioEntity.IdUsuario;
-                        tmp.usuario = usuarioEntity.usuario;
-                        tmp.password = usuarioEntity.password;
-                        tmp.nombre = usuarioEntity.nombre;
-                        tmp.activo = usuarioEntity.activo;
+                        tmp.Usuario = usuarioEntity.Usuario;
+                        tmp.Password = usuarioEntity.Password;
+                        tmp.Nombre = usuarioEntity.Nombre;
+                        tmp.Activo = usuarioEntity.Activo;
                     }
                     else
                     {
-                        tmp.usuario = "error";
+                        tmp.Usuario = "error";
                     }
                 }
             }
@@ -91,13 +91,13 @@ namespace Centrex
                 {
                     var usuarioEntity = new UsuarioEntity()
                     {
-                        usuario = u.usuarioField,
-                        password = u.password,
-                        nombre = u.nombre,
-                        activo = u.activo
+                        Usuario = u.UsuarioField,
+                        Password = u.Password,
+                        Nombre = u.Nombre,
+                        Activo = u.Activo
                     };
 
-                    context.Usuarios.Add(usuarioEntity);
+                    context.UsuarioEntity.Add(usuarioEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -115,20 +115,20 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var usuarioEntity = context.Usuarios.FirstOrDefault(ue => ue.IdUsuario == u.id_usuario);
+                    var usuarioEntity = context.UsuarioEntity.FirstOrDefault(ue => ue.IdUsuario == u.IdUsuario);
 
                     if (usuarioEntity is not null)
                     {
                         if (borra == true)
                         {
-                            usuarioEntity.activo = false;
+                            usuarioEntity.Activo = false;
                         }
                         else
                         {
-                            usuarioEntity.usuario = u.usuarioField;
-                            usuarioEntity.password = u.password;
-                            usuarioEntity.nombre = u.nombre;
-                            usuarioEntity.activo = u.activo;
+                            usuarioEntity.Usuario = u.UsuarioField;
+                            usuarioEntity.Password = u.Password;
+                            usuarioEntity.Nombre = u.Nombre;
+                            usuarioEntity.Activo = u.Activo;
                         }
 
                         context.SaveChanges();
@@ -153,11 +153,11 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var usuarioEntity = context.Usuarios.FirstOrDefault(ue => ue.IdUsuario == u.id_usuario);
+                    var usuarioEntity = context.UsuarioEntity.FirstOrDefault(ue => ue.IdUsuario == u.IdUsuario);
 
                     if (usuarioEntity is not null)
                     {
-                        context.Usuarios.Remove(usuarioEntity);
+                        context.UsuarioEntity.Remove(usuarioEntity);
                         context.SaveChanges();
                         return true;
                     }
@@ -182,11 +182,11 @@ namespace Centrex
                 {
                     var usuarioPerfilEntity = new UsuarioPerfilEntity()
                     {
-                        IdUsuario = up.id_usuario,
-                        IdPerfil = up.id_perfil
+                        IdUsuario = up.IdUsuario,
+                        IdPerfil = up.IdPerfil
                     };
 
-                    context.UsuariosPerfiles.Add(usuarioPerfilEntity);
+                    context.UsuarioPerfilEntity.Add(usuarioPerfilEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -204,13 +204,13 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var perfilPermisoEntity = new PerfilPermisoEntity()
+                    var perfilPermisoEntity = new PermisoPerfilEntity()
                     {
-                        IdPermiso = pp.id_permiso,
-                        IdPerfil = pp.id_perfil
+                        IdPermiso = pp.IdPermiso,
+                        IdPefil = pp.IdPerfil
                     };
 
-                    context.PerfilesPermisos.Add(perfilPermisoEntity);
+                    context.PermisoPerfilEntity.Add(perfilPermisoEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -232,19 +232,19 @@ namespace Centrex
                 using (CentrexDbContext context = GetDbContext())
                 {
                     string passwordEncriptado = e.Encriptar(password);
-                    var usuarioEntity = context.Usuarios.FirstOrDefault(u => u.usuario == usuario && u.password == passwordEncriptado);
+                    var usuarioEntity = context.UsuarioEntity.FirstOrDefault(u => u.Usuario == usuario && u.Password == passwordEncriptado);
 
                     if (usuarioEntity is not null)
                     {
                         tmp.IdUsuario = usuarioEntity.IdUsuario;
-                        tmp.usuario = usuarioEntity.usuario;
-                        tmp.password = usuarioEntity.password;
-                        tmp.nombre = usuarioEntity.nombre;
-                        tmp.activo = usuarioEntity.activo;
+                        tmp.Usuario = usuarioEntity.Usuario;
+                        tmp.Password = usuarioEntity.Password;
+                        tmp.Nombre = usuarioEntity.Nombre;
+                        tmp.Activo = usuarioEntity.Activo;
                     }
                     else
                     {
-                        tmp.usuario = "error";
+                        tmp.Usuario = "error";
                     }
                 }
             }
@@ -268,7 +268,7 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.Usuarios.FirstOrDefault(u => u.NombreUsuario == nombreUsuario);
+                    return context.UsuarioEntity.FirstOrDefault(u => u.Nombre == nombreUsuario);
                 }
             }
             catch (Exception ex)

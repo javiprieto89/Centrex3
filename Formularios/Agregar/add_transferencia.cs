@@ -195,6 +195,7 @@ namespace Centrex
             var frm = new search(Conversions.ToInteger(cmb_banco.SelectedValue));
             frm.ShowDialog();
             VariablesGlobales.tabla = tmp;
+            Enabled = true;
 
             cmb_cuentaBancaria.SelectedValue = VariablesGlobales.id;
             VariablesGlobales.id = 0;

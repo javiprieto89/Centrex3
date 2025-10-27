@@ -1,4 +1,4 @@
-Imports System.IO
+﻿Imports System.IO
 Imports System.Drawing
 Imports System.Drawing.Imaging
 Imports System.Text
@@ -66,7 +66,7 @@ Module factura
             End If
 
             ' Crear conexión con WSFE usando la nueva infraestructura
-            Dim afipMode As AfipMode = If(c.testing, AfipMode.HOMO, AfipMode.PROD)
+            Dim afipMode As AfipMode = If(c.testing, afipMode.HOMO, afipMode.PROD)
             Dim wsfe As WSFEv1 = Nothing
 
             Try
@@ -345,7 +345,7 @@ Module factura
             password_certificado = "Ladeda78"
 
             ' Configurar AfipConfig con las propiedades dinámicas
-            Dim afipMode As AfipMode = If(esTest, AfipMode.HOMO, AfipMode.PROD)
+            Dim afipMode As AfipMode = If(esTest, afipMode.HOMO, afipMode.PROD)
             AfipConfig.DynamicCertPath = archivo_certificado
             AfipConfig.DynamicCertPassword = password_certificado
             AfipConfig.DynamicCuitEmisor = CLng(cuit_emisor)

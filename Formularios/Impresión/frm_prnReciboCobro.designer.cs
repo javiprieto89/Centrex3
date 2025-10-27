@@ -35,7 +35,7 @@ namespace Centrex
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            rpt_view = new Microsoft.Reporting.WinForms.ReportViewer();
+            rpt_view = new Panel();
             SuspendLayout();
             // 
             // rpt_view
@@ -59,6 +59,6 @@ namespace Centrex
 
         }
 
-        internal Microsoft.Reporting.WinForms.ReportViewer rpt_view;
+        internal Panel rpt_view;
     }
 }

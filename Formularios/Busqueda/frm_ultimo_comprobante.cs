@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
@@ -13,10 +14,21 @@ namespace Centrex
         }
         private void frm_ultimo_comprobante_Load(object sender, EventArgs e)
         {
-            var argcombo = cmb_comprobante;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_comprobante, comprobante FROM comprobantes WHERE activo = '1' AND esElectronica = '1' ORDER BY comprobante ASC", VariablesGlobales.basedb, "comprobante", Conversions.ToInteger("id_comprobante"));
-            cmb_comprobante = argcombo;
-            cmb_comprobante.Text = "Seleccione un comprobante...";
+            var filtros = new Dictionary<string, object>
+            {
+                ["EsElectronica"] = true
+            };
+            var orden = new List<Tuple<string, bool>> { Tuple.Create("Comprobante", true) };
+            generales.Cargar_Combo(
+                ref cmb_comprobante,
+                entidad: "ComprobanteEntity",
+                displaymember: "Comprobante",
+                valuemember: "IdComprobante",
+                predet: -1,
+                soloActivos: true,
+                filtros: filtros,
+                orden: orden);
+            cmb_comprobante.SelectedIndex = -1;
         }
 
         private void cmb_comprobante_KeyPress(object sender, KeyPressEventArgs e)
@@ -26,7 +38,7 @@ namespace Centrex
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            if (cmb_comprobante.Text == "Seleccione un comprobante...")
+            if (cmb_comprobante.SelectedValue is null)
             {
                 Interaction.MsgBox("Debe seleccionar un comprobante para ejecutar la consulta", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;

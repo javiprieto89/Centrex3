@@ -1,11 +1,7 @@
-using System;
+﻿using System;
 using System.Data;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex
 {
@@ -19,7 +15,7 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.Cobros.FirstOrDefault(c => c.IdCobro == Conversions.ToInteger(id_cobro));
+                    return context.CobroEntity.FirstOrDefault(c => c.IdCobro == Conversions.ToInteger(id_cobro));
                 }
             }
             catch (Exception ex)
@@ -39,26 +35,26 @@ namespace Centrex
                     {
                         IdCobroOficial = c.id_cobro_oficial,
                         IdCobroNoOficial = c.id_cobro_no_oficial,
-                        FechaCarga = DateTime.Now,
-                        FechaCobro = !string.IsNullOrEmpty(c.fecha_cobro) ? Conversions.ToDate(c.fecha_cobro) : DateTime.Now,
+                        FechaCarga = DateOnly.FromDateTime(DateTime.Now),
+                        FechaCobro = !string.IsNullOrEmpty(c.fecha_cobro) ? DateOnly.FromDateTime(Conversions.ToDate(c.fecha_cobro)) : DateOnly.FromDateTime(DateTime.Now),
                         IdCliente = c.id_cliente,
                         IdCc = c.id_cc,
-                        dineroEnCc = (decimal)c.dineroEnCc,
-                        efectivo = (decimal)c.efectivo,
-                        totalTransferencia = (decimal)c.totalTransferencia,
-                        totalCh = (decimal)c.totalCh,
-                        totalRetencion = (decimal)c.totalRetencion,
-                        total = (decimal)c.total,
-                        hayCheque = c.hayCheque,
-                        hayTransferencia = c.hayTransferencia,
-                        hayRetencion = c.hayRetencion,
-                        activo = true,
+                        DineroEnCc = (decimal)c.dineroEnCc,
+                        Efectivo = (decimal)c.efectivo,
+                        TotalTransferencia = (decimal)c.totalTransferencia,
+                        TotalCh = (decimal)c.totalCh,
+                        TotalRetencion = (decimal)c.totalRetencion,
+                        Total = (decimal)c.total,
+                        HayCheque = c.hayCheque,
+                        HayTransferencia = c.hayTransferencia,
+                        HayRetencion = c.hayRetencion,
+                        Activo = true,
                         IdAnulaCobro = c.id_anulaCobro != -1 ? c.id_anulaCobro : default,
-                        notas = c.notas ?? "",
-                        firmante = c.firmante ?? ""
+                        Notas = c.notas ?? "",
+                        Firmante = c.firmante ?? ""
                     };
 
-                    context.Cobros.Add(cobroEntity);
+                    context.CobroEntity.Add(cobroEntity);
                     context.SaveChanges();
 
                     return cobroEntity.IdCobro;
@@ -134,11 +130,11 @@ namespace Centrex
                     foreach (var idCheque in cheques)
                     {
                         // Buscar el cheque y actualizar estado
-                        var ch = context.Cheques.FirstOrDefault(c => c.IdCheque == idCheque);
+                        var ch = context.ChequeEntity.FirstOrDefault(c => c.IdCheque == idCheque);
                         if (ch is not null)
                         {
-                            ch.IdEstadoCh = VariablesGlobales.ID_CH_ENTREGADO;   // Constante definida en mconfig
-                            ch.FechaSalida = DateTime.Now;
+                            ch.IdEstadoch = VariablesGlobales.ID_CH_ENTREGADO;   // Constante definida en mconfig
+                            ch.FechaSalida = DateOnly.FromDateTime(DateTime.Now);
                             context.Entry(ch).State = EntityState.Modified;
                         }
 
@@ -146,9 +142,9 @@ namespace Centrex
                         var cobroCheque = new CobroChequeEntity()
                         {
                             IdCobro = id_cobro,
-                            idCheque = idCheque
+                            IdCheque = idCheque
                         };
-                        context.CobrosCheques.Add(cobroCheque);
+                        context.CobroChequeEntity.Add(cobroCheque);
                     }
 
                     context.SaveChanges();
@@ -170,10 +166,10 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var chequesCobrados = context.CobrosCheques.Where(cc => cc.IdCobro == id_cobro).ToList();
+                    var chequesCobrados = context.CobroChequeEntity.Where(cc => cc.IdCobro == id_cobro).ToList();
 
                     foreach (var cobroCheque in chequesCobrados)
-                        context.CobrosCheques.Remove((CobrosChequeEntity)cobroCheque);
+                        context.CobroChequeEntity.Remove((CobroChequeEntity)cobroCheque);
 
                     context.SaveChanges();
                     return true;
@@ -193,7 +189,7 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     // Obtener los IDs de cheques asociados al cobro
-                    var idsChequesQuery = from cc in context.CobrosCheques
+                    var idsChequesQuery = from cc in context.CobroChequeEntity
                                           where cc.IdCobro == id_cobro
                                           select cc.IdCheque;
 
@@ -202,10 +198,10 @@ namespace Centrex
                     // Actualizar el estado de los cheques a CARTERA
                     foreach (var idCheque in idsCheques)
                     {
-                        var cheque = context.Cheques.FirstOrDefault(ch => Operators.ConditionalCompareObjectEqual(ch.IdCheque, idCheque, false));
+                        var cheque = context.ChequeEntity.FirstOrDefault(ch => ch.IdCheque == idCheque);
                         if (cheque is not null)
                         {
-                            cheque.IdEstadoCh = VariablesGlobales.ID_CH_CARTERA;
+                            cheque.IdEstadoch = VariablesGlobales.ID_CH_CARTERA;
                         }
                     }
 
@@ -226,10 +222,10 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var transferencias = context.Transferencias.Where(t => t.IdCobro == id_cobro).ToList();
+                    var transferencias = context.TransferenciaEntity.Where(t => t.IdCobro == id_cobro).ToList();
 
                     foreach (var transferencia in transferencias)
-                        context.Transferencias.Remove((TransferenciaEntity)transferencia);
+                        context.TransferenciaEntity.Remove(transferencia);
 
                     context.SaveChanges();
                     return true;
@@ -248,10 +244,10 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var retenciones = context.CobrosRetenciones.Where(r => r.IdCobro == id_cobro).ToList();
+                    var retenciones = context.CobroRetencionEntity.Where(r => r.IdCobro == id_cobro).ToList();
 
                     foreach (var retencion in retenciones)
-                        context.CobrosRetenciones.Remove((CobroRetencionEntity)retencion);
+                        context.CobroRetencionEntity.Remove((CobroRetencionEntity)retencion);
 
                     context.SaveChanges();
                     return true;
@@ -271,9 +267,9 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     // Eliminar relaciones previas del mismo cobro
-                    var previas = context.CobrosFacturasImportes.Where(f => f.IdCobro == id_cobro).ToList();
+                    var previas = context.CobroNfacturaImporteEntity.Where(f => f.IdCobro == id_cobro).ToList();
                     foreach (var f in previas)
-                        context.CobrosFacturasImportes.Remove((CobroNFacturaImporteEntity)f);
+                        context.CobroNfacturaImporteEntity.Remove((CobroNfacturaImporteEntity)f);
 
                     // Agregar nuevas relaciones desde el DataGridView
                     foreach (DataGridViewRow row in dg_view.Rows)
@@ -287,14 +283,14 @@ namespace Centrex
                         decimal importe = Convert.ToDecimal(row.Cells["Importe"].Value);
                         var fecha = row.Cells["Fecha"] is not null && row.Cells["Fecha"].Value is not null ? Convert.ToDateTime(row.Cells["Fecha"].Value) : DateTime.Now;
 
-                        var nuevaRelacion = new CobroNFacturaImporteEntity()
+                        var nuevaRelacion = new CobroNfacturaImporteEntity()
                         {
                             IdCobro = id_cobro,
-                            nfactura = nFactura,
-                            importe = importe,
-                            fecha = fecha
+                            Nfactura = nFactura,
+                            Importe = importe,
+                            Fecha = DateOnly.FromDateTime(fecha)
                         };
-                        context.CobrosFacturasImportes.Add(nuevaRelacion);
+                        context.CobroNfacturaImporteEntity.Add(nuevaRelacion);
                     }
 
                     context.SaveChanges();
@@ -316,7 +312,7 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     int idCobroInt = Conversions.ToInteger(id_cobro);
-                    bool existe = context.Cobros.Any(c => c.IdAnulaCobro.HasValue && c.IdAnulaCobro.Value == idCobroInt);
+                    bool existe = context.CobroEntity.Any(c => c.IdAnulaCobro.HasValue && c.IdAnulaCobro.Value == idCobroInt);
                     return existe;
                 }
             }
@@ -333,9 +329,9 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    if (context.Cobros.Any())
+                    if (context.CobroEntity.Any())
                     {
-                        var maxIdOficial = context.Cobros.Max(c => c.IdCobroOficial);
+                        var maxIdOficial = context.CobroEntity.Max(c => c.IdCobroOficial);
                         if (maxIdOficial == -1)
                         {
                             return 1;
@@ -364,9 +360,9 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    if (context.Cobros.Any())
+                    if (context.CobroEntity.Any())
                     {
-                        var maxIdNoOficial = context.Cobros.Max(c => c.IdCobroNoOficial);
+                        var maxIdNoOficial = context.CobroEntity.Max(c => c.IdCobroNoOficial);
                         if (maxIdNoOficial == -1)
                         {
                             return 1;

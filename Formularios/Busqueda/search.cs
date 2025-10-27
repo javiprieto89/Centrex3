@@ -1,11 +1,10 @@
-﻿using System;
-using System.Data;
-using System.Drawing;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 using Centrex.Models;
+using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -13,152 +12,193 @@ namespace Centrex
     {
         private string _tabla;
         private DataGridQueryResult _queryResult;
+        private int _idBanco = -1;
+        private bool _historicoActivo = true;
+        private bool _addItem = true;
+        private bool _comprobanteCompra;
+        private int _idComprobanteCompra;
 
-        public search(string tabla = "", bool filtroActivo = true, bool esCaso = false)
+        public int SelectedIndex { get; private set; } = -1;
+
+        public search() : this(string.Empty)
+        {
+        }
+
+        public search(string tabla)
         {
             InitializeComponent();
             _tabla = tabla;
         }
 
-        // ===============================================
-        // 🔹 Carga inicial del formulario
-        // ===============================================
+        // Compatibilidad con constructores anteriores (producción / orden de compra)
+        public search(bool produccion, bool ordenCompra, bool addItem) : this(string.Empty)
+        {
+            _addItem = addItem;
+        }
+
+        // Compatibilidad para búsquedas asociadas a comprobantes de compra
+        public search(bool comprobanteCompra, int idComprobanteCompra) : this(string.Empty)
+        {
+            _comprobanteCompra = comprobanteCompra;
+            _idComprobanteCompra = idComprobanteCompra;
+            _addItem = false;
+        }
+
+        // Compatibilidad para búsquedas filtradas por banco
+        public search(int idBanco) : this(string.Empty)
+        {
+            _idBanco = idBanco;
+            if (string.IsNullOrEmpty(_tabla))
+                _tabla = "cuentas_bancarias";
+        }
+
         private async void search_Load(object sender, EventArgs e)
         {
             try
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
+                SelectedIndex = -1;
+                VariablesGlobales.id = 0;
 
-                // Determinar tabla a mostrar
                 if (string.IsNullOrEmpty(_tabla))
                     _tabla = VariablesGlobales.tabla ?? "clientes";
 
-                lbl_titulo.Text = "Buscando en: " + _tabla.ToUpper();
+                lblbusqueda.Text = $"Búsqueda ({_tabla})";
 
                 await CargarDataGridAsync();
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox($"Error al cargar formulario de búsqueda: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+                Interaction.MsgBox($"Error al cargar el buscador: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
             }
             finally
             {
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
             }
         }
 
-        // ===============================================
-        // 🔹 Cargar la grilla dinámicamente
-        // ===============================================
         private async Task CargarDataGridAsync(string filtroTexto = "")
         {
             try
             {
                 using var ctx = new CentrexDbContext();
 
-                // Crear la consulta dinámica con la fábrica
-                _queryResult = DataGridQueryFactory.GetQueryForTable(ctx, _tabla);
+                _queryResult = DataGridQueryFactory.GetQueryForTable(ctx, _tabla, _historicoActivo, _idBanco);
 
-                // Aplicar filtro textual si existe
-                if (!string.IsNullOrEmpty(filtroTexto) && _queryResult.Query != null)
+                if (!string.IsNullOrWhiteSpace(filtroTexto) && _queryResult.Query != null)
                 {
-                    var tipo = _queryResult.Query.ElementType;
-                    var propiedades = tipo.GetProperties();
+                    var elementos = _queryResult.Query.Cast<object>().ToList();
+                    var propiedades = elementos.FirstOrDefault()?.GetType().GetProperties();
 
-                    // Aplica un filtro textual básico (contains)
-                    _queryResult.Query = _queryResult.Query.Cast<object>()
-                        .Where(x => propiedades.Any(p =>
-                        {
-                            var val = p.GetValue(x);
-                            return val != null && val.ToString().Contains(filtroTexto, StringComparison.OrdinalIgnoreCase);
-                        }))
-                        .AsQueryable();
+                    if (propiedades != null)
+                    {
+                        var filtrado = elementos
+                            .Where(x => propiedades.Any(p =>
+                            {
+                                var valor = p.GetValue(x);
+                                return valor != null && valor.ToString().IndexOf(filtroTexto, StringComparison.OrdinalIgnoreCase) >= 0;
+                            }))
+                            .ToList();
+
+                        _queryResult.EsMaterializada = true;
+                        _queryResult.DataMaterializada = filtrado;
+                    }
                 }
 
-                // Cargar grilla con los resultados
-                await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_view_resultados, _queryResult);
+                await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_view, _queryResult, depuracion: true);
+                lbl_totalRegistros.Text = $"Total: {dg_view.Rows.Count}";
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox($"Error cargando datos: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+                Interaction.MsgBox($"Error al cargar los datos: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
             }
         }
 
-        // ===============================================
-        // 🔹 Botón Buscar / Enter
-        // ===============================================
-        private async void txt_busqueda_KeyDown(object sender, KeyEventArgs e)
+        private async void txt_search_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
+            if (e.KeyChar == (char)Keys.Return)
             {
-                e.SuppressKeyPress = true;
-                await CargarDataGridAsync(txt_busqueda.Text);
+                e.Handled = true;
+                await CargarDataGridAsync(txt_search.Text);
             }
         }
 
-        private async void cmd_buscar_Click(object sender, EventArgs e)
+        private async void cmd_go_Click(object sender, EventArgs e)
         {
-            await CargarDataGridAsync(txt_busqueda.Text);
+            await CargarDataGridAsync(txt_search.Text);
         }
 
-        // ===============================================
-        // 🔹 Selección de fila (doble clic o Enter)
-        // ===============================================
-        private void dg_view_resultados_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        private async void lbl_borrarbusqueda_DoubleClick(object sender, EventArgs e)
+        {
+            txt_search.Text = string.Empty;
+            await CargarDataGridAsync();
+        }
+
+        private void cmd_ok_Click(object sender, EventArgs e)
+        {
+            SeleccionarActual();
+        }
+
+        private void dg_view_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
-                DevolverSeleccion();
+                SeleccionarActual();
         }
 
-        private void dg_view_resultados_KeyDown(object sender, KeyEventArgs e)
+        private void dg_view_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
-                DevolverSeleccion();
+                SeleccionarActual();
             }
         }
 
-        // ===============================================
-        // 🔹 Devolver ID seleccionado al formulario que llamó
-        // ===============================================
-        private void DevolverSeleccion()
+        private void SeleccionarActual()
         {
             try
             {
-                if (dg_view_resultados.CurrentRow == null)
+                if (dg_view.CurrentRow == null)
                     return;
 
-                var id = dg_view_resultados.CurrentRow.Cells[0].Value?.ToString();
-                if (string.IsNullOrEmpty(id))
+                var valor = dg_view.CurrentRow.Cells[0].Value?.ToString();
+                if (string.IsNullOrEmpty(valor) || !int.TryParse(valor, out var id))
                     return;
 
-                VariablesGlobales.id = Convert.ToInt32(id);
+                SelectedIndex = id;
+                VariablesGlobales.id = id;
 
-                // Buscar formulario llamador
-                var callerForm = Application.OpenForms.Cast<Form>()
-                    .FirstOrDefault(f => f is add_pedido || f is add_banco);
-
-                if (callerForm is not null)
-                {
-                    callerForm.Tag = VariablesGlobales.id;
-                    callerForm.BringToFront();
-                }
-
-                this.Close();
+                Close();
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox($"Error al devolver selección: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+                Interaction.MsgBox($"Error al devolver la selección: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
             }
         }
 
-        // ===============================================
-        // 🔹 Botón Salir
-        // ===============================================
+        private void cmd_prev_Click(object sender, EventArgs e)
+        {
+            Interaction.MsgBox("La paginación aún no está implementada en la nueva versión del buscador.", MsgBoxStyle.Information, "Centrex");
+        }
+
+        private void cmd_next_Click(object sender, EventArgs e)
+        {
+            Interaction.MsgBox("La paginación aún no está implementada en la nueva versión del buscador.", MsgBoxStyle.Information, "Centrex");
+        }
+
+        private void cmd_first_Click(object sender, EventArgs e)
+        {
+            Interaction.MsgBox("La paginación aún no está implementada en la nueva versión del buscador.", MsgBoxStyle.Information, "Centrex");
+        }
+
+        private void cmd_last_Click(object sender, EventArgs e)
+        {
+            Interaction.MsgBox("La paginación aún no está implementada en la nueva versión del buscador.", MsgBoxStyle.Information, "Centrex");
+        }
+
         private void cmd_salir_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

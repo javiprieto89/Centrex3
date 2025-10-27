@@ -1,12 +1,15 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 
-namespace Centrex
+namespace Centrex;
+
+public partial class add_ordenCompra
 {
-    public partial class add_ordenCompra
-    {
 
         private double totalOriginal;
         private double subTotalOriginal;
@@ -37,7 +40,18 @@ namespace Centrex
             srch.ShowDialog();
             VariablesGlobales.tabla = tmpTabla;
             VariablesGlobales.activo = tmpActivo;
+            Enabled = true;
+
+            if (srch.SelectedIndex > 0)
+            {
+                VariablesGlobales.edita_item = mitem.info_item(srch.SelectedIndex.ToString());
+                var agregaItemFrm = new infoagregaitem(false, true, true, idUsuario, idUnico);
+                agregaItemFrm.ShowDialog();
+                VariablesGlobales.edita_item = new item();
+            }
+
             VariablesGlobales.agregaitem = false;
+            VariablesGlobales.id = 0;
             actualizarDataGrid();
         }
 
@@ -61,15 +75,28 @@ namespace Centrex
         }
         private void add_ordenCompra_Load(object sender, EventArgs e)
         {
-            string sqlstr;
-            var cli = new cliente();
-            // form = Me ' Comentado para evitar error de compilación
+            idUsuario = VariablesGlobales.usuario_logueado?.IdUsuario ?? 0;
+            idUnico = generales.Generar_ID_Unico();
 
-            // Cargo el combo con todos los proveedores
-            sqlstr = "SELECT p.id_proveedor AS 'id_proveedor', p.razon_social AS 'razon_social' FROM proveedores AS p WHERE p.activo = '1' ORDER BY p.razon_social ASC";
-            var argcombo = cmb_proveedor;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "razon_social", Conversions.ToInteger("id_proveedor"));
-            cmb_proveedor = argcombo;
+            generales.Cargar_Combo(
+                ref cmb_proveedor,
+                entidad: "ProveedorEntity",
+                displaymember: "RazonSocial",
+                valuemember: "IdProveedor",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: OrdenAsc("RazonSocial"));
+
+            if (cmb_proveedor.Items.Count == 0)
+            {
+                Interaction.MsgBox("No hay proveedores activos cargados; no es posible generar la orden de compra.", MsgBoxStyle.Exclamation, "Centrex");
+                closeandupdate(this);
+                return;
+            }
+
+            cmb_proveedor.SelectedIndex = -1;
+            cmb_proveedor.Text = "Seleccione un proveedor...";
 
             txt_subTotal.TextChanged -= new EventHandler(txt_subTotal_TextChanged);
             txt_impuestos.TextChanged -= new EventHandler(txt_impuestos_TextChanged);
@@ -77,7 +104,7 @@ namespace Centrex
             if (VariablesGlobales.edicion | VariablesGlobales.borrado)
             {
                 // cargo fecha de la orden de compra
-                // cargo cliente de la orden de compra
+                // cargo Proveedor de la orden de compra
                 // cargo items
                 // cargo total
                 // inhabilito carga secuencial
@@ -85,8 +112,6 @@ namespace Centrex
                 lbl_fechaCarga.Text = Conversions.ToString(DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_ordenCompra.fecha_carga.Value)));
                 dtp_fechaComprobante.Value = DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_ordenCompra.fecha_comprobante.Value));
 
-                var p = new proveedor();
-                p = proveedores.info_proveedor(VariablesGlobales.edita_ordenCompra.IdProveedor.ToString());
 
                 cmb_proveedor.SelectedValue = VariablesGlobales.edita_ordenCompra.IdProveedor;
 
@@ -98,7 +123,7 @@ namespace Centrex
                 txt_totalO.Text = txt_total.Text;
                 txt_nota.Text = VariablesGlobales.edita_ordenCompra.notas;
                 chk_secuencia.Enabled = false;
-                subTotalOriginal = Conversions.ToDouble(txt_subTotal.Text);
+                subTotalOriginal = Convert.ToDouble(txt_subTotal.Text);
 
                 lbl_nOrdenCompra.Text = VariablesGlobales.edita_ordenCompra.id_ordenCompra.ToString();
                 lbl_ordenCompra.Visible = true;
@@ -113,19 +138,13 @@ namespace Centrex
                 txt_subTotal.Text = "0,00";
                 txt_impuestos.Text = "0,00";
                 txt_totalO.Text = txt_total.Text;
+                actualizarDataGrid();
             }
 
             txt_subTotal.TextChanged += new EventHandler(txt_subTotal_TextChanged);
             txt_impuestos.TextChanged += new EventHandler(txt_impuestos_TextChanged);
 
-            if (dg_viewOC.Rows.Count > 0)
-            {
-                cmd_ok.Enabled = true;
-            }
-            else
-            {
-                cmd_ok.Enabled = false;
-            }
+            cmd_ok.Enabled = dg_viewOC.Rows.Count > 0;
 
             if (VariablesGlobales.edita_ordenCompra.id_ordenCompra != 0 | VariablesGlobales.borrado == true)
             {
@@ -175,9 +194,9 @@ namespace Centrex
         {
             ordenCompra ultimaOC = null;
 
-            if (cmb_proveedor.Text == "Seleccione un cliente" | string.IsNullOrEmpty(cmb_proveedor.Text))
+            if (cmb_proveedor.SelectedValue is null)
             {
-                Interaction.MsgBox("El campo 'Cliente' es obligatorio y está vacio");
+                Interaction.MsgBox("El campo 'Proveedor' es obligatorio y está vacio");
                 return;
             }
             else if (dg_viewOC.Rows.Count == 0)
@@ -188,14 +207,14 @@ namespace Centrex
 
             var oc = new ordenCompra();
 
-            oc.IdProveedor = Conversions.ToInteger(cmb_proveedor.SelectedValue);
+            oc.IdProveedor = Convert.ToInt32(cmb_proveedor.SelectedValue);
             oc.fecha_carga = lbl_fechaCarga.Text;
             oc.fecha_comprobante = Conversions.ToString(dtp_fechaComprobante.Value.Date);
             if (lbl_fechaRecepcion.Text != "%fecha_recepcion%")
                 oc.fecha_recepcion = lbl_fechaRecepcion.Text;
-            oc.subtotal = Conversions.ToDouble(txt_subTotal.Text);
-            oc.iva = Conversions.ToDouble(txt_impuestos.Text);
-            oc.total = Conversions.ToDouble(txt_total.Text);
+            oc.subtotal = Convert.ToDouble(txt_subTotal.Text);
+            oc.iva = Convert.ToDouble(txt_impuestos.Text);
+            oc.total = Convert.ToDouble(txt_total.Text);
             oc.notas = txt_nota.Text;
             oc.activo = true;
 
@@ -271,7 +290,7 @@ namespace Centrex
             My.MyProject.Forms.search.ShowDialog();
             VariablesGlobales.tabla = tmp;
 
-            // Establezco la opción del combo, si es 0 elijo el cliente default
+            // Establezco la opción del combo, si es 0 elijo el Proveedor default
             if (VariablesGlobales.id == 0)
                 VariablesGlobales.id = VariablesGlobales.id_proveedor_default;
             var argcmb = cmb_proveedor;
@@ -299,7 +318,7 @@ namespace Centrex
             VariablesGlobales.edita_item = i;
 
             ordenesCompras.updatePreciosOC(dg_viewOC, txt_subTotal, txt_impuestos, txt_total, txt_totalO);
-            subTotalOriginal = Conversions.ToDouble(txt_subTotal.Text);
+            subTotalOriginal = Convert.ToDouble(txt_subTotal.Text);
         }
 
         private void EditarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -319,19 +338,19 @@ namespace Centrex
             // Obtengo el ID interno de la tabla tmpOC_items
             id_tmpOCItem_seleccionado = Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1);
 
-            ordenesCompras.borraritemCargadoOC(Conversions.ToInteger(id_tmpOCItem_seleccionado));
+            ordenesCompras.borraritemCargadoOC(Convert.ToInt32(id_tmpOCItem_seleccionado));
 
             // Si se borró algún descuento recalcula los descuentos 
             // updateDescuentos()
 
             ordenesCompras.updatePreciosOC(dg_viewOC, txt_subTotal, txt_impuestos, txt_total, txt_totalO);
-            subTotalOriginal = Conversions.ToDouble(txt_subTotal.Text);
+            subTotalOriginal = Convert.ToDouble(txt_subTotal.Text);
             // resaltarcolumna(dg_view, 4, Color.Red)
         }
 
         private void txt_subTotal_TextChanged(object sender, EventArgs e)
         {
-            txt_impuestos.Text = Math.Round(Conversions.ToDouble(txt_subTotal.Text) * 0.21d, 2).ToString();
+            txt_impuestos.Text = Math.Round(Convert.ToDouble(txt_subTotal.Text) * 0.21d, 2).ToString();
         }
 
         private void txt_impuestos_TextChanged(object sender, EventArgs e)
@@ -361,7 +380,7 @@ namespace Centrex
         }
         private void updateAndCheck()
         {
-            subTotalOriginal = Conversions.ToDouble(txt_subTotal.Text);
+            subTotalOriginal = Convert.ToDouble(txt_subTotal.Text);
             if (dg_viewOC.Rows.Count > 0)
             {
                 cmd_ok.Enabled = true;
@@ -377,22 +396,58 @@ namespace Centrex
             // e.KeyChar = ""
         }
 
-        private void cmb_cliente_KeyPress(object sender, KeyPressEventArgs e)
+        private void cmb_proveedor_KeyPress(object sender, KeyPressEventArgs e)
         {
             // e.KeyChar = ""
         }
 
         private void actualizarDataGrid()
         {
-            string sqlstr;
+            using var context = new CentrexDbContext();
 
-            sqlstr = "SELECT CONCAT(ti.id_tmpOCItem, '-', ti.id_item) AS 'ID', ti.id_OCItem AS 'id_OCItem', " + "CASE WHEN i.id_item IS NULL THEN ti.descript ELSE i.descript END AS 'Producto', " + "ti.cantidad AS 'Cant.', ti.precio AS 'Precio', " + "ti.cantidad_recibida AS 'Cantidad Recibida' " + "FROM tmpOC_items AS ti " + "LEFT JOIN items AS i ON ti.id_item = i.id_item " + "WHERE ti.activo = '1' AND (i.esMarkup = '0' OR ti.id_item IS NULL) " + "ORDER BY id ASC";
-            var argdataGrid = dg_viewOC;
-            int argnRegs = 0;
-            int argtPaginas = 0;
-            TextBox argtxtnPage = null;
-            generales.cargar_datagrid(ref argdataGrid, sqlstr, VariablesGlobales.basedb, 0, ref argnRegs, ref argtPaginas, 1, ref argtxtnPage, "", "");
-            dg_viewOC = argdataGrid;
+            var query = context.TmpOcItemEntity
+                .AsNoTracking()
+                .Where(t => t.Activo != false);
+
+            if (VariablesGlobales.edicion)
+            {
+                query = query.Where(t => t.IdOrdenCompra == VariablesGlobales.edita_ordenCompra.id_ordenCompra);
+            }
+            else
+            {
+                query = query.Where(t => !t.IdOrdenCompra.HasValue);
+            }
+
+
+            var items = (from tmp in query
+                         join item in context.ItemEntity.AsNoTracking() on tmp.IdItem equals (int?)item.IdItem into itemJoin
+                         from item in itemJoin.DefaultIfEmpty()
+                         where !tmp.IdItem.HasValue || item == null || !item.EsMarkup
+                         orderby tmp.IdTmpOcitem
+                         select new
+                         {
+                             ID = $"{tmp.IdTmpOcitem}-{tmp.IdItem.GetValueOrDefault()}",
+                             id_OCItem = tmp.IdOcItem,
+                             Producto = item != null ? item.Descript : tmp.Descript,
+                             Cantidad = tmp.Cantidad,
+                             Precio = tmp.Precio,
+                             CantidadRecibida = tmp.CantidadRecibida ?? 0
+                         }).ToList();
+
+            dg_viewOC.DataSource = items;
+
+            if (dg_viewOC.Columns.Contains("id_OCItem"))
+                dg_viewOC.Columns["id_OCItem"].HeaderText = "id_OCItem";
+            if (dg_viewOC.Columns.Contains("Cantidad"))
+                dg_viewOC.Columns["Cantidad"].HeaderText = "Cant.";
+            if (dg_viewOC.Columns.Contains("Precio"))
+            {
+                dg_viewOC.Columns["Precio"].HeaderText = "Precio";
+                dg_viewOC.Columns["Precio"].DefaultCellStyle.Format = "N2";
+            }
+            if (dg_viewOC.Columns.Contains("CantidadRecibida"))
+                dg_viewOC.Columns["CantidadRecibida"].HeaderText = "Cantidad Recibida";
+
             ordenesCompras.updatePreciosOC(dg_viewOC, txt_subTotal, txt_impuestos, txt_total, txt_totalO);
             updateAndCheck();
         }
@@ -400,7 +455,6 @@ namespace Centrex
         private void ModificarArtículoRecibidoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string seleccionado;
-            string sqlstr;
             string tmpTabla;
             bool tmpActivo;
             int id_item;
@@ -408,7 +462,7 @@ namespace Centrex
 
             // Obtengo el ID interno de la tabla tmpOC_items
             seleccionado = dg_viewOC.CurrentRow.Cells[0].Value.ToString();
-            id_item_tmp = Conversions.ToInteger(Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1));
+            id_item_tmp = Convert.ToInt32(Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1));
 
             tmpTabla = VariablesGlobales.tabla;
             tmpActivo = VariablesGlobales.activo;
@@ -420,8 +474,15 @@ namespace Centrex
             srch.ShowDialog();
             id_item = VariablesGlobales.id;
 
-            sqlstr = "UPDATE tmpOC_items SET id_item_recibido = '" + id_item.ToString() + "' WHERE id_tmpOCItem = '" + id_item_tmp.ToString() + "'";
-            ejecutarSQL(sqlstr);
+            using (var context = new CentrexDbContext())
+            {
+                var tmpItem = context.TmpOcItemEntity.FirstOrDefault(t => t.IdTmpOcitem == id_item_tmp);
+                if (tmpItem is not null)
+                {
+                    tmpItem.IdItemRecibido = id_item;
+                    context.SaveChanges();
+                }
+            }
 
             actualizarDataGrid();
         }
@@ -429,7 +490,6 @@ namespace Centrex
         private void ModificarCantidadRecibidaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string seleccionado;
-            string sqlstr;
             int cantidad_recibida;
 
             // Obtengo el ID del item
@@ -446,11 +506,21 @@ namespace Centrex
             agregaItem.ShowDialog();
             cantidad_recibida = agregaItem.cant;
 
-            sqlstr = "UPDATE tmpproduccion_items SET cantidad_recibida = '" + cantidad_recibida.ToString() + "' WHERE id_tmpProduccionItem = '" + VariablesGlobales.edita_item.id_item_temporal.ToString + "'";
-            ejecutarSQL(sqlstr);
+            using (var context = new CentrexDbContext())
+            {
+                int idTmp = Convert.ToInt32(VariablesGlobales.edita_item.id_item_temporal);
+                var tmpItem = context.TmpOcItemEntity.FirstOrDefault(t => t.IdTmpOcitem == idTmp);
+                if (tmpItem is not null)
+                {
+                    tmpItem.CantidadRecibida = cantidad_recibida;
+                    context.SaveChanges();
+                }
+            }
 
             actualizarDataGrid();
         }
-    }
+
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+            new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
 }
 

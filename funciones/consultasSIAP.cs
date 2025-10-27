@@ -75,6 +75,14 @@ public static class consultasSIAP
         }
     }
 
+    public static List<consultaSIAP> ObtenerConsultasActivas()
+    {
+        return _consultas.Values
+            .Where(c => c.activo)
+            .OrderBy(c => c.nombre)
+            .ToList();
+    }
+
     // 🔹 Ejecuta la consulta lógica y devuelve el resultado como texto (para exportar)
     public static string ejecutarConsultaSIAP(string claveConsulta, DateTime? fechaDesde = null, DateTime? fechaHasta = null)
     {

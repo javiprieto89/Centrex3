@@ -26,6 +26,9 @@ namespace Centrex
 
         private void add_produccion_Load(object sender, EventArgs e)
         {
+            idUsuario = VariablesGlobales.usuario_logueado?.IdUsuario ?? 0;
+            idUnico = generales.Generar_ID_Unico();
+
             // Cargo proveedores usando EF
             var proveedores = ctx.Proveedores.Where(p => p.activo == true).OrderBy(p => p.razon_social).ToList();
 
@@ -141,14 +144,27 @@ namespace Centrex
             srch.ShowDialog();
             VariablesGlobales.tabla = tmpTabla;
             VariablesGlobales.activo = tmpActivo;
-            VariablesGlobales.agregaitem = false;
-            actualizarDataGrid();
+            Enabled = true;
 
-            if (asocitems.Tiene_Items_Asociados(VariablesGlobales.id.ToString()))
+            int seleccionado = VariablesGlobales.id;
+            if (seleccionado > 0)
             {
-                var frm_detalle_prod = new frm_detalle_asoc_produccion(VariablesGlobales.id);
+                VariablesGlobales.edita_item = mitem.info_item(seleccionado.ToString());
+                var agregaItemFrm = new infoagregaitem(true, false, true, idUsuario, idUnico);
+                agregaItemFrm.ShowDialog();
+                VariablesGlobales.edita_item = new item();
+            }
+
+            if (asocitems.Tiene_Items_Asociados(seleccionado.ToString()))
+            {
+                var frm_detalle_prod = new frm_detalle_asoc_produccion(seleccionado);
                 frm_detalle_prod.ShowDialog();
             }
+
+            VariablesGlobales.agregaitem = false;
+            VariablesGlobales.id = 0;
+            actualizarDataGrid();
+
         }
 
         private void cmd_exit_Click(object sender, EventArgs e)
@@ -296,6 +312,7 @@ namespace Centrex
                 ctx.SaveChanges();
             }
 
+            VariablesGlobales.id = 0;
             actualizarDataGrid();
         }
 

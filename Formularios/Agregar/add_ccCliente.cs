@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -11,25 +11,17 @@ namespace Centrex
         {
             InitializeComponent();
         }
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+            new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
+
         private void add_ccCliente_Load(object sender, EventArgs e)
         {
-            string sqlstr;
-
             // form = Me ' Comentado para evitar error de compilación
             txt_saldo.Text = "0";
             chk_activo.Checked = true;
 
-            // Cargo el combo con todos los clientes
-            sqlstr = "SELECT c.id_cliente AS 'id_cliente', c.razon_social AS 'razon_social' FROM clientes AS c WHERE c.activo = '1' ORDER BY c.razon_social ASC";
-            var argcombo = cmb_cliente;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "razon_social", Conversions.ToInteger("id_cliente"));
-            cmb_cliente = argcombo;
-
-            // Cargo el combo con todas las monedas
-            sqlstr = "SELECT id_moneda, moneda FROM sysMoneda ORDER BY moneda ASC";
-            var argcombo1 = cmb_moneda;
-            generales.Cargar_Combo(ref argcombo1, sqlstr, VariablesGlobales.basedb, "moneda", Conversions.ToInteger("id_moneda"));
-            cmb_moneda = argcombo1;
+            CargarClientes();
+            CargarMonedas();
 
             if (VariablesGlobales.edicion | VariablesGlobales.borrado)
             {
@@ -48,6 +40,8 @@ namespace Centrex
             }
             else
             {
+                cmb_cliente.SelectedIndex = -1;
+                cmb_moneda.SelectedIndex = -1;
                 cmb_cliente.Text = "Seleccione un cliente...";
                 cmb_moneda.Text = "Seleccione una moneda...";
             }
@@ -89,12 +83,12 @@ namespace Centrex
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            if (cmb_cliente.Text == "Seleccione un cliente...")
+            if (cmb_cliente.SelectedValue is null)
             {
                 Interaction.MsgBox("El campo 'Cliente' es obligatorio y está vacio", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
-            else if (cmb_moneda.Text == "Seleccione una moneda...")
+            else if (cmb_moneda.SelectedValue is null)
             {
                 Interaction.MsgBox("El campo 'Moneda' es obligatorio y está vacio", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
@@ -107,10 +101,10 @@ namespace Centrex
 
             var tmp = new ccCliente();
 
-            tmp.IdCliente = Conversions.ToInteger(cmb_cliente.SelectedValue);
-            tmp.IdMoneda = Conversions.ToInteger(cmb_moneda.SelectedValue);
+            tmp.IdCliente = Convert.ToInt32(cmb_cliente.SelectedValue);
+            tmp.IdMoneda = Convert.ToInt32(cmb_moneda.SelectedValue);
             tmp.Nombre = txt_nombre.Text;
-            tmp.Saldo = Conversions.ToDecimal(txt_saldo.Text);
+            tmp.Saldo = Convert.ToDecimal(txt_saldo.Text);
             tmp.Activo = chk_activo.Checked;
 
             if (VariablesGlobales.edicion == true)
@@ -134,6 +128,10 @@ namespace Centrex
                 txt_saldo.Text = "0";
                 chk_activo.Checked = true;
                 ActiveControl = cmb_cliente;
+                cmb_cliente.SelectedIndex = -1;
+                cmb_moneda.SelectedIndex = -1;
+                cmb_cliente.Text = "Seleccione un cliente...";
+                cmb_moneda.Text = "Seleccione una moneda...";
             }
             else
             {
@@ -162,6 +160,34 @@ namespace Centrex
             var argcmb = cmb_cliente;
             generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
             cmb_cliente = argcmb;
+        }
+
+        private void CargarClientes()
+        {
+            var ordenClientes = OrdenAsc("RazonSocial");
+            generales.Cargar_Combo(
+                ref cmb_cliente,
+                entidad: "ClienteEntity",
+                displaymember: "RazonSocial",
+                valuemember: "IdCliente",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenClientes);
+        }
+
+        private void CargarMonedas()
+        {
+            var ordenMonedas = OrdenAsc("Moneda");
+            generales.Cargar_Combo(
+                ref cmb_moneda,
+                entidad: "SysMonedaEntity",
+                displaymember: "Moneda",
+                valuemember: "IdMoneda",
+                predet: -1,
+                soloActivos: false,
+                filtros: null,
+                orden: ordenMonedas);
         }
     }
 }

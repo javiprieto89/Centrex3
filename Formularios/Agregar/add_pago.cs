@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 
@@ -24,24 +29,27 @@ namespace Centrex
         }
         // Private chSelSearch() As Integer
 
-        private void add_pago_Load(object sender, EventArgs e)
+        private async void add_pago_Load(object sender, EventArgs e)
         {
-            string sqlstr;
+            generales.Cargar_Combo(
+                ref cmb_proveedor,
+                entidad: "ProveedorEntity",
+                displaymember: "RazonSocial",
+                valuemember: "IdProveedor",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: OrdenAsc("RazonSocial"));
 
-            // form = Me ' Comentado para evitar error de compilación
-
-            // Cargo el combo con todos los proveedores
-            sqlstr = "SELECT p.id_proveedor AS 'id_proveedor', p.razon_social AS 'razon_social' FROM proveedores AS p WHERE p.activo = '1' ORDER BY p.razon_social ASC";
-            var argcombo = cmb_proveedor;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "razon_social", Conversions.ToInteger("id_proveedor"));
-            cmb_proveedor = argcombo;
+            cmb_proveedor.SelectedIndex = -1;
             cmb_proveedor.Text = "Seleccione un proveedor...";
+
+            cmb_cc.DataSource = null;
             cmb_cc.Enabled = false;
 
-            resetForm();
-            actualizarDataGrid();
+            await ResetFormAsync();
+            await ActualizarDataGridAsync();
             lbl_fecha.Text = generales.Hoy();
-            // form = Me ' Comentado para evitar error de compilación
         }
 
         private void add_pago_FormClosed(object sender, FormClosedEventArgs e)
@@ -49,10 +57,8 @@ namespace Centrex
             closeandupdate(this);
         }
 
-        private void cmb_proveedor_SelectionChangeCommitted(object sender, EventArgs e)
+        private async void cmb_proveedor_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            string sqlstr;
-
             // 
             // MUESTRA LAS FACTURAS PENDIENTES DE ABONAR POR EL CLIENTE
             // chk_efectivo.Enabled = True
@@ -70,18 +76,29 @@ namespace Centrex
             // MUESTRA LAS FACTURAS PENDIENTES DE ABONAR POR EL CLIENTE
             // 
 
-            string p = cmb_proveedor.SelectedValue.ToString();
+            if (cmb_proveedor.SelectedValue is null)
+                return;
 
-            // sqlstr = "SELECT id_cc, nombre FROM cc_proveedores WHERE activo = 1 AND id_proveedor = '" + p + "' ORDER BY nombre ASC"
-            // cargar_combo(cmb_cc, sqlstr, basedb, "nombre", "id_cc")
-            // cmb_cc.Enabled = True
+            var filtros = new Dictionary<string, object>
+            {
+                ["IdProveedor"] = Convert.ToInt32(cmb_proveedor.SelectedValue)
+            };
 
-            // Cargo los combos con todas las cuentas corrientes del proveedor
-            sqlstr = "SELECT id_cc, nombre FROM cc_proveedores WHERE activo = 1 AND id_proveedor = '" + p + "' ORDER BY nombre ASC";
-            var argcombo = cmb_cc;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_cc"));
-            cmb_cc = argcombo;
-            cmb_cc.Enabled = true;
+            generales.Cargar_Combo(
+                ref cmb_cc,
+                entidad: "CcProveedorEntity",
+                displaymember: "Nombre",
+                valuemember: "IdCc",
+                predet: -1,
+                soloActivos: true,
+                filtros: filtros,
+                orden: OrdenAsc("Nombre"));
+
+            cmb_cc.Enabled = cmb_cc.Items.Count > 0;
+            if (cmb_cc.Items.Count > 0)
+                cmb_cc.SelectedIndex = 0;
+            else
+                cmb_cc.SelectedIndex = -1;
 
             chk_efectivo.Enabled = true;
             chk_transferencia.Enabled = true;
@@ -91,8 +108,8 @@ namespace Centrex
             // c = info_cliente(cmb_cliente.SelectedValue)
             cmb_cc_SelectionChangeCommitted(null, null);
             // actualizarDataGrid(p)
-            actualizarDataGrid();
-            resetForm();
+            await ActualizarDataGridAsync();
+            await ResetFormAsync();
         }
 
         private void chk_efectivo_CheckedChanged(object sender, EventArgs e)
@@ -165,12 +182,12 @@ namespace Centrex
             }
         }
 
-        private void cmd_addCheques_Click(object sender, EventArgs e)
+        private async void cmd_addCheques_Click(object sender, EventArgs e)
         {
             var addCheque = new add_cheque(-1, Conversions.ToInteger(cmb_proveedor.SelectedValue));
             addCheque.ShowDialog();
             // actualizarDataGrid(cmb_proveedor.SelectedValue.ToString)
-            actualizarDataGrid();
+            await ActualizarDataGridAsync();
         }
 
         private void cmd_verCheques_Click(object sender, EventArgs e)
@@ -358,64 +375,112 @@ namespace Centrex
             // e.KeyChar = ""
         }
 
-        private void lbl_borrarbusqueda_DoubleClick(object sender, EventArgs e)
+        private async void lbl_borrarbusqueda_DoubleClick(object sender, EventArgs e)
         {
             txt_search.Text = "";
             // actualizarDataGrid(cmb_proveedor.SelectedValue.ToString)
-            actualizarDataGrid();
+            await ActualizarDataGridAsync();
         }
 
-        // Private Sub actualizarDataGrid(ByVal p As String)
-        private void actualizarDataGrid()
+        private async Task ActualizarDataGridAsync()
         {
-            string sqlstr = "";
-            string txtsearch = "";
-            int count = 0;
-
-            if (!string.IsNullOrEmpty(txt_search.Text))
-            {
-                txtsearch = Strings.Replace(txt_search.Text, " ", "%");
-
-                checkCheques();
-
-                sqlstr = "SELECT ch.id_cheque AS 'ID', CASE WHEN ch.id_cliente IS NULL THEN '**** CHEQUE PROPIO ****' ELSE c.razon_social END AS 'Cliente', b.nombre AS 'Banco', ch.nCheque AS 'Nº cheque', ch.importe AS 'Importe', sech.estado AS 'Estado', " + "CASE WHEN ch.id_cuentaBancaria IS NULL THEN 'No' ELSE CONCAT('Si, en:', cbb.nombre, ' - ', cb.nombre) END AS '¿Depositado?', " + "CASE WHEN ch.activo = 1 THEN 'Si' ELSE 'No' END AS '¿Activo?' " + "FROM cheques AS ch " + "LEFT JOIN clientes AS c ON ch.id_cliente = c.id_cliente " + "INNER JOIN bancos AS b ON ch.id_banco = b.id_banco " + "LEFT JOIN cuentas_bancarias AS cb ON ch.id_cuentaBancaria = cb.id_cuentaBancaria " + "LEFT JOIN bancos AS cbb ON cb.id_banco = cbb.id_banco " + "INNER JOIN sysestados_cheques AS sech ON ch.id_estadoch = sech.id_estadoch " + "WHERE ch.activo = 1 AND ch.id_estadoch = 1  " + "AND (ch.id_cheque LIKE '%" + txtsearch + "%' " + "OR b.nombre LIKE '%" + txtsearch + "%' " + "OR ch.nCheque LIKE '%" + txtsearch + "%' " + "OR ch.importe LIKE '%" + txtsearch + "%' " + "OR sech.estado LIKE '%" + txtsearch + "%') " + "ORDER BY ch.nCheque ASC"; // id_estadoch = 1 = En cartera
-            }
-            else
+            try
             {
                 checkCheques();
 
-                // MUESTRA LOS CHEQUES EN CARTERA DISPONIBLES PARA USAR PARA PAGAR A UN PROVEEDOR
+                using var ctx = new CentrexDbContext();
 
-                sqlstr = "SELECT ch.id_cheque AS 'ID', CASE WHEN ch.id_cliente IS NULL THEN '**** CHEQUE PROPIO ****' ELSE c.razon_social END AS 'Cliente', b.nombre AS 'Banco', ch.nCheque AS 'Nº cheque', ch.importe AS 'Importe', sech.estado AS 'Estado', " + "CASE WHEN ch.id_cuentaBancaria IS NULL THEN 'No' ELSE CONCAT('Si, en:', cbb.nombre, ' - ', cb.nombre) END AS '¿Depositado?', " + "CASE WHEN ch.activo = 1 THEN 'Si' ELSE 'No' END AS '¿Activo?' " + "FROM cheques AS ch " + "LEFT JOIN clientes AS c ON ch.id_cliente = c.id_cliente " + "INNER JOIN bancos AS b ON ch.id_banco = b.id_banco " + "LEFT JOIN cuentas_bancarias AS cb ON ch.id_cuentaBancaria = cb.id_cuentaBancaria " + "LEFT JOIN bancos AS cbb ON cb.id_banco = cbb.id_banco " + "INNER JOIN sysestados_cheques AS sech ON ch.id_estadoch = sech.id_estadoch " + "WHERE ch.activo = 1 AND ch.id_estadoch = 1  " + "ORDER BY ch.nCheque ASC"; // id_estadoch = 1 = En cartera
-            }
+                var query = ctx.ChequeEntity
+                    .AsNoTracking()
+                    .Include(ch => ch.IdClienteNavigation)
+                    .Include(ch => ch.IdProveedorNavigation)
+                    .Include(ch => ch.IdBancoNavigation)
+                    .Include(ch => ch.IdCuentaBancariaNavigation)
+                        .ThenInclude(cb => cb.IdBancoNavigation)
+                    .Include(ch => ch.IdEstadochNavigation)
+                    .Where(ch => ch.Activo && ch.IdEstadoch == VariablesGlobales.ID_CH_CARTERA);
 
-            if (!string.IsNullOrEmpty(sqlstr) & sqlstr != "error")
-            {
-                int nRegs = 0;
-                int tPaginas = 0;
-                var txtnPage = new TextBox();
-                var argdataGrid = dg_viewCH;
-                generales.cargar_datagrid(ref argdataGrid, sqlstr, VariablesGlobales.basedb, 0, ref nRegs, ref tPaginas, 1, ref txtnPage, "cheques", "cheques");
-                dg_viewCH = argdataGrid;
+                var rawSearch = txt_search.Text?.Trim();
+                if (!string.IsNullOrWhiteSpace(rawSearch))
+                {
+                    var normalized = rawSearch.Replace(" ", "%");
+                    var pattern = $"%{normalized}%";
+                    var hasInt = int.TryParse(rawSearch, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intValue);
+                    var hasDecimal = decimal.TryParse(rawSearch, NumberStyles.Number, CultureInfo.CurrentCulture, out var decimalValue);
+
+                    query = query.Where(ch =>
+                        (ch.IdClienteNavigation != null && EF.Functions.Like(ch.IdClienteNavigation.RazonSocial, pattern)) ||
+                        (ch.IdProveedorNavigation != null && EF.Functions.Like(ch.IdProveedorNavigation.RazonSocial, pattern)) ||
+                        EF.Functions.Like(ch.IdBancoNavigation.Nombre, pattern) ||
+                        EF.Functions.Like(ch.IdEstadochNavigation.Estado, pattern) ||
+                        (hasInt && (ch.IdCheque == intValue || ch.NCheque == intValue || ch.NCheque2 == intValue)) ||
+                        (hasDecimal && ch.Importe == decimalValue));
+                }
+
+                var projection = query
+                    .OrderBy(ch => ch.NCheque)
+                    .Select(ch => new
+                    {
+                        ID = ch.IdCheque,
+                        Cliente = ch.IdClienteNavigation == null ? "**** CHEQUE PROPIO ****" : ch.IdClienteNavigation.RazonSocial,
+                        Banco = ch.IdBancoNavigation.Nombre,
+                        NumeroCheque = ch.NCheque,
+                        Importe = ch.Importe,
+                        Estado = ch.IdEstadochNavigation.Estado,
+                        Depositado = ch.IdCuentaBancariaNavigation == null
+                            ? "No"
+                            : "Si, en: " + ch.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre + " - " + ch.IdCuentaBancariaNavigation.Nombre,
+                        Activo = ch.Activo ? "Si" : "No"
+                    });
+
+                var result = new DataGridQueryResult
+                {
+                    Query = projection,
+                    ColumnasOcultar = new List<string> { "ID" },
+                    TieneCheckbox = true,
+                    NombreColumnCheckbox = selColName,
+                    PosicionColumnCheckbox = 0
+                };
+
+                await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_viewCH, result, depuracion: true);
+
+                if (dg_viewCH.Columns.Contains(selColName))
+                {
+                    dg_viewCH.Columns[selColName].HeaderText = "";
+                    dg_viewCH.Columns[selColName].Width = 60;
+                    dg_viewCH.Columns[selColName].DisplayIndex = 0;
+                }
+
+                if (dg_viewCH.Columns.Contains("NumeroCheque"))
+                    dg_viewCH.Columns["NumeroCheque"].HeaderText = "Nº cheque";
+                if (dg_viewCH.Columns.Contains("Importe"))
+                {
+                    dg_viewCH.Columns["Importe"].HeaderText = "$$";
+                    dg_viewCH.Columns["Importe"].DefaultCellStyle.Format = "N2";
+                }
+                if (dg_viewCH.Columns.Contains("Estado"))
+                    dg_viewCH.Columns["Estado"].HeaderText = "Estado";
+                if (dg_viewCH.Columns.Contains("Depositado"))
+                    dg_viewCH.Columns["Depositado"].HeaderText = "¿Depositado?";
+                if (dg_viewCH.Columns.Contains("Activo"))
+                    dg_viewCH.Columns["Activo"].HeaderText = "¿Activo?";
+
                 selCheques();
+
+                lbl_importePago.Text = "$ " + Convert.ToString(total);
             }
-
-            // If chSel IsNot Nothing Then
-            // For Each idCheque As Integer In chSel
-            // totalCh += info_cheque(idCheque.ToString).importe
-            // Next
-            // End If
-
-            // total += totalCh
-            lbl_importePago.Text = "$ " + Convert.ToString(total);
+            catch (Exception ex)
+            {
+                Interaction.MsgBox("Error al actualizar la grilla de cheques: " + ex.Message, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+            }
         }
 
-        private void txt_search_KeyPress(object sender, KeyPressEventArgs e)
+        private async void txt_search_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
             {
                 // actualizarDataGrid(cmb_proveedor.SelectedValue.ToString)
-                actualizarDataGrid();
+                await ActualizarDataGridAsync();
             }
         }
 
@@ -496,7 +561,7 @@ namespace Centrex
             noCambiar = false;
         }
 
-        private void resetForm()
+        private async Task ResetFormAsync()
         {
             total = 0d;
             efectivo = 0d;
@@ -515,7 +580,7 @@ namespace Centrex
             txt_search.Text = "";
             lbl_totalCh.Text = "$ " + Convert.ToString(totalCh);
             lbl_importePago.Text = "$ " + Convert.ToString(total);
-            cargarDGTransferencias();
+            await CargarDGTransferenciasAsync();
         }
 
         private void pic_searchCCProveedor_Click(object sender, EventArgs e)
@@ -568,19 +633,53 @@ namespace Centrex
             dg_viewTransferencia.Enabled = chk;
             cmd_addTransferencia.Enabled = chk;
         }
-        private void cargarDGTransferencias()
+        private async Task CargarDGTransferenciasAsync()
         {
-            string sqlstr;
+            try
+            {
+                using var ctx = new CentrexDbContext();
 
-            sqlstr = "SELECT t.id_tmpTransferencia AS 'ID', b.nombre AS 'Banco', cb.nombre AS 'Cuenta Bancaria', CAST(t.fecha AS VARCHAR(50)) AS 'Fecha', " + "t.total AS 'Total', t.notas AS 'Notas' " + "FROM tmptransferencias AS t " + "INNER JOIN cuentas_bancarias AS cb ON t.id_cuentaBancaria = cb.id_cuentaBancaria " + "INNER JOIN bancos AS b ON cb.id_banco = b.id_banco";
+                var query = ctx.TmpTransferenciaEntity
+                    .AsNoTracking()
+                    .Include(t => t.IdCuentaBancariaNavigation)
+                        .ThenInclude(cb => cb.IdBancoNavigation)
+                    .OrderBy(t => t.IdTmpTransferencia)
+                    .Select(t => new
+                    {
+                        ID = t.IdTmpTransferencia,
+                        Banco = t.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre,
+                        CuentaBancaria = t.IdCuentaBancariaNavigation.Nombre,
+                        Fecha = t.Fecha,
+                        Total = t.Total,
+                        Notas = t.Notas
+                    });
 
-            // Carga el datagrid con los nuevos datos
-            int nRegs = 0;
-            int tPaginas = 0;
-            var txtnPage = new TextBox();
-            var argdataGrid = dg_viewTransferencia;
-            generales.cargar_datagrid(ref argdataGrid, sqlstr, VariablesGlobales.basedb, 0, ref nRegs, ref tPaginas, 1, ref txtnPage, "tmptransferencias", "tmptransferencias");
-            dg_viewTransferencia = argdataGrid;
+                var result = new DataGridQueryResult
+                {
+                    Query = query,
+                    ColumnasOcultar = new List<string> { "ID" }
+                };
+
+                await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_viewTransferencia, result, depuracion: true);
+
+                if (dg_viewTransferencia.Columns.Contains("CuentaBancaria"))
+                    dg_viewTransferencia.Columns["CuentaBancaria"].HeaderText = "Cuenta bancaria";
+                if (dg_viewTransferencia.Columns.Contains("Total"))
+                {
+                    dg_viewTransferencia.Columns["Total"].HeaderText = "$$";
+                    dg_viewTransferencia.Columns["Total"].DefaultCellStyle.Format = "N2";
+                }
+                if (dg_viewTransferencia.Columns.Contains("Banco"))
+                    dg_viewTransferencia.Columns["Banco"].HeaderText = "Banco";
+                if (dg_viewTransferencia.Columns.Contains("Fecha"))
+                    dg_viewTransferencia.Columns["Fecha"].HeaderText = "Fecha";
+
+                dg_viewTransferencia.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox("Error al cargar las transferencias temporales: " + ex.Message, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+            }
         }
         private double sumaTransferencias()
         {
@@ -593,9 +692,9 @@ namespace Centrex
             return suma;
         }
 
-        private void actualizaTransferencias()
+        private async Task ActualizaTransferenciasAsync()
         {
-            cargarDGTransferencias();
+            await CargarDGTransferenciasAsync();
 
             total -= transferenciaBancaria;
             transferenciaBancaria = sumaTransferencias();
@@ -605,7 +704,7 @@ namespace Centrex
             lbl_importePago.Text = Strings.FormatCurrency(total);
         }
 
-        private void dg_viewTransferencia_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        private async void dg_viewTransferencia_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             string seleccionado = dg_viewTransferencia.CurrentRow.Cells[0].Value.ToString();
             VariablesGlobales.edita_transferencia = InfoTmpTransferencia(seleccionado);
@@ -621,18 +720,18 @@ namespace Centrex
 
             My.MyProject.Forms.add_transferencia.ShowDialog();
 
-            actualizaTransferencias();
+            await ActualizaTransferenciasAsync();
 
             VariablesGlobales.edicion = false;
         }
 
-        private void cmd_addTransferencia_Click(object sender, EventArgs e)
+        private async void cmd_addTransferencia_Click(object sender, EventArgs e)
         {
             // Dim t As New transferencia
 
             My.MyProject.Forms.add_transferencia.ShowDialog();
 
-            actualizaTransferencias();
+            await ActualizaTransferenciasAsync();
         }
 
         private double sumaCheques()
@@ -703,7 +802,7 @@ namespace Centrex
             lbl_importePago.Text = Strings.FormatCurrency(total);
         }
 
-        private void dg_viewCH_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        private async void dg_viewCH_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             string seleccionado = dg_viewTransferencia.CurrentRow.Cells[0].Value.ToString();
             VariablesGlobales.edita_cheque = Centrex.cheques.info_cheque(seleccionado);
@@ -712,7 +811,7 @@ namespace Centrex
 
             My.MyProject.Forms.add_cheque.ShowDialog();
 
-            actualizarDataGrid();
+            await ActualizarDataGridAsync();
             VariablesGlobales.edicion = false;
         }
 
@@ -725,6 +824,7 @@ namespace Centrex
             }
         }
 
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+            new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
     }
 }
-

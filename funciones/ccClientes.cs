@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -24,20 +25,20 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var ccEntity = context.CcClientes.FirstOrDefault(cc => cc.IdCc == id_cc);
+                    var ccEntity = context.CcClienteEntity.FirstOrDefault(cc => cc.IdCc == id_cc);
 
                     if (ccEntity is not null)
                     {
-                        tmp.id_cc = ccEntity.IdCc.ToString();
-                        tmp.id_cliente = ccEntity.IdCliente.ToString();
-                        tmp.id_moneda = ccEntity.IdMoneda.ToString();
-                        tmp.nombre = ccEntity.nombre;
-                        tmp.saldo = Conversions.ToDouble(ccEntity.saldo.ToString());
-                        tmp.activo = ccEntity.activo;
+                        tmp.IdCc = ccEntity.IdCc;
+                        tmp.IdCliente = ccEntity.IdCliente;
+                        tmp.IdMoneda = ccEntity.IdMoneda;
+                        tmp.Nombre = ccEntity.Nombre;
+                        tmp.Saldo = ccEntity.Saldo;
+                        tmp.Activo = ccEntity.Activo;
                     }
                     else
                     {
-                        tmp.nombre = "error";
+                        tmp.Nombre = "error";
                     }
                 }
 
@@ -45,7 +46,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                tmp.nombre = "error";
+                tmp.Nombre = "error";
                 return tmp;
             }
         }
@@ -58,14 +59,14 @@ namespace Centrex
                 {
                     var ccEntity = new CcClienteEntity()
                     {
-                        IdCliente = cc.id_cliente,
-                        IdMoneda = cc.id_moneda,
-                        nombre = cc.nombre,
-                        saldo = (decimal)cc.saldo,
-                        activo = cc.activo
+                        IdCliente = cc.IdCliente,
+                        IdMoneda = cc.IdMoneda,
+                        Nombre = cc.Nombre,
+                        Saldo = cc.Saldo,
+                        Activo = cc.Activo
                     };
 
-                    context.CcClientes.Add(ccEntity);
+                    context.CcClienteEntity.Add(ccEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -83,21 +84,21 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var ccEntity = context.CcClientes.FirstOrDefault(c => c.IdCc == cc.id_cc);
+                    var ccEntity = context.CcClienteEntity.FirstOrDefault(c => c.IdCc == cc.IdCc);
 
                     if (ccEntity is not null)
                     {
                         if (borra == true)
                         {
-                            ccEntity.activo = false;
+                            ccEntity.Activo = false;
                         }
                         else
                         {
-                            ccEntity.IdCliente = cc.id_cliente;
-                            ccEntity.IdMoneda = cc.id_moneda;
-                            ccEntity.nombre = cc.nombre;
-                            ccEntity.saldo = (decimal)cc.saldo;
-                            ccEntity.activo = cc.activo;
+                             ccEntity.IdCliente = cc.IdCliente;
+ccEntity.IdMoneda = cc.IdMoneda;
+                             ccEntity.Nombre = cc.Nombre;
+                            ccEntity.Saldo = cc.Saldo;
+                            ccEntity.Activo = cc.Activo;
                         }
 
                         context.SaveChanges();
@@ -122,11 +123,11 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var ccEntity = context.CcClientes.FirstOrDefault(c => c.IdCc == cc.id_cc);
+                    var ccEntity = context.CcClienteEntity.FirstOrDefault(c => c.IdCc == cc.IdCc);
 
                     if (ccEntity is not null)
                     {
-                        context.CcClientes.Remove(ccEntity);
+                        context.CcClienteEntity.Remove(ccEntity);
                         context.SaveChanges();
                         return true;
                     }
@@ -169,23 +170,22 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    // Usar stored procedure
-                    var resultado = context.Database.SqlQuery<object>("EXEC SP_consulta_CC_Cliente @id_cliente, @id_cc, @fecha_desde, @fecha_hasta", new SqlParameter("@id_cliente", id_cliente), new SqlParameter("@id_cc", id_Cc), new SqlParameter("@fecha_desde", fecha_desde), new SqlParameter("@fecha_hasta", fecha_hasta)).ToList();
+                    var resultado = context.Procedures
+                        .SP_consulta_CC_ClienteAsync(
+                            id_cliente,
+                            id_Cc,
+                            fecha_desde.ToString("yyyy-MM-dd"),
+                            fecha_hasta.ToString("yyyy-MM-dd"))
+                        .GetAwaiter()
+                        .GetResult() ?? new List<SP_consulta_CC_ClienteResult>();
 
-                    // Convertir a DataTable
                     if (resultado.Count > 0)
                     {
-                        System.Reflection.PropertyInfo[] props = resultado[0].GetType().GetProperties();
-                        foreach (var prop in props)
-                            datatable.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
-
-                        foreach (var item in resultado)
-                        {
-                            var row = datatable.NewRow();
-                            foreach (var prop in props)
-                                row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
-                            datatable.Rows.Add(row);
-                        }
+                        datatable = combos_ef.ToDataTable(resultado);
+                    }
+                    else
+                    {
+                        datatable.Rows.Clear();
                     }
 
                     if (!traerTodo)
@@ -251,11 +251,11 @@ namespace Centrex
             {
                 using (CentrexDbContext context = GetDbContext())
                 {
-                    var importeTotal = (from trans in context.Transacciones
-                                        join tipoComp in context.TiposComprobantes on trans.IdTipoComprobante equals tipoComp.IdTipoComprobante
-                                        join comp in context.Comprobantes on tipoComp.IdTipoComprobante equals comp.IdTipoComprobante
-                                        where trans.fecha >= fecha_desde && trans.fecha <= fecha_hasta && trans.IdCliente == id_cliente && comp.contabilizar == true
-                                        select trans.total).Distinct().Sum();
+                    var importeTotal = (from trans in context.TransaccionEntity
+  join tipoComp in context.TipoComprobanteEntity on trans.IdTipoComprobante equals tipoComp.IdTipoComprobante
+     join comp in context.ComprobanteEntity on tipoComp.IdTipoComprobante equals comp.IdTipoComprobante
+     where trans.Fecha >= DateOnly.FromDateTime(fecha_desde) && trans.Fecha <= DateOnly.FromDateTime(fecha_hasta) && trans.IdCliente == id_cliente && comp.Contabilizar == true
+       select trans.Total).Distinct().Sum();
 
                     // Evitar NullReference (Sum puede devolver Nothing)
                     if (importeTotal is null)

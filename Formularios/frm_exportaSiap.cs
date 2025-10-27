@@ -3,6 +3,7 @@ using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Centrex
@@ -15,11 +16,11 @@ namespace Centrex
         }
         private void frm_exportaSiap_Load(object sender, EventArgs e)
         {
-            // Cargo todas las consultas
-            var argcombo = cmb_consultas;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_consultaSiap, nombre FROM consultas_SIAP ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_consultaSiap"));
-            cmb_consultas = argcombo;
-            cmb_consultas.SelectedValue = 0;
+            var consultas = consultasSIAP.ObtenerConsultasActivas();
+            cmb_consultas.DataSource = consultas;
+            cmb_consultas.DisplayMember = nameof(consultaSIAP.nombre);
+            cmb_consultas.ValueMember = nameof(consultaSIAP.id_consulta);
+            cmb_consultas.SelectedIndex = -1;
             cmb_consultas.Text = "Elija una consulta...";
 
             pExportXLS.Enabled = false;
@@ -30,7 +31,7 @@ namespace Centrex
         {
             bool ok = true;
 
-            if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(cmb_consultas.SelectedValue, 0, false)))
+            if (cmb_consultas.SelectedValue is null)
             {
                 Interaction.MsgBox("Debe elegir una consulta para ejecutar", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 ok = false;
@@ -145,7 +146,7 @@ namespace Centrex
         {
             consultaSIAP c;
 
-            c = consultasSIAP.info_consultaSIAP(Conversions.ToInteger(cmb_consultas.SelectedValue));
+            c = consultasSIAP.info_consultaSIAP(Convert.ToInt32(cmb_consultas.SelectedValue));
 
             if (c.excel)
             {

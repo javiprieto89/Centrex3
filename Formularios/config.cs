@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
@@ -18,9 +19,16 @@ namespace Centrex
 
         private void tctrl_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            var argcombo = cmb_clientes;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_cliente AS 'ID', razon_social AS 'Cliente' FROM clientes WHERE activo = '1' ORDER BY razon_social ASC", VariablesGlobales.basedb, "cliente", Conversions.ToInteger("id"));
-            cmb_clientes = argcombo;
+            var ordenClientes = new List<Tuple<string, bool>> { Tuple.Create("RazonSocial", true) };
+            generales.Cargar_Combo(
+                ref cmb_clientes,
+                entidad: "ClienteEntity",
+                displaymember: "RazonSocial",
+                valuemember: "IdCliente",
+                predet: -1,
+                soloActivos: true,
+                orden: ordenClientes);
+            cmb_clientes.SelectedIndex = -1;
         }
 
         private void config_Load(object sender, EventArgs e)

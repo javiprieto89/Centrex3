@@ -1,4 +1,4 @@
-﻿Imports System.Data.SqlClient
+Imports System.Data.SqlClient
 
 Module precios
     Public Function updatePrecios_items(ByVal id_item As String, ByVal precio As String) As Boolean

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-
+using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -136,7 +136,6 @@ namespace Centrex
         public const int ID_DOLAR = 2;
         public static double Ultima_CC_Pedido_Cliente = 0d;
         public static string consultaUltimoComprobante = "";
-        public static string Consultar_Comprobante = "";
         public static double precio = 0d;
 
         // ======================================================
@@ -155,108 +154,93 @@ namespace Centrex
         }
 
 
-
-
         // ======================================================
         // FUNCIONES DE CONVERSIÓN ENTRE ENTIDADES Y MODELOS LEGACY
         // ======================================================
         public static item ConvertToItem(ItemEntity itemEntity)
         {
-            return new item()
-            {
-                id_item = itemEntity.IdItem,
-                itemField = itemEntity.item,
-                descript = itemEntity.descript,
-                cantidad = (decimal)itemEntity.cantidad,
-                precio = itemEntity.Precio,
-                esDescuento = itemEntity.esDescuento,
-                IdItemTemporal = itemEntity.IdItemTemporal
-            };
+    var result = new item();
+       result.IdItem = itemEntity.IdItem;
+  result.Item = itemEntity.Item;
+    result.Descript = itemEntity.Descript;
+      result.Cantidad = itemEntity.Cantidad;
+            result.PrecioLista = itemEntity.PrecioLista;
+            result.EsDescuento = itemEntity.EsDescuento;
+    result.Activo = itemEntity.Activo;
+          return result;
         }
 
         public static TmpTransferenciaEntity ConvertToTmpTransferencia(TransferenciaEntity transferenciaEntity)
         {
-            return new TmpTransferenciaEntity()
+  return new TmpTransferenciaEntity()
             {
-                IdTransferencia = transferenciaEntity.IdTransferencia,
-                IdCuentaBancaria = transferenciaEntity.IdCuentaBancaria,
-                fecha = transferenciaEntity.fecha,
-                total = transferenciaEntity.total,
-                nComprobante = transferenciaEntity.nComprobante,
-                notas = transferenciaEntity.notas
+IdCuentaBancaria = transferenciaEntity.IdCuentaBancaria,
+            Fecha = transferenciaEntity.Fecha,
+ Total = transferenciaEntity.Total,
+    NComprobante = transferenciaEntity.NComprobante,
+       Notas = transferenciaEntity.Notas
             };
         }
 
         public static pedido ConvertToPedido(PedidoEntity pedidoEntity)
-        {
-            return new pedido()
-            {
-                id_pedido = pedidoEntity.IdPedido,
-                fecha = Conversions.ToString(pedidoEntity.fecha.Value),
-                id_cliente = pedidoEntity.IdCliente,
-                subTotal = (double)pedidoEntity.subtotal,
-                iva = (double)pedidoEntity.iva,
-                total = (double)pedidoEntity.total,
-                activo = pedidoEntity.activo,
-                cerrado = pedidoEntity.cerrado,
-                esPresupuesto = pedidoEntity.esPresupuesto
-            };
-        }
+{
+  var result = new pedido();
+         result.IdPedido = pedidoEntity.IdPedido;
+            result.Fecha = pedidoEntity.Fecha;
+result.IdCliente = pedidoEntity.IdCliente;
+result.Subtotal = pedidoEntity.Subtotal;
+            result.Iva = pedidoEntity.Iva;
+ result.Total = pedidoEntity.Total;
+    result.Activo = pedidoEntity.Activo;
+        result.Cerrado = pedidoEntity.Cerrado;
+         result.EsPresupuesto = pedidoEntity.EsPresupuesto;
+            return result;
+      }
 
-        public static PedidoEntity ConvertToPedidoEntity(pedido pedido)
-        {
-            return new PedidoEntity()
-            {
-                IdPedido = pedido.id_pedido,
-                fecha = Conversions.ToDate(pedido.fecha),
-                IdCliente = pedido.id_cliente,
-                subtotal = (decimal)pedido.subTotal,
-                iva = (decimal?)pedido.iva,
-                total = (decimal)pedido.total,
-                activo = pedido.activo,
-                cerrado = pedido.cerrado,
-                esPresupuesto = pedido.esPresupuesto
+   public static PedidoEntity ConvertToPedidoEntity(pedido pedido)
+    {
+  return new PedidoEntity()
+   {
+   IdPedido = pedido.IdPedido,
+ Fecha = pedido.Fecha,
+      IdCliente = pedido.IdCliente,
+Subtotal = pedido.Subtotal,
+    Iva = pedido.Iva,
+     Total = pedido.Total,
+                Activo = pedido.Activo,
+    Cerrado = pedido.Cerrado,
+ EsPresupuesto = pedido.EsPresupuesto
             };
         }
 
         public static comprobante ConvertToComprobante(ComprobanteEntity comprobanteEntity)
         {
-            return new comprobante()
-            {
-                id_comprobante = comprobanteEntity.IdComprobante,
-                fecha = comprobanteEntity.Fecha,
-                id_cliente = comprobanteEntity.IdCliente,
-                subtotal = comprobanteEntity.Subtotal,
-                iva = comprobanteEntity.Iva,
-                total = comprobanteEntity.Total,
-                activo = comprobanteEntity.activo
-            };
+            var result = new comprobante();
+            result.IdComprobante = comprobanteEntity.IdComprobante;
+            result.Comprobante = comprobanteEntity.Comprobante;
+            result.Activo = comprobanteEntity.Activo;
+   return result;
         }
 
-        public static ComprobanteEntity ConvertToComprobanteEntity(comprobante comprobante)
+    public static ComprobanteEntity ConvertToComprobanteEntity(comprobante comprobante)
         {
             return new ComprobanteEntity()
-            {
-                IdComprobante = comprobante.id_comprobante,
-                Fecha = comprobante.fecha,
-                IdCliente = comprobante.id_cliente,
-                Subtotal = comprobante.subtotal,
-                Iva = comprobante.iva,
-                Total = comprobante.total,
-                activo = comprobante.activo
-            };
-        }
+       {
+  IdComprobante = comprobante.IdComprobante,
+    Comprobante = comprobante.Comprobante,
+     Activo = comprobante.Activo
+     };
+   }
 
         public static itemImpuesto ConvertToItemImpuesto(ItemImpuestoEntity itemImpuestoEntity)
         {
-            return new itemImpuesto()
-            {
-                id_itemImpuesto = itemImpuestoEntity.IdItemImpuesto,
-                id_item = itemImpuestoEntity.IdItem,
-                id_impuesto = itemImpuestoEntity.IdImpuesto,
-                activo = itemImpuestoEntity.activo
-            };
-        }
+  var result = new itemImpuesto();
+result.IdItemImpuesto = itemImpuestoEntity.IdItemImpuesto;
+            result.IdItem = itemImpuestoEntity.IdItem;
+    result.IdImpuesto = itemImpuestoEntity.IdImpuesto;
+       result.Activo = itemImpuestoEntity.Activo;
+        return result;
+     }
 
     }
 }

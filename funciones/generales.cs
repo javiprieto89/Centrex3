@@ -22,34 +22,13 @@ namespace Centrex
 {
 
     /// <summary>
-/// Módulo generales completamente migrado a Entity Framework
-/// Sin código SQL directo - Solo Entity Framework
-/// </summary>
+    /// Módulo generales completamente migrado a Entity Framework
+    /// Sin código SQL directo - Solo Entity Framework
+    /// </summary>
     public static class generales
     {
 
         // ************************************* FUNCIONES GENERALES CON ENTITY FRAMEWORK PURO *****************************
-
-        public static void cargar_datagrid(ref DataGridView dataGrid, string sqlstr, string db, int desde, ref int nRegs, ref int tPaginas, int pagina, ref TextBox txtnPage, string tbl, string tblVieja, bool historicoActivo = true)
-        {
-
-            try
-            {
-                // Usar Entity Framework en lugar de SQL directo
-                LoadDataGridWithEF(ref dataGrid, tbl, historicoActivo);
-
-                // Configurar paginación
-                nRegs = dataGrid.Rows.Count;
-                tPaginas = (int)Math.Round(Math.Ceiling(nRegs / 50.0d));
-                txtnPage.Text = "Página " + pagina.ToString() + " de " + tPaginas.ToString();
-            }
-
-            catch (Exception ex)
-            {
-                Interaction.MsgBox("Error cargando DataGrid: " + ex.Message);
-            }
-        }
-
         /// <summary>
         /// Ejecuta operaciones usando Entity Framework
         /// </summary>
@@ -105,154 +84,89 @@ namespace Centrex
         /// <summary>
         /// Función de compatibilidad usando Entity Framework
         /// </summary>
-        public static int FnExecSQL(string sqlstr)
-        {
-            try
-            {
-                using (var context = new CentrexDbContext())
-                {
-                    // Para conteos, usar EF
-                    if (sqlstr.ToUpper().Contains("SELECT COUNT"))
-                    {
-                        if (sqlstr.Contains("clientes"))
-                        {
-                            return context.ClienteEntity.Count();
-                        }
-                        else if (sqlstr.Contains("proveedores"))
-                        {
-                            return context.ProveedorEntity.Count();
-                        }
-                        else if (sqlstr.Contains("items"))
-                        {
-                            return context.ItemEntity.Count();
-                        }
-                        else if (sqlstr.Contains("pedidos"))
-                        {
-                            return context.PedidoEntity.Count();
-                        }
-                        else if (sqlstr.Contains("cobros"))
-                        {
-                            return context.CobroEntity.Count();
-                        }
-                    }
-                    return 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }
+        //public static int FnExecSQL(string sqlstr)
+        //{
+        //    try
+        //    {
+        //        using (var context = new CentrexDbContext())
+        //        {
+        //            // Para conteos, usar EF
+        //            if (sqlstr.ToUpper().Contains("SELECT COUNT"))
+        //            {
+        //                if (sqlstr.Contains("clientes"))
+        //                {
+        //                    return context.ClienteEntity.Count();
+        //                }
+        //                else if (sqlstr.Contains("proveedores"))
+        //                {
+        //                    return context.ProveedorEntity.Count();
+        //                }
+        //                else if (sqlstr.Contains("items"))
+        //                {
+        //                    return context.ItemEntity.Count();
+        //                }
+        //                else if (sqlstr.Contains("pedidos"))
+        //                {
+        //                    return context.PedidoEntity.Count();
+        //                }
+        //                else if (sqlstr.Contains("cobros"))
+        //                {
+        //                    return context.CobroEntity.Count();
+        //                }
+        //            }
+        //            return 0;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return 0;
+        //    }
+        //}
+
+
 
         /// <summary>
-    /// Actualiza DataGrid usando Entity Framework puro
-    /// </summary>
-        public static string updateDataGrid(string tbl, bool historicoActivo, int id_banco = -1)
-        {
-            try
-            {
-                using (var context = new CentrexDbContext())
-                {
-                    switch (tbl ?? "")
-                    {
-                        case var @case when @case == "clientes":
-                            {
-                                var clientes = context.ClienteEntity.Where(c => c.Activo == historicoActivo).OrderBy(c => c.RazonSocial).ToList();
-                                return ConvertToDataGridString(clientes, "clientes");
-                            }
+        /// Búsqueda usando Entity Framework puro
+        /// </summary>
+        //public static string sqlstrbuscar(string tbl, string txtsearch, bool historicoActivo)
+        //{
+        //    try
+        //    {
+        //        using (var context = new CentrexDbContext())
+        //        {
+        //            switch (tbl ?? "")
+        //            {
+        //                case var @case when @case == "clientes":
+        //                    {
+        //                        var clientes = context.ClienteEntity.Where(c => c.Activo == historicoActivo && (c.IdCliente.ToString().Contains(txtsearch) || c.RazonSocial.Contains(txtsearch) || c.NombreFantasia.Contains(txtsearch) || c.TaxNumber.Contains(txtsearch) || c.Contacto.Contains(txtsearch) || c.Telefono.Contains(txtsearch) || c.Celular.Contains(txtsearch) || c.Email.Contains(txtsearch) || c.DireccionFiscal.Contains(txtsearch) || c.LocalidadFiscal.Contains(txtsearch) || c.CpFiscal.Contains(txtsearch) || c.DireccionEntrega.Contains(txtsearch) || c.LocalidadEntrega.Contains(txtsearch) || c.CpEntrega.Contains(txtsearch))).OrderBy(c => c.RazonSocial).ToList();
+        //                        return ConvertToDataGridString<ClienteEntity>(clientes, "clientes_search");
+        //                    }
 
-                        case var case1 when case1 == "proveedores":
-                            {
-                                var proveedores = context.ProveedorEntity.Where(p => p.Activo == historicoActivo).OrderBy(p => p.RazonSocial).ToList();
-                                return ConvertToDataGridString(proveedores, "proveedores");
-                            }
+        //                case var case1 when case1 == "proveedores":
+        //                    {
+        //                        var proveedores = context.ProveedorEntity.Where(p => p.Activo == historicoActivo && (p.IdProveedor.ToString().Contains(txtsearch) || p.RazonSocial.Contains(txtsearch) || p.TaxNumber.Contains(txtsearch) || p.Contacto.Contains(txtsearch) || p.Telefono.Contains(txtsearch) || p.Celular.Contains(txtsearch) || p.Email.Contains(txtsearch) || p.DireccionFiscal.Contains(txtsearch) || p.LocalidadFiscal.Contains(txtsearch) || p.CpFiscal.Contains(txtsearch) || p.DireccionEntrega.Contains(txtsearch) || p.LocalidadEntrega.Contains(txtsearch) || p.CpEntrega.Contains(txtsearch))).OrderBy(p => p.RazonSocial).ToList();
+        //                        return ConvertToDataGridString<ProveedorEntity>(proveedores, "proveedores_search");
+        //                    }
 
-                        case var case2 when case2 == "items":
-                        case "itemsImpuestosItems":
-                            {
-                                var items = context.ItemEntity.Where(i => i.Activo == historicoActivo).OrderBy(i => i.Item).ToList();
-                                return ConvertToDataGridString(items, "items");
-                            }
+        //                case var case2 when case2 == "items":
+        //                case "itemsImpuestosItems":
+        //                    {
+        //                        var items = context.ItemImpuestoEntity.Where(i => i.Activo == historicoActivo && (i.IdItemNavigation.ToString().Contains(txtsearch) || i.IdItemNavigation.Item.Contains(txtsearch) || i.IdItemNavigation.Descript.Contains(txtsearch) || i.IdItemNavigation.Cantidad.ToString().Contains(txtsearch) || i.IdItemNavigation.Costo.ToString().Contains(txtsearch) || i.IdItemNavigation.PrecioLista.ToString().Contains(txtsearch) || i.IdItemNavigation.Factor.ToString().Contains(txtsearch))).OrderBy(i => i.IdItemNavigation.Item).ToList();
+        //                        return ConvertToDataGridString<ItemImpuestoEntity>(items, "items_search");
+        //                    }
 
-                        case var case3 when case3 == "comprobantes":
-                            {
-                                var comprobantes = context.ComprobanteEntity.Where(c => c.Activo == historicoActivo).OrderBy(c => c.Comprobante).ToList();
-                                return ConvertToDataGridString(comprobantes, "comprobantes");
-                            }
-
-                        case var case4 when case4 == "pedidos":
-                            {
-                                var pedidos = historicoActivo ? context.PedidoEntity.Where(p => p.Cerrado == false & p.Activo == true).OrderByDescending(p => p.IdPedido).ToList() : context.PedidoEntity.Where(p => p.Cerrado == true & p.Activo == false).OrderByDescending(p => p.FechaEdicion).ToList();
-                                return ConvertToDataGridString((IEnumerable<PedidoEntity>)pedidos, "pedidos");
-                            }
-
-                        case var case5 when case5 == "cobros":
-                            {
-                                var cobros = context.CobroEntity.OrderBy(c => c.FechaCobro).ToList();
-                                return ConvertToDataGridString<CobroEntity>(cobros, "cobros");
-                            }
-
-                        case var case6 when case6 == "usuarios":
-                            {
-                                var usuarios = context.UsuarioEntity.OrderBy(u => u.Nombre).ToList();
-                                return ConvertToDataGridString(usuarios, "usuarios");
-                            }
-
-                        default:
-                            {
-                                return "ef_error_unknown_table";
-                            }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return "ef_error_" + ex.Message;
-            }
-        }
-
-        /// <summary>
-    /// Búsqueda usando Entity Framework puro
-    /// </summary>
-        public static string sqlstrbuscar(string tbl, string txtsearch, bool historicoActivo)
-        {
-            try
-            {
-                using (var context = new CentrexDbContext())
-                {
-                    switch (tbl ?? "")
-                    {
-                        case var @case when @case == "clientes":
-                            {
-                                var clientes = context.ClienteEntity.Where(c => c.Activo == historicoActivo && (c.IdCliente.ToString().Contains(txtsearch) || c.RazonSocial.Contains(txtsearch) || c.NombreFantasia.Contains(txtsearch) || c.TaxNumber.Contains(txtsearch) || c.Contacto.Contains(txtsearch) || c.Telefono.Contains(txtsearch) || c.Celular.Contains(txtsearch) || c.Email.Contains(txtsearch) || c.DireccionFiscal.Contains(txtsearch) || c.LocalidadFiscal.Contains(txtsearch) || c.CpFiscal.Contains(txtsearch) || c.DireccionEntrega.Contains(txtsearch) || c.LocalidadEntrega.Contains(txtsearch) || c.CpEntrega.Contains(txtsearch))).OrderBy(c => c.RazonSocial).ToList();
-                                return ConvertToDataGridString<ClienteEntity>(clientes, "clientes_search");
-                            }
-
-                        case var case1 when case1 == "proveedores":
-                            {
-                                var proveedores = context.ProveedorEntity.Where(p => p.Activo == historicoActivo && (p.IdProveedor.ToString().Contains(txtsearch) || p.RazonSocial.Contains(txtsearch) || p.TaxNumber.Contains(txtsearch) || p.Contacto.Contains(txtsearch) || p.Telefono.Contains(txtsearch) || p.Celular.Contains(txtsearch) || p.Email.Contains(txtsearch) || p.DireccionFiscal.Contains(txtsearch) || p.LocalidadFiscal.Contains(txtsearch) || p.CpFiscal.Contains(txtsearch) || p.DireccionEntrega.Contains(txtsearch) || p.LocalidadEntrega.Contains(txtsearch) || p.CpEntrega.Contains(txtsearch))).OrderBy(p => p.RazonSocial).ToList();
-                                return ConvertToDataGridString<ProveedorEntity>(proveedores, "proveedores_search");
-                            }
-
-                        case var case2 when case2 == "items":
-                        case "itemsImpuestosItems":
-                            {
-                                var items = context.ItemImpuestoEntity.Where(i => i.Activo == historicoActivo && (i.IdItemNavigation.ToString().Contains(txtsearch) || i.IdItemNavigation.Item.Contains(txtsearch) || i.IdItemNavigation.Descript.Contains(txtsearch) || i.IdItemNavigation.Cantidad.ToString().Contains(txtsearch) || i.IdItemNavigation.Costo.ToString().Contains(txtsearch) || i.IdItemNavigation.PrecioLista.ToString().Contains(txtsearch) || i.IdItemNavigation.Factor.ToString().Contains(txtsearch))).OrderBy(i => i.IdItemNavigation.Item).ToList();
-                                return ConvertToDataGridString<ItemImpuestoEntity>(items, "items_search");
-                            }
-
-                        default:
-                            {
-                                return "ef_error_unknown_table";
-                            }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return "ef_error_" + ex.Message;
-            }
-        }
+        //                default:
+        //                    {
+        //                        return "ef_error_unknown_table";
+        //                    }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return "ef_error_" + ex.Message;
+        //    }
+        //}
 
         /// <summary>
         /// Función simple para obtener fecha actual
@@ -266,64 +180,64 @@ namespace Centrex
         /// Borra tabla usando Entity Framework puro
         /// </summary>
 
-public static byte borrartbl(string tbl, bool reseed = false)
-    {
-        try
+        public static byte borrartbl(string tbl, bool reseed = false)
         {
-            using (var context = new CentrexDbContext())
+            try
             {
-                // Buscar dinámicamente el DbSet por nombre
-                var dbSetProp = context.GetType()
-                    .GetProperties()
-                    .FirstOrDefault(p => p.Name.Equals(tbl, StringComparison.OrdinalIgnoreCase));
-
-                if (dbSetProp == null)
+                using (var context = new CentrexDbContext())
                 {
-                    Interaction.MsgBox($"La entidad '{tbl}' no existe en el contexto.", Constants.vbExclamation, "Centrex");
-                    return 0;
-                }
+                    // Buscar dinámicamente el DbSet por nombre
+                    var dbSetProp = context.GetType()
+                        .GetProperties()
+                        .FirstOrDefault(p => p.Name.Equals(tbl, StringComparison.OrdinalIgnoreCase));
 
-                // Obtener el DbSet (IQueryable<object>)
-                var dbSet = dbSetProp.GetValue(context, null) as IQueryable<object>;
-                if (dbSet == null)
-                {
-                    Interaction.MsgBox($"No se pudo acceder al conjunto de datos '{tbl}'.", Constants.vbCritical, "Centrex");
-                    return 0;
-                }
-
-                // Cargar y eliminar todos los registros
-                var registros = dbSet.ToList();
-                if (registros.Count > 0)
-                {
-                    context.RemoveRange(registros);
-                    context.SaveChanges();
-                }
-
-                // Reseed opcional (si la tabla tiene identidad)
-                if (reseed)
-                {
-                    try
+                    if (dbSetProp == null)
                     {
-                        string reseedSql = $"DBCC CHECKIDENT ('[{tbl}]', RESEED, 0);";
-                        context.Database.ExecuteSqlRaw(reseedSql);
+                        Interaction.MsgBox($"La entidad '{tbl}' no existe en el contexto.", Constants.vbExclamation, "Centrex");
+                        return 0;
                     }
-                    catch
-                    {
-                        // Ignorar si la tabla no tiene columna IDENTITY
-                    }
-                }
 
-                return 1;
+                    // Obtener el DbSet (IQueryable<object>)
+                    var dbSet = dbSetProp.GetValue(context, null) as IQueryable<object>;
+                    if (dbSet == null)
+                    {
+                        Interaction.MsgBox($"No se pudo acceder al conjunto de datos '{tbl}'.", Constants.vbCritical, "Centrex");
+                        return 0;
+                    }
+
+                    // Cargar y eliminar todos los registros
+                    var registros = dbSet.ToList();
+                    if (registros.Count > 0)
+                    {
+                        context.RemoveRange(registros);
+                        context.SaveChanges();
+                    }
+
+                    // Reseed opcional (si la tabla tiene identidad)
+                    if (reseed)
+                    {
+                        try
+                        {
+                            string reseedSql = $"DBCC CHECKIDENT ('[{tbl}]', RESEED, 0);";
+                            context.Database.ExecuteSqlRaw(reseedSql);
+                        }
+                        catch
+                        {
+                            // Ignorar si la tabla no tiene columna IDENTITY
+                        }
+                    }
+
+                    return 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al vaciar la tabla '{tbl}': {ex.Message}", Constants.vbCritical, "Error en borrartbl");
+                return 0;
             }
         }
-        catch (Exception ex)
-        {
-            Interaction.MsgBox($"Error al vaciar la tabla '{tbl}': {ex.Message}", Constants.vbCritical, "Error en borrartbl");
-            return 0;
-        }
-    }
 
-   
+
         /// <summary>
         /// Carga ComboBox usando Entity Framework
         /// </summary>
@@ -740,420 +654,6 @@ public static byte borrartbl(string tbl, bool reseed = false)
             return total;
         }
 
-        /// <summary>
-    /// Obtiene nombre de columna legible para el DataGrid
-    /// </summary>
-        private static string GetDisplayName(string propertyName, string tableType)
-        {
-            switch (tableType.ToLower() ?? "")
-            {
-                case "clientes":
-                    {
-                        switch (propertyName ?? "")
-                        {
-                            case "IdCliente":
-                                {
-                                    return "ID";
-                                }
-                            case "RazonSocial":
-                                {
-                                    return "Razón Social";
-                                }
-                            case "NombreFantasia":
-                                {
-                                    return "Nombre de Fantasía";
-                                }
-                            case "DireccionEntrega":
-                                {
-                                    return "Dirección de Entrega";
-                                }
-                            case "LocalidadEntrega":
-                                {
-                                    return "Localidad";
-                                }
-                            case "Telefono":
-                                {
-                                    return "Teléfono";
-                                }
-                            case "Email":
-                                {
-                                    return "eMail";
-                                }
-                            case "Contacto":
-                                {
-                                    return "Contacto";
-                                }
-                            case "Celular":
-                                {
-                                    return "Celular";
-                                }
-                            case "TaxNumber":
-                                {
-                                    return "CUIT";
-                                }
-                            case "DireccionFiscal":
-                                {
-                                    return "Dirección Fiscal";
-                                }
-                            case "LocalidadFiscal":
-                                {
-                                    return "Localidad Fiscal";
-                                }
-                            case "CpFiscal":
-                                {
-                                    return "CP Fiscal";
-                                }
-                            case "CpEntrega":
-                                {
-                                    return "CP Entrega";
-                                }
-                            case "EsInscripto":
-                                {
-                                    return "Inscripto";
-                                }
-                            case "Activo":
-                                {
-                                    return "Activo";
-                                }
-
-                            default:
-                                {
-                                    return propertyName;
-                                }
-                        }
-
-                        break;
-                    }
-
-                case "proveedores":
-                    {
-                        switch (propertyName ?? "")
-                        {
-                            case "IdProveedor":
-                                {
-                                    return "ID";
-                                }
-                            case "RazonSocial":
-                                {
-                                    return "Razón Social";
-                                }
-                            case "DireccionEntrega":
-                                {
-                                    return "Dirección de Entrega";
-                                }
-                            case "LocalidadEntrega":
-                                {
-                                    return "Localidad";
-                                }
-                            case "Telefono":
-                                {
-                                    return "Teléfono";
-                                }
-                            case "Email":
-                                {
-                                    return "eMail";
-                                }
-                            case "Contacto":
-                                {
-                                    return "Contacto";
-                                }
-                            case "Celular":
-                                {
-                                    return "Celular";
-                                }
-                            case "TaxNumber":
-                                {
-                                    return "CUIT";
-                                }
-                            case "DireccionFiscal":
-                                {
-                                    return "Dirección Fiscal";
-                                }
-                            case "LocalidadFiscal":
-                                {
-                                    return "Localidad Fiscal";
-                                }
-                            case "CpFiscal":
-                                {
-                                    return "CP Fiscal";
-                                }
-                            case "CpEntrega":
-                                {
-                                    return "CP Entrega";
-                                }
-                            case "EsInscripto":
-                                {
-                                    return "Inscripto";
-                                }
-                            case "Activo":
-                                {
-                                    return "Activo";
-                                }
-
-                            default:
-                                {
-                                    return propertyName;
-                                }
-                        }
-
-                        break;
-                    }
-
-                case "items":
-                case "items_search":
-                    {
-                        switch (propertyName ?? "")
-                        {
-                            case "IdItem":
-                                {
-                                    return "ID";
-                                }
-                            case "Item":
-                                {
-                                    return "Código";
-                                }
-                            case "Descript":
-                                {
-                                    return "Producto";
-                                }
-                            case "PrecioLista":
-                                {
-                                    return "Precio de Lista";
-                                }
-                            case "Factor":
-                                {
-                                    return "Factor";
-                                }
-                            case "Costo":
-                                {
-                                    return "Costo";
-                                }
-                            case "Cantidad":
-                                {
-                                    return "Cantidad";
-                                }
-                            case "EsDescuento":
-                                {
-                                    return "Descuento";
-                                }
-                            case "EsMarkup":
-                                {
-                                    return "Markup";
-                                }
-                            case "Activo":
-                                {
-                                    return "Activo";
-                                }
-
-                            default:
-                                {
-                                    return propertyName;
-                                }
-                        }
-
-                        break;
-                    }
-
-                case "comprobantes":
-                    {
-                        switch (propertyName ?? "")
-                        {
-                            case "IdComprobante":
-                                {
-                                    return "ID";
-                                }
-                            case "Comprobante":
-                                {
-                                    return "Comprobante";
-                                }
-                            case "NumeroComprobante":
-                                {
-                                    return "Número de Comprobante";
-                                }
-                            case "PuntoVenta":
-                                {
-                                    return "Punto de Venta";
-                                }
-                            case "EsFiscal":
-                                {
-                                    return "Es Fiscal";
-                                }
-                            case "EsElectronica":
-                                {
-                                    return "Es Electrónico";
-                                }
-                            case "EsManual":
-                                {
-                                    return "Es Manual";
-                                }
-                            case "EsPresupuesto":
-                                {
-                                    return "Es Presupuesto";
-                                }
-                            case "Testing":
-                                {
-                                    return "Comprobante de Testeo";
-                                }
-                            case "MaxItems":
-                                {
-                                    return "Máximo de Items";
-                                }
-                            case "Contabilizar":
-                                {
-                                    return "Contabilizar";
-                                }
-                            case "MueveStock":
-                                {
-                                    return "¿Mueve Stock?";
-                                }
-                            case "Activo":
-                                {
-                                    return "Activo";
-                                }
-
-                            default:
-                                {
-                                    return propertyName;
-                                }
-                        }
-
-                        break;
-                    }
-
-                case "pedidos":
-                    {
-                        switch (propertyName ?? "")
-                        {
-                            case "IdPedido":
-                                {
-                                    return "ID";
-                                }
-                            case "Fecha":
-                                {
-                                    return "Fecha";
-                                }
-                            case "FechaEdicion":
-                                {
-                                    return "Fecha Edición";
-                                }
-                            case "Total":
-                                {
-                                    return "Total";
-                                }
-                            case "Cerrado":
-                                {
-                                    return "Cerrado";
-                                }
-                            case "Activo":
-                                {
-                                    return "Activo";
-                                }
-                            case "IdPresupuesto":
-                                {
-                                    return "ID Presupuesto";
-                                }
-                            case "NumeroComprobante":
-                                {
-                                    return "Número Comprobante";
-                                }
-
-                            default:
-                                {
-                                    return propertyName;
-                                }
-                        }
-
-                        break;
-                    }
-
-                case "cobros":
-                    {
-                        switch (propertyName ?? "")
-                        {
-                            case "IdCobro":
-                                {
-                                    return "ID";
-                                }
-                            case "FechaCarga":
-                                {
-                                    return "Fecha de Carga";
-                                }
-                            case "FechaCobro":
-                                {
-                                    return "Fecha de Cobro";
-                                }
-                            case "Efectivo":
-                                {
-                                    return "Efectivo";
-                                }
-                            case "TotalTransferencia":
-                                {
-                                    return "Trans. B.";
-                                }
-                            case "TotalCh":
-                                {
-                                    return "Total Cheques";
-                                }
-                            case "TotalRetencion":
-                                {
-                                    return "Retenciones";
-                                }
-                            case "Total":
-                                {
-                                    return "Total";
-                                }
-                            case "Activo":
-                                {
-                                    return "Activo";
-                                }
-
-                            default:
-                                {
-                                    return propertyName;
-                                }
-                        }
-
-                        break;
-                    }
-
-                case "usuarios":
-                    {
-                        switch (propertyName ?? "")
-                        {
-                            case "IdUsuario":
-                                {
-                                    return "ID";
-                                }
-                            case "Usuario":
-                                {
-                                    return "Usuario";
-                                }
-                            case "Nombre":
-                                {
-                                    return "Nombre";
-                                }
-                            case "Activo":
-                                {
-                                    return "Activo";
-                                }
-
-                            default:
-                                {
-                                    return propertyName;
-                                }
-                        }
-
-                        break;
-                    }
-
-                default:
-                    {
-                        // Para tipos no específicos, usar el nombre de la propiedad
-                        return propertyName;
-                    }
-            }
-        }
-
         public static void updateform([Optional, DefaultParameterValue("")] string seleccionado, [Optional] ref ComboBox cmb)
         {
             if (cmb is null)
@@ -1191,20 +691,6 @@ public static byte borrartbl(string tbl, bool reseed = false)
             fechaFinal = anio + mes + dia;
 
             return fechaFinal;
-            // Else
-            // Try
-            // fechaArray = Split(fecha, divChar)
-            // anio = fechaArray(0)
-            // mes = fechaArray(1)
-            // dia = fechaArray(2)
-
-            // fechaFinal = anio + mes + dia
-
-            // Return fechaFinal
-            // Catch ex As Exception
-            // Return 0
-            // End Try
-            // End If
         }
 
         public static string fechaAFIP_fecha(string fecha_afip)
@@ -1426,8 +912,8 @@ public static byte borrartbl(string tbl, bool reseed = false)
         }
 
         /// <summary>
-    /// Verifica si hay cambios pendientes en la base de datos
-    /// </summary>
+        /// Verifica si hay cambios pendientes en la base de datos
+        /// </summary>
         public static bool haycambios()
         {
             try
@@ -1447,32 +933,6 @@ public static byte borrartbl(string tbl, bool reseed = false)
                 return false;
             }
         }
-
-        /// <summary>
-        /// Cierra y actualiza el formulario
-        /// </summary>
-        public static void CloseAndUpdate(Form formulario)
-        {
-            try
-            {
-                if (formulario != null && !formulario.IsDisposed)
-                {
-                    // Cierra el formulario actual de manera segura
-                    formulario.Close();
-                    formulario.Dispose();
-                }
-
-                // 🔹 Si necesitás actualizar la interfaz principal sin reiniciar la app,
-                // podés invocar un método o evento de refresco desde acá.
-                // Ejemplo:
-                // MainForm.Instance.RefreshData();
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox("Error al cerrar el formulario: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
-            }
-        }
-
 
         /// <summary>
         /// Cuenta registros en una tabla usando SQL directo
@@ -1543,8 +1003,8 @@ public static byte borrartbl(string tbl, bool reseed = false)
             return new CentrexDbContext();
         }
 
-    
-    
+
+
         // ================================================================
         // 1. LECTURA Y ESCRITURA DE ARCHIVOS DE TEXTO
         // ================================================================
@@ -1736,7 +1196,7 @@ public static byte borrartbl(string tbl, bool reseed = false)
             return partes[1].Trim();
         }
 
-   
+
         public static int[] addValArray(ref int[] array, int @add)
         {
             int max = 0;
@@ -1817,7 +1277,7 @@ public static byte borrartbl(string tbl, bool reseed = false)
             }
             catch (Exception ex)
             {
-
+                Interaction.MsgBox("Error " + ex.Message, MsgBoxStyle.Critical, "Centrex");
             }
 
             return found;
@@ -1858,8 +1318,15 @@ public static byte borrartbl(string tbl, bool reseed = false)
                 Interaction.MsgBox(ex.Message.ToString());
             }
         }
-    }
+
+        public static string Precio(decimal valor)
+        {
+            return $"$ {valor:N2}";
+        }
+    } 
 }
+
+
 
 
 
