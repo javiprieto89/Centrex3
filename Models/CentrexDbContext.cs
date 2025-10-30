@@ -86,6 +86,8 @@ public partial class CentrexDbContext : DbContext
 
     public virtual DbSet<CondicionCompraEntity> CondicionCompraEntity { get; set; }
 
+    public virtual DbSet<CondicionVentaEntity> CondicionVentaEntity { get; set; }
+
     public virtual DbSet<ConsultaPersonalizadaEntity> ConsultaPersonalizadaEntity { get; set; }
 
     public virtual DbSet<CuentaBancariaEntity> CuentaBancariaEntity { get; set; }

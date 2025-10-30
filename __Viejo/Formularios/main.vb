@@ -4,22 +4,8 @@ Imports System.Data.SqlClient
 Imports System.Globalization
 Imports System.IO
 Imports System.Net
+Imports System.Windows.Forms.Form
 
-Module MainModule
-    <STAThread()>
-    Sub Main()
-        ' Configurar protocolos TLS (antes de crear formularios)
-        ServicePointManager.SecurityProtocol =
-            SecurityProtocolType.Tls12 Or SecurityProtocolType.Tls11 Or SecurityProtocolType.Tls
-
-        ' Inicializar entorno gráfico
-        Application.EnableVisualStyles()
-        Application.SetCompatibleTextRenderingDefault(False)
-
-        ' Iniciar el formulario principal
-        Application.Run(New main())
-    End Sub
-End Module
 Public Class main
     Inherits Form
 
@@ -29,6 +15,15 @@ Public Class main
     Dim nRegs As Integer
     Dim tPaginas As Integer
     Dim orderCol As ColumnClickEventArgs = Nothing
+
+    Private ReadOnly Dictionary<String, Func<CentrexDbContext, IQueryable>> _queries =
+    New Dictionary<string, Func<CentrexDbContext, IQueryable>>()
+{
+    ["clientes"] = ctx => ctx.ClienteEntity.Include(c => c.IdProvinciaFiscalNavigation),
+    ["proveedores"] = ctx => ctx.ProveedorEntity.Include(p => p.IdProvinciaEntregaNavigation),
+    ["bancos"] = ctx => ctx.BancoEntity.Include(b => b.IdPaisNavigation),
+    ["items"] = ctx => ctx.ItemEntity.Include(i => i.IdMarcaNavigation)
+};
 
     Private Sub main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Visible = False

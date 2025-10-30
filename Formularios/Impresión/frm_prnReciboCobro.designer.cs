@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -54,7 +54,7 @@ namespace Centrex
             Controls.Add(rpt_view);
             Name = "frm_prnReciboCobro";
             Text = "Impresión";
-            Load += new EventHandler(frm_prnReciboCobro_Load);
+            //Load += new EventHandler(frm_prnReciboCobro_Load);
             ResumeLayout(false);
 
         }

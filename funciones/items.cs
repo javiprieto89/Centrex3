@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class mitem
@@ -23,7 +19,7 @@ namespace Centrex
 .Include(i => i.IdTipoNavigation)
         .Include(i => i.IdProveedorNavigation)
   .FirstOrDefault(i => i.IdItem == id_item);
- }
+                }
             }
             catch (Exception ex)
             {
@@ -43,14 +39,14 @@ namespace Centrex
      .Include(i => i.IdTipoNavigation)
          .Include(i => i.IdProveedorNavigation)
    .FirstOrDefault(i => i.Descript == descript);
-         }
-   }
-   catch (Exception ex)
-     {
-   Interaction.MsgBox(ex.Message.ToString());
-        return null;
-  }
- }
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message.ToString());
+                return null;
+            }
+        }
 
         public static bool info_itemtmp(string _idItem, int _idUsuario, Guid _idUnico)
         {
@@ -120,14 +116,14 @@ namespace Centrex
       .Include(i => i.IdProveedorNavigation)
          .OrderByDescending(i => i.IdItem)
    .FirstOrDefault();
-    }
-    }
-      catch (Exception ex)
-   {
-         Interaction.MsgBox(ex.Message.ToString());
-    return null;
-  }
-    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message.ToString());
+                return null;
+            }
+        }
 
         public static bool updateitem(ItemEntity it, bool borra = false)
         {
@@ -215,6 +211,33 @@ namespace Centrex
             {
                 Interaction.MsgBox(ex.Message.ToString());
                 return -1;
+            }
+        }
+
+        public static bool updatePrecios_items(string id_item, string precio)
+        {
+            try
+            {
+                using (CentrexDbContext context = new CentrexDbContext())
+                {
+                    var itemEntity = context.ItemEntity.FirstOrDefault(i => i.IdItem == Conversions.ToInteger(id_item));
+
+                    if (itemEntity is not null)
+                    {
+                        itemEntity.PrecioLista = Conversions.ToDecimal(precio);
+                        context.SaveChanges();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message);
+                return false;
             }
         }
         // ************************************ FUNCIONES DE ITEMS ***************************

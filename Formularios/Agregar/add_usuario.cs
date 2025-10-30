@@ -1,8 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -15,7 +13,7 @@ namespace Centrex
         private void add_usuario_Load(object sender, EventArgs e)
         {
             var encripta = new EncriptarType();
-            var up = new usuario_perfil();
+            var up = new UsuarioPerfilEntity();
 
             var ordenPerfiles = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
             var argcombo = cmb_perfil;
@@ -37,12 +35,12 @@ namespace Centrex
             {
                 // up = info_perfi
                 chk_secuencia.Enabled = false;
-                txt_usuario.Text = VariablesGlobales.edita_usuario.usuario;
-                txt_password.Text = encripta.Desencriptar(VariablesGlobales.edita_usuario.password);
-                txt_nombre.Text = VariablesGlobales.edita_usuario.nombre;
+                txt_usuario.Text = VariablesGlobales.edita_usuario.Usuario;
+                txt_password.Text = encripta.Desencriptar(VariablesGlobales.edita_usuario.Password);
+                txt_nombre.Text = VariablesGlobales.edita_usuario.Nombre;
                 cmb_perfil.SelectedValue = 1; // Fijo por el momento
                                               // cmb_perfil.Enabled = False
-                chk_activo.Checked = VariablesGlobales.edita_usuario.activo;
+                chk_activo.Checked = VariablesGlobales.edita_usuario.Activo;
             }
 
             if (VariablesGlobales.borrado == true)
@@ -99,18 +97,18 @@ namespace Centrex
                 return;
             }
 
-            var u = new usuario();
-            var perf_user = new usuario_perfil();
+            var u = new UsuarioEntity();
+            var perf_user = new UsuarioPerfilEntity();
             var encripta = new EncriptarType();
 
-            u.usuarioField = txt_usuario.Text;
-            u.password = encripta.Encriptar(txt_password.Text);
-            u.nombre = txt_nombre.Text;
-            u.activo = chk_activo.Checked;
+            u.Usuario = txt_usuario.Text;
+            u.Password = encripta.Encriptar(txt_password.Text);
+            u.Nombre = txt_nombre.Text;
+            u.Activo = chk_activo.Checked;
 
             if (VariablesGlobales.edicion == true)
             {
-                u.id_usuario = VariablesGlobales.edita_usuario.id_usuario;
+                u.IdUsuario = VariablesGlobales.edita_usuario.IdUsuario;
                 if (usuarios.updateUsuario(u) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar el usuario, consulte con su programdor", Constants.vbExclamation);
@@ -121,13 +119,13 @@ namespace Centrex
             {
                 usuarios.addUsuario(u);
                 u = info_usuario(txt_usuario.Text, false);
-                if (u.usuarioField == "error")
+                if (u.Usuario == "error")
                 {
                     Interaction.MsgBox("Ha ocurrido un error al crear el usuario, consulte con su programador.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                     return;
                 }
-                perf_user.id_perfil = Conversions.ToInteger(cmb_perfil.SelectedValue);
-                perf_user.id_usuario = u.id_usuario;
+                perf_user.IdPerfil = Conversions.ToInteger(cmb_perfil.SelectedValue);
+                perf_user.IdUsuario = u.IdUsuario;
 
                 if (!usuarios.add_usuario_perfil(perf_user))
                 {

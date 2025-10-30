@@ -1,69 +1,52 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class ccProveedores
     {
 
         // ************************************ FUNCIONES DE CUENTAS CORRIENTES DE PROVEEDORES **********************
-        public static ccProveedor info_ccProveedor(int id_cc)
+        public static CcProveedorEntity info_ccProveedor(int  _ccP)
         {
-            var tmp = new ccProveedor();
-
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var ccEntity = context.CcProveedorEntity.FirstOrDefault(cc => cc.IdCc == id_cc);
-
-                    if (ccEntity is not null)
+                    if (_ccP != 0 || _ccP != -1)
                     {
-                        tmp.id_cc = ccEntity.IdCc.ToString();
-                        tmp.IdProveedor = ccEntity.IdProveedor.ToString();
-                        tmp.id_moneda = ccEntity.IdMoneda.ToString();
-                        tmp.nombre = ccEntity.Nombre;
-                        tmp.saldo = Conversions.ToDouble(ccEntity.Saldo.ToString());
-                        tmp.activo = ccEntity.Activo;
+                        return context.CcProveedorEntity.FirstOrDefault(c => c.IdProveedor == _ccP);
                     }
-                    else
-                    {
-                        tmp.nombre = "error";
+                    else                     {
+                        return null;
                     }
-                }
-
-                return tmp;
+                }                
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                tmp.nombre = "error";
-                return tmp;
+                Interaction.MsgBox(ex.Message.ToString());                
+                return null;
             }
         }
 
-        public static bool addCCProveedor(ccProveedor cc)
+        public static bool addCCProveedor(CcProveedorEntity _ccP)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var ccEntity = new CcProveedorEntity()
+                    var tmp = new CcProveedorEntity()
                     {
-                        IdProveedor = cc.IdProveedor,
-                        IdMoneda = cc.id_moneda,
-                        Nombre = cc.nombre,
-                        Saldo = (decimal)cc.saldo,
-                        Activo = cc.activo
+                        IdProveedor = _ccP.IdProveedor,
+                        IdMoneda = _ccP.IdMoneda,
+                        Nombre = _ccP.Nombre,
+                        Saldo = _ccP.Saldo,
+                        Activo = _ccP.Activo
                     };
 
-                    context.CcProveedorEntity.Add(ccEntity);
+                    context.CcProveedorEntity.Add(tmp);
                     context.SaveChanges();
                     return true;
                 }
@@ -75,27 +58,25 @@ namespace Centrex
             }
         }
 
-        public static bool updateCCProveedor(ccProveedor cc, bool borra = false)
+        public static bool updateCCProveedor(CcProveedorEntity _ccP, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var ccEntity = context.CcProveedorEntity.FirstOrDefault(c => c.IdCc == cc.id_cc);
-
-                    if (ccEntity is not null)
+                    if (_ccP is not null)
                     {
                         if (borra == true)
                         {
-                            ccEntity.activo = false;
+                            _ccP.Activo = false;
                         }
                         else
                         {
-                            ccEntity.IdProveedor = cc.IdProveedor;
-                            ccEntity.IdMoneda = cc.id_moneda;
-                            ccEntity.nombre = cc.nombre;
-                            ccEntity.saldo = (decimal)cc.saldo;
-                            ccEntity.activo = cc.activo;
+                            _ccP.IdProveedor = _ccP.IdProveedor;
+                            _ccP.IdMoneda = _ccP.IdMoneda;
+                            _ccP.Nombre = _ccP.Nombre;
+                            _ccP.Saldo = _ccP.Saldo;
+                            _ccP.Activo = _ccP.Activo;
                         }
 
                         context.SaveChanges();
@@ -114,17 +95,15 @@ namespace Centrex
             }
         }
 
-        public static bool borrarccProveedor(ccProveedor cc)
+        public static bool borrarccProveedor(CcProveedorEntity _ccP)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var ccEntity = context.CcProveedorEntity.FirstOrDefault(c => c.IdCc == cc.id_cc);
-
-                    if (ccEntity is not null)
+                    if (_ccP is not null)
                     {
-                        context.CcProveedorEntity.Remove(ccEntity);
+                        context.CcProveedorEntity.Remove(_ccP);
                         context.SaveChanges();
                         return true;
                     }
@@ -142,16 +121,16 @@ namespace Centrex
         }
 
 
-        public static string consultaTotalCcProveedor(int id_proveedor, DateTime fecha_desde, DateTime fecha_hasta)
+        public static string consultaTotalCcProveedor(int id_proveedor, DateOnly fecha_desde, DateOnly fecha_hasta)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var importeTotal = (from trans in context.Transacciones
-                                        join tipoComp in context.TiposComprobantes on trans.IdTipoComprobante equals tipoComp.IdTipoComprobante
-                                        where trans.fecha >= fecha_desde && trans.fecha <= fecha_hasta && trans.IdProveedor == id_proveedor && tipoComp.contabilizar == true
-                                        select trans.total).Distinct().Sum();
+                    var importeTotal = (from trans in context.TransaccionEntity
+                                        join tipoComp in context.TipoComprobanteEntity on trans.IdTipoComprobante equals tipoComp.IdTipoComprobante
+                                        where trans.Fecha >= fecha_desde && trans.Fecha <= fecha_hasta && trans.IdProveedor == id_proveedor && tipoComp.Contabilizar == true
+                                        select trans.Total).Distinct().Sum();
 
                     // Manejo de valores nulos
                     if (importeTotal is null)

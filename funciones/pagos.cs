@@ -6,19 +6,19 @@ using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class pagos
     {
         // ************************************ FUNCIONES DE PAGOS ***************************
-        public static PagoEntity info_pago(string id_pago)
+        public static PagoEntity info_pago(string IdPago)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.Pagos.FirstOrDefault(p => p.IdPago == Conversions.ToInteger(id_pago));
+                    return context.PagoEntity.FirstOrDefault(p => p.IdPago == Conversions.ToInteger(IdPago));
                 }
             }
             catch (Exception ex)
@@ -28,7 +28,7 @@ namespace Centrex
             }
         }
 
-        public static int addpago(pago p)
+        public static int addpago(PagoEntity p)
         {
             try
             {
@@ -36,23 +36,23 @@ namespace Centrex
                 {
                     var pagoEntity = new PagoEntity()
                     {
-                        FechaCarga = DateTime.Now,
-                        FechaPago = !string.IsNullOrEmpty(p.fecha_pago) ? Conversions.ToDate(p.fecha_pago) : DateTime.Now,
+                        FechaCarga = DateOnly.FromDateTime(DateTime.Now),
+                        FechaPago = p.FechaPago,
                         IdProveedor = p.IdProveedor,
-                        IdCc = p.id_cc,
-                        dineroEnCc = (decimal)p.dineroEnCc,
-                        efectivo = (decimal)p.efectivo,
-                        totalTransferencia = (decimal)p.totalTransferencia,
-                        totalCh = (decimal)p.totalch,
-                        total = (decimal)p.total,
-                        hayCheque = p.hayCheque,
-                        hayTransferencia = p.hayTransferencia,
-                        activo = true,
-                        IdAnulaPago = p.id_anulaPago != -1 ? p.id_anulaPago : default,
-                        notas = p.notas ?? ""
+                        IdCc = p.IdCc,
+                        DineroEnCc = (decimal)p.DineroEnCc,
+                        Efectivo = (decimal)p.Efectivo,
+                        TotalTransferencia = (decimal)p.TotalTransferencia,
+                        TotalCh = (decimal)p.TotalCh,
+                        Total = (decimal)p.Total,
+                        HayCheque = p.HayCheque,
+                        HayTransferencia = p.HayTransferencia,
+                        Activo = true,
+                        IdAnulaPago = p.IdAnulaPago != -1 ? p.IdAnulaPago : default,
+                        Notas = p.Notas ?? ""
                     };
 
-                    context.Pagos.Add(pagoEntity);
+                    context.PagoEntity.Add(pagoEntity);
                     context.SaveChanges();
 
                     return pagoEntity.IdPago;
@@ -65,31 +65,31 @@ namespace Centrex
             }
         }
 
-        public static bool Anula_Pago(pago p)
+        public static bool Anula_Pago(PagoEntity p)
         {
             try
             {
-                var ap = new pago();
-                var cc = new ccProveedor();
+                var ap = new PagoEntity();
+                var cc = new CcProveedorEntity();
 
                 ap = p;
-                ap.dineroEnCc = ap.dineroEnCc * -1;
-                ap.efectivo = ap.efectivo * -1;
-                ap.totalTransferencia = ap.totalTransferencia * -1;
-                ap.totalch = ap.totalch * -1;
-                ap.total = ap.total * -1;
-                ap.id_anulaPago = p.id_pago;
-                ap.notas += Constants.vbCr + "ANULA PAGO: " + ap.id_pago.ToString();
+                ap.DineroEnCc = ap.DineroEnCc * -1;
+                ap.Efectivo = ap.Efectivo * -1;
+                ap.TotalTransferencia = ap.TotalTransferencia * -1;
+                ap.TotalCh = ap.TotalCh * -1;
+                ap.Total = ap.Total * -1;
+                ap.IdAnulaPago = p.IdPago;
+                ap.Notas += Constants.vbCr + "ANULA PAGO: " + ap.IdPago.ToString();
 
                 // Agrego un pago exactamente al revez, referenciando al pago original
-                ap.id_pago = addpago(ap);
+                ap.IdPago = addpago(ap);
 
-                if (ap.id_pago > 0)
+                if (ap.IdPago > 0)
                 {
-                    // Borro los cheques asignados al pago para liberarlos y actualizo el saldo
-                    borrar_chequePagado(ap.id_pago);
-                    cc = ccProveedores.info_ccProveedor(p.id_cc);
-                    cc.saldo -= p.total;
+                    // Borro los cheques asignados al pago para liberarlos y actualizo el Saldo
+                    borrar_chequePagado(ap.IdPago);
+                    cc = ccProveedores.info_ccProveedor(p.IdCc);
+                    cc.Saldo -= p.Total;
                     ccProveedores.updateCCProveedor(cc);
                     return true;
                 }
@@ -105,7 +105,7 @@ namespace Centrex
             }
         }
 
-        public static bool add_chequePagado(int id_pago, int[] id_cheque)
+        public static bool add_chequePagado(int IdPago, int[] id_cheque)
         {
             try
             {
@@ -115,10 +115,10 @@ namespace Centrex
                     {
                         var pagoCheque = new PagoChequeEntity()
                         {
-                            IdPago = id_pago,
+                            IdPago = IdPago,
                             IdCheque = chequeId
                         };
-                        context.PagosCheques.Add(pagoCheque);
+                        context.PagoChequeEntity.Add(pagoCheque);
                     }
 
                     context.SaveChanges();
@@ -132,16 +132,16 @@ namespace Centrex
             }
         }
 
-        public static bool borrar_chequePagado(int id_pago)
+        public static bool borrar_chequePagado(int IdPago)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var chequesPagados = context.PagosCheques.Where(pc => pc.IdPago == id_pago).ToList();
+                    var chequesPagados = context.PagoChequeEntity.Where(pc => pc.IdPago == IdPago).ToList();
 
                     foreach (var pagoCheque in chequesPagados)
-                        context.PagosCheques.Remove((PagoChequeEntity)pagoCheque);
+                        context.PagoChequeEntity.Remove((PagoChequeEntity)pagoCheque);
 
                     context.SaveChanges();
                     return true;
@@ -154,7 +154,7 @@ namespace Centrex
             }
         }
 
-        public static bool guardar_pagos_facturas_importes(int id_pago, DataGridView dg)
+        public static bool guardar_pagos_facturas_importes(int IdPago, DataGridView dg)
         {
             try
             {
@@ -166,14 +166,16 @@ namespace Centrex
                         {
                             if (row is not null & !row.IsNewRow)
                             {
-                                var facturaImporte = new PagoNFacturaImporteEntity()
+                                var facturaImporte = new PagoNfacturaImporteEntity()
                                 {
-                                    IdPago = id_pago,
-                                    fecha = Conversions.ToDate(row.Cells["Fecha"].Value),
-                                    nfactura = row.Cells["Factura"].Value.ToString(),
-                                    importe = Conversions.ToDecimal(row.Cells["Importe"].Value)
+                                    IdPago = IdPago,
+                                    Fecha = row.Cells["Fecha"].Value is DateTime fecha
+                                        ? DateOnly.FromDateTime(fecha)
+                                        : DateOnly.FromDateTime(DateTime.Now),
+                                    Nfactura = row.Cells["Factura"].Value.ToString(),
+                                    Importe = Conversions.ToDecimal(row.Cells["Importe"].Value)
                                 };
-                                context.PagosNFacturasImportes.Add(facturaImporte);
+                                context.PagoNfacturaImporteEntity.Add(facturaImporte);
                             }
                         }
 
@@ -193,14 +195,14 @@ namespace Centrex
             }
         }
 
-        public static bool Pago_Ya_Anulado(string id_pago)
+        public static bool Pago_Ya_Anulado(string IdPago)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    int idPagoInt = Conversions.ToInteger(id_pago);
-                    bool existe = context.Pagos.Any(p => p.IdAnulaPago.HasValue && p.IdAnulaPago.Value == idPagoInt);
+                    int idPagoInt = Conversions.ToInteger(IdPago);
+                    bool existe = context.PagoEntity.Any(p => p.IdAnulaPago.HasValue && p.IdAnulaPago.Value == idPagoInt);
                     return existe;
                 }
             }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
@@ -50,8 +50,8 @@ namespace Centrex
             if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                cmb_permisos.SelectedValue = VariablesGlobales.edita_permiso_perfil.id_permiso;
-                cmb_perfiles.SelectedValue = VariablesGlobales.edita_permiso_perfil.id_perfil;
+                cmb_permisos.SelectedValue = VariablesGlobales.edita_permiso_perfil.IdPermiso;
+                cmb_perfiles.SelectedValue = VariablesGlobales.edita_permiso_perfil.IdPefil;
                 cmb_permisos.Enabled = false;
                 cmb_perfiles.Enabled = false;
             }
@@ -88,11 +88,11 @@ namespace Centrex
                 return;
             }
 
-            var tmp = new perfil_permiso();
+            var tmp = new PermisoPerfilEntity();
 
 
-            tmp.id_permiso = Conversions.ToInteger(cmb_permisos.SelectedValue);
-            tmp.id_perfil = Conversions.ToInteger(cmb_perfiles.SelectedValue);
+            tmp.IdPermiso = Conversions.ToInteger(cmb_permisos.SelectedValue);
+            tmp.IdPefil = Conversions.ToInteger(cmb_perfiles.SelectedValue);
 
             usuarios.add_permiso_perfil(tmp);
 

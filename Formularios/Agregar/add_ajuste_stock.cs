@@ -42,7 +42,7 @@ namespace Centrex
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            var _as = new ajusteStock();
+            var _as = new AjusteStockEntity();
 
             if (cmb_items.Text == "Seleccione un item...")
             {
@@ -60,7 +60,7 @@ namespace Centrex
             _as.Cantidad = Conversions.ToInteger(txt_cantidad.Text);
             _as.Notas = txt_notas.Text;
 
-            if (!ajustes_stock.add_ajusteStock(_as))
+            if (!add_ajusteStock(_as))
             {
                 Interaction.MsgBox("Hubo un error al ingresar el ajuste de stock.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
             }

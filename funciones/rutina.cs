@@ -2,7 +2,7 @@ using System;
 using Microsoft.VisualBasic;
 using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
     static class rutinas
     {

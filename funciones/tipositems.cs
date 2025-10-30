@@ -1,34 +1,34 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class tipositems
     {
         // ************************************ FUNCIONES DE TIPOS DE ITEMS ***********************
-        public static tipoitem InfoTipoItem(object id_tipo)
+        public static TipoItemEntity InfoTipoItem(object IdTipo)
         {
-            var tmp = new tipoitem();
+            var tmp = new TipoItemEntity();
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var tipoEntity = context.TiposItems.FirstOrDefault(t => t.IdTipo == Conversions.ToInteger(id_tipo));
+                    var tipoEntity = context.TipoItemEntity.FirstOrDefault(t => t.IdTipo == Conversions.ToInteger(IdTipo));
 
                     if (tipoEntity is not null)
                     {
-                        tmp.id_tipo = tipoEntity.IdTipo.ToString();
-                        tmp.tipo = tipoEntity.tipo;
-                        tmp.activo = tipoEntity.activo;
+                        tmp.IdTipo = tipoEntity.IdTipo;
+                        tmp.Tipo = tipoEntity.Tipo;
+                        tmp.Activo = tipoEntity.Activo;
                     }
                     else
                     {
-                        tmp.tipo = "error";
+                        tmp.Tipo = "error";
                     }
                 }
                 return tmp;
@@ -36,24 +36,24 @@ namespace Centrex
             catch (Exception ex)
             {
                 Interaction.MsgBox(ex.Message.ToString());
-                tmp.tipo = "error";
+                tmp.Tipo = "error";
                 return tmp;
             }
         }
 
-        public static bool AddTipoItem(tipoitem titem)
+        public static bool AddTipoItem(TipoItemEntity titem)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var tipoEntity = new TipoItemEntity()
                     {
-                        tipo = titem.tipo,
-                        activo = titem.activo
+                        Tipo = titem.Tipo,
+                        Activo = titem.Activo
                     };
 
-                    context.TiposItems.Add(tipoEntity);
+                    context.TipoItemEntity.Add(tipoEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -65,24 +65,24 @@ namespace Centrex
             }
         }
 
-        public static bool UpdateTipoItem(TipoItemEntity titem, bool borra = false)
+        public static bool updatetipoitem(TipoItemEntity titem, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var tipoEntity = context.TiposItems.FirstOrDefault(t => t.IdTipo == titem.id_tipo);
+                    var tipoEntity = context.TipoItemEntity.FirstOrDefault(t => t.IdTipo == titem.IdTipo);
 
                     if (tipoEntity is not null)
                     {
                         if (borra == true)
                         {
-                            tipoEntity.activo = false;
+                            tipoEntity.Activo = false;
                         }
                         else
                         {
-                            tipoEntity.tipo = titem.tipo;
-                            tipoEntity.activo = titem.activo;
+                            tipoEntity.Tipo = titem.Tipo;
+                            tipoEntity.Activo = titem.Activo;
                         }
 
                         context.SaveChanges();
@@ -105,13 +105,13 @@ namespace Centrex
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var tipoEntity = context.TiposItems.FirstOrDefault(t => t.IdTipo == titem.id_tipo);
+                    var tipoEntity = context.TipoItemEntity.FirstOrDefault(t => t.IdTipo == titem.IdTipo);
 
                     if (tipoEntity is not null)
                     {
-                        context.TiposItems.Remove(tipoEntity);
+                        context.TipoItemEntity.Remove(tipoEntity);
                         context.SaveChanges();
                         return true;
                     }

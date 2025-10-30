@@ -73,7 +73,7 @@ public partial class ComprobanteEntity
 
     [Column("id_modoMiPyme")]
     public int IdModoMiPyme { get; set; }
-
+        
     [ForeignKey("IdModoMiPyme")]
     [InverseProperty("ComprobanteEntity")]
     public virtual SysModoMiPymeEntity IdModoMiPymeNavigation { get; set; } = null!;
@@ -84,4 +84,16 @@ public partial class ComprobanteEntity
 
     [InverseProperty("IdComprobanteNavigation")]
     public virtual ICollection<PedidoEntity> PedidoEntity { get; set; } = new List<PedidoEntity>();
+
+    [NotMapped]
+    private string _prefijo;
+
+    [NotMapped]
+    public string Prefijo
+    {
+        get => !string.IsNullOrEmpty(_prefijo)
+            ? _prefijo
+            : (IdTipoComprobanteNavigation?.NombreAbreviado ?? "");
+        set => _prefijo = value;
+    }
 }

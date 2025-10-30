@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex
 {
@@ -300,7 +299,7 @@ namespace Centrex
                 // ITEMS SIN DESCUENTO
                 // SQL: Mismo que items pero con filtro esDescuento = '0' AND esMarkup = '0'
                 // =======================
-                case "items_sindescuento":                
+                case "items_sindescuento":
                     result.Query = ctx.ItemEntity
                         .Include(i => i.IdTipoNavigation)
                         .Include(i => i.IdMarcaNavigation)
@@ -507,7 +506,7 @@ namespace Centrex
                                 NumeroCheque = ch.NCheque,
                                 Importe = ch.Importe,
                                 Estado = ch.IdEstadochNavigation.Estado,
-                                Depositado = ch.IdCuentaBancariaNavigation == null ? "No" : "Si, en: " + ch.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre + " - " + ch.IdCuentaBancariaNavigation.Nombre,                                
+                                Depositado = ch.IdCuentaBancariaNavigation == null ? "No" : "Si, en: " + ch.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre + " - " + ch.IdCuentaBancariaNavigation.Nombre,
                                 Activo = ch.Activo ? "Si" : "No"
                             });
 
@@ -540,7 +539,7 @@ namespace Centrex
                                 NumeroCheque = ch.NCheque,
                                 Importe = ch.Importe,
                                 Estado = ch.IdEstadochNavigation.Estado,
-                                Depositado = ch.IdCuentaBancariaNavigation  == null ? "No" : "Si, en: " + ch.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre + " - " + ch.IdCuentaBancariaNavigation.Nombre,                                
+                                Depositado = ch.IdCuentaBancariaNavigation == null ? "No" : "Si, en: " + ch.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre + " - " + ch.IdCuentaBancariaNavigation.Nombre,
                                 Activo = ch.Activo ? "Si" : "No"
                             });
 
@@ -558,31 +557,31 @@ namespace Centrex
                 //      LEFT JOIN cuentas_bancarias, LEFT JOIN sysestados_cheques
                 // =======================
                 case "chcartera":
-                  result.Query = ctx.ChequeEntity
-                 .Include(ch => ch.IdClienteNavigation)
-                 .Include(ch => ch.IdProveedorNavigation)
-                 .Include(ch => ch.IdBancoNavigation)
-                 .Include(ch => ch.IdCuentaBancariaNavigation)
-                 .Include(ch => ch.IdEstadochNavigation)
-                 .Where(ch => ch.Activo == historicoActivo)
-                 .OrderBy(ch => ch.IdCheque)
-                 .Select(ch => new
-                 {
-                     ID = ch.IdCheque,
-                     FechaIngreso = ch.FechaIngreso,
-                     FechaEmisión = ch.FechaEmision,
-                     RecibidoDe = ch.IdClienteNavigation.RazonSocial,    // EF maneja el null
-                     EntregadoA = ch.IdProveedorNavigation.RazonSocial,  // EF maneja el null
-                     BancoEmisor = ch.IdBancoNavigation.Nombre,          // EF maneja el null
-                     DepositadoEn = ch.IdCuentaBancariaNavigation.Nombre, // EF maneja el null
-                     NCheque = ch.NCheque,
-                     SegundoNDeCheque = ch.NCheque2,
-                     Monto = ch.Importe,
-                     Estado = ch.IdEstadochNavigation.Estado,                 // EF maneja el null
-                     FechaDeCobro = ch.FechaCobro,
-                     FechaDeSalida = ch.FechaSalida,
-                     FechaDeDeposito = ch.FechaDeposito
-                 });
+                    result.Query = ctx.ChequeEntity
+                   .Include(ch => ch.IdClienteNavigation)
+                   .Include(ch => ch.IdProveedorNavigation)
+                   .Include(ch => ch.IdBancoNavigation)
+                   .Include(ch => ch.IdCuentaBancariaNavigation)
+                   .Include(ch => ch.IdEstadochNavigation)
+                   .Where(ch => ch.Activo == historicoActivo)
+                   .OrderBy(ch => ch.IdCheque)
+                   .Select(ch => new
+                   {
+                       ID = ch.IdCheque,
+                       FechaIngreso = ch.FechaIngreso,
+                       FechaEmisión = ch.FechaEmision,
+                       RecibidoDe = ch.IdClienteNavigation.RazonSocial,    // EF maneja el null
+                       EntregadoA = ch.IdProveedorNavigation.RazonSocial,  // EF maneja el null
+                       BancoEmisor = ch.IdBancoNavigation.Nombre,          // EF maneja el null
+                       DepositadoEn = ch.IdCuentaBancariaNavigation.Nombre, // EF maneja el null
+                       NCheque = ch.NCheque,
+                       SegundoNDeCheque = ch.NCheque2,
+                       Monto = ch.Importe,
+                       Estado = ch.IdEstadochNavigation.Estado,                 // EF maneja el null
+                       FechaDeCobro = ch.FechaCobro,
+                       FechaDeSalida = ch.FechaSalida,
+                       FechaDeDeposito = ch.FechaDeposito
+                   });
                     result.ColumnasOcultar.Add("ID");
                     break;
 
@@ -868,8 +867,8 @@ namespace Centrex
                             FechaCarga = p.FechaCarga,
                             FechaEnvio = p.FechaEnvio,
                             FechaRecepcion = p.FechaRecepcion,
-                            MercaderiaEnviada = (bool) p.Enviado ? "SI" : "NO",
-                            MercaderiaRecibida = (bool) p.Recibido ? "SI" : "NO"
+                            MercaderiaEnviada = (bool)p.Enviado ? "SI" : "NO",
+                            MercaderiaRecibida = (bool)p.Recibido ? "SI" : "NO"
                         });
                     result.ColumnasOcultar.Add("ID");
                     break;
@@ -1080,6 +1079,37 @@ namespace Centrex
                         result.Query = null;
                         break;
                     }
+                case "depositarCH":
+                    {
+                        new frm_depositarCH().ShowDialog();
+                        break;
+                    }
+                case "rechazarCH":
+                    {
+                        new frm_rechazarCH().ShowDialog();
+                        break;
+                    }
+                case "ccProveedores":
+                    {
+                        new infoccProveedores().ShowDialog();
+                        break;
+                    }
+                case "ccClientes":
+                    {
+                        new infoccClientes().ShowDialog();
+                        break;
+                    }
+                case "ultimoComprobante":
+                    {
+                        new frm_ultimo_comprobante().ShowDialog();
+                        break;
+                    }
+                case "info_fc":
+                    {
+                        new info_fc().ShowDialog();
+                        break;
+                    }
+
 
                 // =======================
                 // DEFAULT (error)

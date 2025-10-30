@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 
@@ -17,13 +17,13 @@ namespace Centrex
                 Interaction.MsgBox("El campo 'Permiso' es obligatorio y está vacio");
             }
 
-            var tmp = new permiso();
+            var tmp = new PermisoEntity();
 
-            tmp.nombre = txt_permiso.Text;
+            tmp.Nombre = txt_permiso.Text;
 
             if (VariablesGlobales.edicion == true)
             {
-                tmp.id_permiso = VariablesGlobales.edita_permiso.id_permiso;
+                tmp.IdPermiso = VariablesGlobales.edita_permiso.IdPermiso;
                 if (permisos.updatepermiso(tmp) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar el permiso, consulte con su programdor", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
@@ -60,7 +60,7 @@ namespace Centrex
             if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_permiso.Text = VariablesGlobales.edita_permiso.nombre;
+                txt_permiso.Text = VariablesGlobales.edita_permiso.Nombre;
             }
 
             if (VariablesGlobales.borrado == true)

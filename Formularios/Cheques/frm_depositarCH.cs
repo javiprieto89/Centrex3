@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -481,7 +481,7 @@ namespace Centrex
             int c;
             int sel = 0;
             bool hay_error = false;
-            var ch = new cheque();
+            var ch = new ChequeEntity();
 
             var loopTo = dg_view_chCartera.Rows.Count - 1;
             for (c = 0; c <= loopTo; c++)
@@ -528,14 +528,19 @@ namespace Centrex
                 if (idValor is null)
                     continue;
 
-                ch.id_cheque = Convert.ToInt32(idValor);
-                ch.fecha_deposito = generales.Hoy();
-                ch.id_cuentaBancaria = Convert.ToInt32(cmb_cuentaBancaria.SelectedValue);
-                ch.nCheque = dg_view_chCartera.Rows[c].Cells["NumeroCheque"].Value?.ToString() ?? string.Empty;
+                ch.IdCheque = Convert.ToInt32(idValor);
+                ch.FechaDeposito = ConversorFechas.GetFecha(generales.Hoy(), ch.FechaDeposito) ;
+                ch.IdCuentaBancaria = Convert.ToInt32(cmb_cuentaBancaria.SelectedValue);
+                var nChequeValor = dg_view_chCartera.Rows[c].Cells["NumeroCheque"].Value;
+                if (nChequeValor != null && int.TryParse(nChequeValor.ToString(), out var numCheque))
+                    ch.NCheque = numCheque;
+                else
+                    ch.NCheque = 0;
+
 
                 if (!cheques.Depositar_cheque(ch))
                 {
-                Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.nCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.NCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                     hay_error = true;
                 }
             }
@@ -696,7 +701,7 @@ namespace Centrex
             int c;
             int sel = 0;
             bool hay_error = false;
-            var ch = new cheque();
+            var ch = new ChequeEntity();
 
             var loopTo = dg_view_chDepositados.Rows.Count - 1;
             for (c = 0; c <= loopTo; c++)
@@ -733,11 +738,16 @@ namespace Centrex
                 if (idValor is null)
                     continue;
 
-                ch.id_cheque = Convert.ToInt32(idValor);
-                ch.nCheque = dg_view_chDepositados.Rows[c].Cells["NumeroCheque"].Value?.ToString() ?? string.Empty;
-                if (!cheques.Anular_Deposito_Cheque(ch.id_cheque))
+                ch.IdCheque = Convert.ToInt32(idValor);
+                var nChequeValor = dg_view_chCartera.Rows[c].Cells["NumeroCheque"].Value;
+                if (nChequeValor != null && int.TryParse(nChequeValor.ToString(), out var numCheque))
+                    ch.NCheque = numCheque;
+                else
+                    ch.NCheque = 0;
+
+                if (!cheques.Anular_Deposito_Cheque(ch.IdCheque))
                 {
-                Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.nCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.NCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                     hay_error = true;
                 }
             }

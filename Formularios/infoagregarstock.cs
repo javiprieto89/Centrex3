@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
@@ -56,19 +56,19 @@ namespace Centrex
 
             if (VariablesGlobales.edicion | edicion_item_registro_stock)
             {
-                i = mitem.info_item(VariablesGlobales.edita_item_registro_stock.id_item);
-                VariablesGlobales.id = i.id_item;
+                i = mitem.info_item(VariablesGlobales.edita_item_registro_stock.IdItem);
+                VariablesGlobales.id = i.IdItem;
 
-                lbl_item.Text = i.descript;
-                txt_fecha.Text = Conversions.ToString(DateTime.Parse(VariablesGlobales.edita_item_registro_stock.fecha));
-                txt_factura.Text = VariablesGlobales.edita_item_registro_stock.factura;
+                lbl_item.Text = i.Descript;
+                txt_fecha.Text = ConversorFechas.GetFecha(VariablesGlobales.edita_item_registro_stock.Fecha, txt_fecha);
+                txt_factura.Text = VariablesGlobales.edita_item_registro_stock.Factura;
                 // cmb_proveedor.SelectedValue = CByte(VariablesGlobales.edita_item_registro_stock.id_proveedor)
                 cmb_proveedor.SelectedValue = id_proveedor;
-                txt_cantidad.Text = VariablesGlobales.edita_item_registro_stock.cantidad;
-                txt_costo.Text = VariablesGlobales.edita_item_registro_stock.costo;
-                txt_preciolista.Text = VariablesGlobales.edita_item_registro_stock.precio_lista;
-                txt_factor.Text = VariablesGlobales.edita_item_registro_stock.factor;
-                txt_notas.Text = VariablesGlobales.edita_item_registro_stock.nota;
+                txt_cantidad.Text = VariablesGlobales.edita_item_registro_stock.Cantidad.ToString();
+                txt_costo.Text = VariablesGlobales.edita_item_registro_stock.Costo.ToString();
+                txt_preciolista.Text = VariablesGlobales.edita_item_registro_stock.PrecioLista.ToString();
+                txt_factor.Text = VariablesGlobales.edita_item_registro_stock.Factor.ToString();
+                txt_notas.Text = VariablesGlobales.edita_item_registro_stock.Nota;
                 if (VariablesGlobales.edicion & !editaStock)
                 {
                     lbl_item.Enabled = false;
@@ -85,9 +85,9 @@ namespace Centrex
             }
             else
             {
-                i = VariablesGlobales.ConvertToItem(mitem.info_item(VariablesGlobales.id.ToString()));
+                i = VariablesGlobales.ConvertToItem(mitem.info_item((int)Conversion.Int(VariablesGlobales.id.ToString())));
 
-                lbl_item.Text = i.descript;
+                lbl_item.Text = i.Descript;
                 txt_fecha.Text = My.MyProject.Forms.add_stock.txt_fecha.Text;
                 txt_factura.Text = My.MyProject.Forms.add_stock.txt_factura.Text;
                 // cmb_proveedor.SelectedValue = CByte(add_stock.cmb_proveedor.SelectedValue)
@@ -101,13 +101,13 @@ namespace Centrex
                     cmb_proveedor.Text = "Seleccione un proveedor...";
                 }
 
-                txt_costo.Text = i.costo.ToString();
-                txt_preciolista.Text = i.precio_lista.ToString();
-                txt_factor.Text = i.factor.ToString();
+                txt_costo.Text = i.Costo.ToString();
+                txt_preciolista.Text = i.PrecioLista.ToString();
+                txt_factor.Text = i.Factor.ToString();
                 txt_notas.Text = My.MyProject.Forms.add_stock.txt_notas.Text;
 
                 // Si el item se encuentra inactivo, al agregar stock se activa
-                if (i.activo == false)
+                if (i.Activo == false)
                 {
                     if (!string.IsNullOrEmpty(txt_notas.Text))
                     {
@@ -117,7 +117,7 @@ namespace Centrex
                     {
                         txt_notas.Text = "ESTE ITEM SE ENCUENTRA INACTIVO, SI AGREGA STOCK SE ACTIVARÁ";
                     }
-                    i.activo = true;
+                    i.Activo = true;
                     mitem.updateitem(i);
                 }
 
@@ -133,7 +133,7 @@ namespace Centrex
                 return;
             }
 
-            var rs = new registro_stock();
+            var rs = new RegistroStockEntity();
 
             if (cmb_proveedor.SelectedValue is null)
             {
@@ -170,14 +170,14 @@ namespace Centrex
             rs.Fecha = DateOnly.Parse(txt_fecha.Text);
             rs.Factura = txt_factura.Text;
             rs.IdProveedor = Convert.ToInt32(cmb_proveedor.SelectedValue);
-            rs.Cantidad = Convert.ToDecimal(txt_cantidad.Text);
+            rs.Cantidad = Convert.ToInt32(txt_cantidad.Text);
             rs.Costo = Convert.ToDecimal(txt_costo.Text);
             rs.PrecioLista = Convert.ToDecimal(txt_preciolista.Text);
             rs.Factor = Convert.ToDecimal(txt_factor.Text);
-            rs.CantidadAnterior = i.Cantidad;
+            rs.CantidadAnterior = (int)i.Cantidad;
             rs.CostoAnterior = i.Costo;
             rs.PrecioListaAnterior = i.PrecioLista;
-            rs.FactorAnterior = i.Factor;
+            rs.FactorAnterior = (int)i.Factor;
             rs.Nota = txt_notas.Text;
             if (edicion_item_registro_stock)
             {
@@ -215,7 +215,7 @@ namespace Centrex
 
         private void psearch_item_Click(object sender, EventArgs e)
         {
-            var i = new item();
+            var i = new ItemEntity();
             string tablatmp;
 
             tablatmp = VariablesGlobales.tabla;

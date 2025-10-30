@@ -318,6 +318,31 @@ namespace Centrex
                 e.Handled = true;
         }
 
+        private void cmb_cliente_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cmb_proveedor_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cmb_banco_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cmb_estadoch_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cmb_cuentaBancaria_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
         private async void cmd_ok_Click(object sender, EventArgs e)
         {
             try

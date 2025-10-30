@@ -57,6 +57,10 @@ public partial class TransaccionEntity
     [InverseProperty("TransaccionEntity")]
     public virtual ComprobanteCompraEntity? IdComprobanteCompraNavigation { get; set; }
 
+    [ForeignKey("IdCliente")]
+    [InverseProperty("TransaccionEntity")]
+    public virtual ClienteEntity? IdClienteNavigation { get; set; }
+
     [ForeignKey("IdPago")]
     [InverseProperty("TransaccionEntity")]
     public virtual PagoEntity? IdPagoNavigation { get; set; }

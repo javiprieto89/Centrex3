@@ -1,11 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Windows.Forms;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
-{
-    [Microsoft.VisualBasic.CompilerServices.DesignerGenerated()]
+{    
     public partial class add_consulta : Form
     {
 

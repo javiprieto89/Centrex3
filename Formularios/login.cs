@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 
@@ -18,19 +18,19 @@ namespace Centrex
             UsuarioEntity u;
 
             u = info_usuario(txt_usuario.Text, true);
-            if (u.usuario == "error")
+            if (u.Usuario == "error")
             {
                 Interaction.MsgBox("El nombre de usuario: " + txt_usuario.Text + " NO EXISTE", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
 
             u = usuarios.info_login(txt_usuario.Text, txt_password.Text);
-            if (u.usuario == "error")
+            if (u.Usuario == "error")
             {
                 Interaction.MsgBox("La contraseña ingresada para el usuario: " + txt_usuario.Text + " NO ES CORRECTA.", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
-            else if (!u.activo)
+            else if (!u.Activo)
             {
                 Interaction.MsgBox("El usuario: " + txt_usuario.Text + " esta deshabilitado para el inicio de sesión", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                 return;
@@ -63,5 +63,9 @@ namespace Centrex
             }
         }
 
+        private void login_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

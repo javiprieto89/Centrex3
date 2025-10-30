@@ -1,11 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 
 namespace Centrex
 {
-    public partial class grilla_resultados
+    public partial class grilla_resultados : Form
     {
         public grilla_resultados()
         {
@@ -17,37 +18,77 @@ namespace Centrex
 
         private void grilla_resultados_Load(object sender, EventArgs e)
         {
-            var orden = OrdenAsc("Nombre");
-            generales.Cargar_Combo(
-                ref cmb_consultas,
-                entidad: "ConsultaPersonalizadaEntity",
-                displaymember: "Nombre",
-                valuemember: "IdConsulta",
-                predet: -1,
-                soloActivos: true,
-                filtros: null,
-                orden: orden);
-            cmb_consultas.SelectedIndex = -1;
-            cmb_consultas.Text = "Elija una consulta...";
+            try
+            {
+                var orden = OrdenAsc("Nombre");
+
+                // 🔹 Cargar combo usando la nueva función EF de "generales"
+                generales.Cargar_Combo(
+                    ref cmb_consultas,
+                    entidad: "ConsultaPersonalizadaEntity",
+                    displaymember: "Nombre",
+                    valuemember: "IdConsulta",
+                    predet: -1,
+                    soloActivos: true,
+                    filtros: null,
+                    orden: orden);
+
+                cmb_consultas.SelectedIndex = -1;
+                cmb_consultas.Text = "Elija una consulta...";
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al cargar consultas: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
         }
 
-        private void cmd_ejecutar_Click(object sender, EventArgs e)
+        private async void cmd_ejecutar_Click(object sender, EventArgs e)
         {
-            var c = new consultaP();
-            if (cmb_consultas.SelectedValue is null)
+            try
             {
-                Interaction.MsgBox("Debe elegir una consulta para ejecutar", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
-                return;
+                if (cmb_consultas.SelectedValue is null)
+                {
+                    Interaction.MsgBox("Debe elegir una consulta para ejecutar",
+                        (MsgBoxStyle)((int)MsgBoxStyle.Exclamation | (int)MsgBoxStyle.OkOnly), "Centrex");
+                    return;
+                }
+
+                int idConsulta = Convert.ToInt32(cmb_consultas.SelectedValue);
+
+                using var ctx = new CentrexDbContext();
+                var consulta = ctx.ConsultaPersonalizadaEntity.FirstOrDefault(x => x.IdConsulta == idConsulta);
+
+                if (consulta is null)
+                {
+                    Interaction.MsgBox("No se encontró la consulta seleccionada.",
+                        MsgBoxStyle.Exclamation, "Centrex");
+                    return;
+                }
+
+                // 🔹 Obtener la "entidad" o alias de consulta
+                string entidad = consulta.Consulta?.Trim() ?? "";
+                if (string.IsNullOrEmpty(entidad))
+                {
+                    Interaction.MsgBox("La consulta seleccionada no tiene una entidad asociada.",
+                        MsgBoxStyle.Exclamation, "Centrex");
+                    return;
+                }
+
+                // 🔹 Construir el DataGridQueryResult con EF dinámico
+                var result = DataGridQueryFactory.GetQueryForTable(ctx, entidad, historicoActivo: true);
+                result.GridName = "grilla_resultados";
+
+                // 🔹 Cargar la grilla usando la nueva función centralizada
+                await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_view_resultados, result);
+
+                // Mostrar total de registros
+                lbl_registros.Text = $"Total: {dg_view_resultados.Rows.Count}";
             }
-
-            c = consultas.info_consulta(Convert.ToInt32(cmb_consultas.SelectedValue));
-
-            var argdataGrid = dg_view_resultados;
-            int argnRegs = 0;
-            int argtPaginas = 0;
-            TextBox argtxtnPage = null;
-            generales.cargar_datagrid(ref argdataGrid, c.consulta, VariablesGlobales.basedb, 0, ref argnRegs, ref argtPaginas, 1, ref argtxtnPage, "", "");
-            dg_view_resultados = argdataGrid;
+            catch (Exception ex)
+            {
+                Interaction.MsgBox("Error al ejecutar la consulta: " + ex.Message,
+                    MsgBoxStyle.Critical, "Centrex");
+            }
         }
     }
 }

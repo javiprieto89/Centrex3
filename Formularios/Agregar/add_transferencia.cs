@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -32,7 +32,7 @@ namespace Centrex
             using (var context = new CentrexDbContext())
             {
                 // Cargar bancos
-                var bancos = context.Bancos.OrderBy(b => b.nombre).ToList();
+                var bancos = context.BancoEntity.OrderBy(b => b.Nombre).ToList();
                 cmb_banco.DataSource = bancos;
                 cmb_banco.DisplayMember = "Nombre";
                 cmb_banco.ValueMember = "IdBanco";
@@ -47,17 +47,17 @@ namespace Centrex
             }
             else
             {
-                dtp_fecha.Value = DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_transferencia.fecha.Value));
+                dtp_fecha.Value = ConversorFechas.GetFecha(edita_transferencia.Fecha, dtp_fecha.Value);
 
                 using (var context = new CentrexDbContext())
                 {
-                    var cb = context.CuentasBancarias.Include(c => c.Banco).FirstOrDefault(c => c.IdCuentaBancaria == VariablesGlobales.edita_transferencia.IdCuentaBancaria);
+                    var cb = context.CuentaBancariaEntity.Include(c => c.Nombre).FirstOrDefault(c => c.IdCuentaBancaria == VariablesGlobales.edita_transferencia.IdCuentaBancaria);
 
                     if (cb is not null)
                     {
-                        cmb_banco.SelectedValue = cb.Banco.IdBanco;
+                        cmb_banco.SelectedValue = cb.IdBanco;
 
-                        var cuentas = context.CuentasBancarias.Where(c => c.IdBanco == cb.Banco.IdBanco).OrderBy(c => c.Nombre).ToList();
+                        var cuentas = context.CuentaBancariaEntity.Where(c => c.IdBanco == cb.IdBanco).OrderBy(c => c.Nombre).ToList();
 
 
                         cmb_cuentaBancaria.DataSource = cuentas;
@@ -67,9 +67,9 @@ namespace Centrex
                     }
                 }
 
-                txt_importe.Text = VariablesGlobales.edita_transferencia.total.ToString();
-                txt_nComprobante.Text = VariablesGlobales.edita_transferencia.nComprobante;
-                txt_notas.Text = VariablesGlobales.edita_transferencia.notas;
+                txt_importe.Text = VariablesGlobales.edita_transferencia.Total.ToString();
+                txt_nComprobante.Text = VariablesGlobales.edita_transferencia.NComprobante;
+                txt_notas.Text = VariablesGlobales.edita_transferencia.Notas;
             }
 
             if (VariablesGlobales.borrado)
@@ -98,7 +98,7 @@ namespace Centrex
 
         private void txt_importe_KeyPress(object sender, KeyPressEventArgs e)
         {
-            e.Handled = VariablesGlobales.valida(e.KeyChar, 5);
+            e.Handled = generales.valida(e.KeyChar, false);
         }
 
         private void cmd_exit_Click(object sender, EventArgs e)
@@ -126,11 +126,11 @@ namespace Centrex
                 return;
             }
 
-            t.fecha = dtp_fecha.Value.Date;
-            t.IdCuentaBancaria = cmb_cuentaBancaria.SelectedValue;
-            t.total = decimal.Parse(txt_importe.Text);
-            t.nComprobante = txt_nComprobante.Text;
-            t.notas = txt_notas.Text;
+            t.Fecha = ConversorFechas.GetFecha(dtp_fecha.Value.Date, t.Fecha);
+            t.IdCuentaBancaria = (int)Conversion.Int(cmb_cuentaBancaria.SelectedValue);
+            t.Total = decimal.Parse(txt_importe.Text);
+            t.NComprobante = txt_nComprobante.Text;
+            t.Notas = txt_notas.Text;
 
             if (VariablesGlobales.edicion)
             {
@@ -142,7 +142,7 @@ namespace Centrex
             }
             else
             {
-                t.IdTransferencia = transferencias.AddTmpTransferencia(VariablesGlobales.ConvertToTmpTransferencia(t));
+                t.IdTransferencia = ConversorFechas.GetFecha(transferencias.AddTmpTransferencia(VariablesGlobales.ConvertToTmpTransferencia(t)), t.Fecha);
                 if (t.IdTransferencia == 0)
                 {
                     Interaction.MsgBox("Ocurrió un error al agregar la transferencia", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
@@ -158,7 +158,7 @@ namespace Centrex
 
             using (var context = new CentrexDbContext())
             {
-                var cuentas = context.CuentasBancarias.Where(c => c.IdBanco == seleccionado).OrderBy(c => c.Nombre).ToList();
+                var cuentas = context.CuentaBancariaEntity.Where(c => c.IdBanco == seleccionado).OrderBy(c => c.Nombre).ToList();
 
 
                 cmb_cuentaBancaria.DataSource = cuentas;

@@ -1,13 +1,6 @@
-﻿//using Centrex.Helpers;
-//using Centrex.Models;
-//using Microsoft.EntityFrameworkCore;
-//using Microsoft.VisualBasic;
-//using Microsoft.VisualBasic.CompilerServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
-//using System.Data.SqlClient;
-//using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     /// <summary>
@@ -702,8 +695,7 @@ namespace Centrex
 
             if (string.IsNullOrEmpty(fecha_afip))
             {
-                return "";
-                return default;
+                return "";                
             }
 
             anio = Strings.Left(fecha_afip, 4);
@@ -977,33 +969,23 @@ namespace Centrex
         /// <summary>
         /// Genera ID único usando NEWID() de SQL Server
         /// </summary>
-        public static string Generar_ID_Unico()
+        public static Guid Generar_ID_Unico()
         {
             try
             {
                 // 🔹 Generar un GUID nativo en formato estándar
-                return Guid.NewGuid().ToString();
+                return Guid.NewGuid();
             }
             catch (Exception)
             {
                 // 🔸 En caso de error (extremadamente raro), devolver un GUID vacío
-                return Guid.Empty.ToString();
+                return Guid.Empty;
             }
         }
 
         // ============= FUNCIONES DE COMPATIBILIDAD LEGACY =============
         // Estas funciones han sido movidas a vb para evitar ambigüedad
         // y mantener compatibilidad con código existente
-
-        /// <summary>
-        /// Obtiene instancia del DbContext para Entity Framework
-        /// </summary>
-        public static CentrexDbContext GetDbContext()
-        {
-            return new CentrexDbContext();
-        }
-
-
 
         // ================================================================
         // 1. LECTURA Y ESCRITURA DE ARCHIVOS DE TEXTO
@@ -1045,7 +1027,7 @@ namespace Centrex
         // ================================================================
         // 2. BACKUP DE BASE DE DATOS (mantiene compatibilidad)
         // ================================================================
-        public static bool dbBackupFunction(string strRuta, string strArchivo)
+        public static bool dbBackup(string strRuta, string strArchivo)
         {
             try
             {
@@ -1183,6 +1165,32 @@ namespace Centrex
             return valor;
         }
 
+        /// <summary>
+        /// Valida una tecla presionada. Permite números, separadores decimales (., ,), signo negativo y backspace.
+        /// Devuelve TRUE si la tecla debe bloquearse.
+        /// </summary>
+        public static bool valida(char tecla, bool negativosOk = true)
+        {
+            // Caracteres válidos siempre
+            string permitidos = negativosOk
+                ? "0123456789.,-\b"
+                : "0123456789.,\b";
+
+            // Si el carácter no está permitido → se bloquea
+            return !permitidos.Contains(tecla);
+        }
+
+        /// <summary>
+        /// Corrige el separador decimal o miles según la configuración.
+        /// Devuelve el carácter que debe escribirse.
+        /// </summary>
+        public static char NormalizaDecimal(char tecla)
+        {
+            // Permite usar ',' o '.' indistintamente
+            if (tecla == ',') tecla = '.';
+            return tecla;
+        }
+
         // ================================================================
         // 6. OBTIENE VALOR DE CONFIGURACIÓN "clave=valor"
         // ================================================================
@@ -1283,6 +1291,66 @@ namespace Centrex
             return found;
         }
 
+        public static string CalculoComprobanteLocal(string tipo, int puntoVenta, int numero)
+        {
+            return $"{tipo} Nº {puntoVenta.ToString().PadLeft(4, '0')}-{numero.ToString().PadLeft(8, '0')}";
+        }
+
+        /// <summary>
+        /// Convierte cualquier valor (DateTimePicker, TextBox, Label, string, DateTime, DateOnly, etc.)
+        /// a DateOnly de forma segura.
+        /// Si no puede convertir, devuelve DateOnly.MinValue.
+        /// </summary>
+        public static DateOnly ToDateOnly(object valor)
+        {
+            try
+            {
+                if (valor == null) return DateOnly.MinValue;
+
+                return valor switch
+                {
+                    DateOnly d => d,
+                    DateTime dt => DateOnly.FromDateTime(dt.Date),
+                    DateTimePicker dtp => DateOnly.FromDateTime(dtp.Value.Date),
+                    TextBox txt when !string.IsNullOrWhiteSpace(txt.Text) => DateOnly.Parse(txt.Text),
+                    Label lbl when !string.IsNullOrWhiteSpace(lbl.Text) => DateOnly.Parse(lbl.Text),
+                    string s when !string.IsNullOrWhiteSpace(s) => DateOnly.Parse(s),
+                    _ => DateOnly.MinValue
+                };
+            }
+            catch
+            {
+                return DateOnly.MinValue;
+            }
+        }
+
+        /// <summary>
+        /// Convierte DateOnly, DateTime o cualquier valor de fecha a string ("dd/MM/yyyy").
+        /// Si es nulo o inválido, devuelve cadena vacía.
+        /// </summary>
+        public static string ToDateString(object valor)
+        {
+            try
+            {
+                if (valor == null) return "";
+
+                return valor switch
+                {
+                    DateOnly d => d.ToString("dd/MM/yyyy"),
+                    DateTime dt => dt.ToString("dd/MM/yyyy"),
+                    DateTimePicker dtp => dtp.Value.ToString("dd/MM/yyyy"),
+                    TextBox txt when !string.IsNullOrWhiteSpace(txt.Text) => txt.Text,
+                    Label lbl when !string.IsNullOrWhiteSpace(lbl.Text) => lbl.Text,
+                    string s => s,
+                    _ => ""
+                };
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
 
         // ======================================================
         // EXPORTAR A EXCEL
@@ -1319,9 +1387,24 @@ namespace Centrex
             }
         }
 
+    //public static string Precio(decimal valor)
+    //{
+    //    return $"$ {valor:N2}";
+    //}
+
+        // =====================================
+        // SOBRECARGA DE PRECIO (acepta decimal)
+        // =====================================
         public static string Precio(decimal valor)
         {
-            return $"$ {valor:N2}";
+            try
+            {
+                return "$ " + valor.ToString("N2", CultureInfo.CurrentCulture);
+            }
+            catch
+            {
+                return "$ 0,00";
+            }
         }
     } 
 }

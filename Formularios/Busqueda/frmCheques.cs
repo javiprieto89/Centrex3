@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,9 +10,9 @@ namespace Centrex
 {
     public partial class frmCheques
     {
-        private cliente cl = new cliente();
-        private proveedor pr = new proveedor();
-        private cobro c = new cobro();
+        private ClienteEntity cl = new ClienteEntity();
+        private ProveedorEntity pr = new ProveedorEntity();
+        private CobroEntity c = new CobroEntity();
         private bool cliente = false;
 
         public frmCheques(int idCliente = -1, int idProveedor = -1, int idCobro = -1)
@@ -22,7 +22,7 @@ namespace Centrex
             InitializeComponent();
             if (idCliente != -1)
             {
-                cl = clientes.info_cliente(idCliente.ToString());
+                cl = clientes.info_cliente(idCliente);
                 cliente = true;
             }
             else
@@ -96,7 +96,7 @@ namespace Centrex
             using var ctx = new CentrexDbContext();
             var chequeIds = await ctx.ChequeEntity
                 .AsNoTracking()
-                .Where(ch => ch.IdCliente == cl.id_cliente)
+                .Where(ch => ch.IdCliente == cl.IdCliente)
                 .Select(ch => ch.IdCheque)
                 .ToListAsync();
 
@@ -130,13 +130,13 @@ namespace Centrex
 
             if (cliente)
             {
-                lbl_cheques.Text = "Cheques disponibles del cliente: " + cl.razon_social;
+                lbl_cheques.Text = "Cheques disponibles del cliente: " + cl.RazonSocial;
 
                 var query = ctx.TmpSelChEntity
                     .AsNoTracking()
                     .Include(tmp => tmp.IdChequeNavigation)
                         .ThenInclude(ch => ch.IdBancoNavigation)
-                    .Where(tmp => tmp.IdChequeNavigation.IdCliente == cl.id_cliente)
+                    .Where(tmp => tmp.IdChequeNavigation.IdCliente == cl.IdCliente)
                     .OrderBy(tmp => tmp.IdCheque)
                     .Select(tmp => new
                     {

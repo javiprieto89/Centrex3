@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -89,7 +89,7 @@ namespace Centrex
             StartPosition = FormStartPosition.CenterParent;
             Text = "Edición masiva de precios";
             ((System.ComponentModel.ISupportInitialize)dg_view).EndInit();
-            Load += new EventHandler(VariablesGlobales.edita_precios_Load);
+            Load += new EventHandler(edita_precios_Load);
             ResumeLayout(false);
 
         }

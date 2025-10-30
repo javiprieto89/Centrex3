@@ -1,15 +1,26 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+using Centrex.Models;
 
 namespace Centrex
 {
-    public partial class add_Consulta
+    public partial class add_consulta : Form
     {
-        public add_Consulta()
+        public add_consulta()
         {
             InitializeComponent();
         }
+      
         private void cmd_ok_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txt_nombre.Text))
@@ -25,16 +36,16 @@ namespace Centrex
 
             var tmp = new ConsultaPersonalizadaEntity();
 
-            tmp.nombre = txt_nombre.Text;
-            tmp.SqlTexto = txt_consulta.Text;
-            tmp.activo = chk_activo.Checked;
+            tmp.Nombre = txt_nombre.Text;
+            tmp.Consulta = txt_consulta.Text;
+            tmp.Activo = chk_activo.Checked;
 
             if (VariablesGlobales.edicion == true)
             {
                 tmp.IdConsulta = VariablesGlobales.edita_Consulta.IdConsulta;
                 if (consultas.updateConsulta(tmp) == false)
                 {
-                    Interaction.MsgBox("Hubo un problema al actualizar la Consulta, consulte con su programdor", Constants.vbExclamation);
+                    Interaction.MsgBox("Hubo un problema al actualizar la Consulta, consulte con su programador", Constants.vbExclamation);
                     closeandupdate(this);
                 }
             }
@@ -72,7 +83,7 @@ namespace Centrex
             {
                 chk_secuencia.Enabled = false;
                 txt_nombre.Text = VariablesGlobales.edita_Consulta.Nombre;
-                txt_consulta.Text = VariablesGlobales.edita_Consulta.SqlTexto;
+                txt_consulta.Text = VariablesGlobales.edita_Consulta.Consulta;
                 chk_activo.Checked = VariablesGlobales.edita_Consulta.Activo;
             }
 
@@ -88,12 +99,12 @@ namespace Centrex
                 {
                     if (consultas.borrarConsulta(VariablesGlobales.edita_Consulta) == false)
                     {
-                        if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la Consulta, ¿desea intectar desactivarla para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
+                        if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la Consulta, ¿desea intentar desactivarla para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
                             if (consultas.updateConsulta(VariablesGlobales.edita_Consulta, true) == true)
                             {
-                                Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la Consulta no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que la Consulta, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
+                                Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la Consulta no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que la Consulta tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }
                             else
                             {

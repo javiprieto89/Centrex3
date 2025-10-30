@@ -443,39 +443,39 @@ Module factura
     ''' <summary>
     ''' Guarda imagen QR en la base de datos - MANTIENE LA FIRMA ORIGINAL
     ''' </summary>
-    Public Function Guardar_QR_DB(ByVal archivo_imagen As String, ByVal id_pedido As Integer) As Integer
-        Dim con As SqlClient.SqlConnection = Nothing
-        Try
-            If Not File.Exists(archivo_imagen) Then
-                Return 0
-            End If
+    'Public Function Guardar_QR_DB(ByVal archivo_imagen As String, ByVal id_pedido As Integer) As Integer
+    '    Dim con As SqlClient.SqlConnection = Nothing
+    '    Try
+    '        If Not File.Exists(archivo_imagen) Then
+    '            Return 0
+    '        End If
 
-            Dim img As Image = Image.FromFile(archivo_imagen)
-            Dim ms As New MemoryStream()
-            img.Save(ms, ImageFormat.Jpeg)
-            Dim md As Byte() = ms.GetBuffer()
+    '        Dim img As Image = Image.FromFile(archivo_imagen)
+    '        Dim ms As New MemoryStream()
+    '        img.Save(ms, ImageFormat.Jpeg)
+    '        Dim md As Byte() = ms.GetBuffer()
 
-            con = New SqlClient.SqlConnection("Server=" + serversql + ";Database=" + basedb + ";Uid=" + usuariodb + ";Password=" + passdb)
-            con.Open()
+    '        con = New SqlClient.SqlConnection("Server=" + serversql + ";Database=" + basedb + ";Uid=" + usuariodb + ";Password=" + passdb)
+    '        con.Open()
 
-            Dim sqlstr As String = "UPDATE pedidos SET fc_qr = @qr WHERE id_pedido = '" + id_pedido.ToString + "'"
-            Dim cmd As New SqlClient.SqlCommand(sqlstr, con)
-            Dim param As New SqlClient.SqlParameter("@qr", SqlDbType.Image) With {.Value = md}
+    '        Dim sqlstr As String = "UPDATE pedidos SET fc_qr = @qr WHERE id_pedido = '" + id_pedido.ToString + "'"
+    '        Dim cmd As New SqlClient.SqlCommand(sqlstr, con)
+    '        Dim param As New SqlClient.SqlParameter("@qr", SqlDbType.Image) With {.Value = md}
 
-            cmd.Parameters.Add(param)
-            cmd.ExecuteNonQuery()
+    '        cmd.Parameters.Add(param)
+    '        cmd.ExecuteNonQuery()
 
-            Return 0
+    '        Return 0
 
-        Catch ex As Exception
-            Console.WriteLine("Error al guardar QR en DB: " & ex.Message)
-            Return -1
-        Finally
-            If con IsNot Nothing AndAlso con.State = ConnectionState.Open Then
-                con.Close()
-            End If
-        End Try
-    End Function
+    '    Catch ex As Exception
+    '        Console.WriteLine("Error al guardar QR en DB: " & ex.Message)
+    '        Return -1
+    '    Finally
+    '        If con IsNot Nothing AndAlso con.State = ConnectionState.Open Then
+    '            con.Close()
+    '        End If
+    '    End Try
+    'End Function
 
     ''' <summary>
     ''' Formatea errores de AFIP - NUEVA FUNCIÓN

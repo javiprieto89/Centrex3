@@ -1,59 +1,164 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 
 namespace Centrex
 {
-    public partial class edita_precios
+    public partial class edita_precios : Form
     {
         public edita_precios()
         {
             InitializeComponent();
         }
-        private void edita_precios_Load(object sender, EventArgs e)
-        {
-            string sqlstr;
-            sqlstr = "SELECT i.id_item AS 'ID', i.item AS 'Código', i.descript AS 'Producto', i.precio_lista AS 'Precio' " + "FROM items AS i " + "WHERE i.esDescuento = '0' AND i.esMarkup = '0' AND i.activo = '1'";
 
-            var argdataGrid = dg_view;
-            int argnRegs = 0;
-            int argtPaginas = 0;
-            TextBox argtxtnPage = null;
-            generales.cargar_datagrid(ref argdataGrid, sqlstr, VariablesGlobales.basedb, 0, ref argnRegs, ref argtPaginas, 1, ref argtxtnPage, "", "");
-            dg_view = argdataGrid;
-            dg_view.Columns[0].ReadOnly = true;
-            dg_view.Columns[1].ReadOnly = true;
-            dg_view.Columns[2].ReadOnly = true;
+        private async void edita_precios_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                using var ctx = new CentrexDbContext();
+
+                // 🔹 Consulta EF (reemplaza SQL directo)
+                var query = ctx.ItemEntity
+                    .AsNoTracking()
+                    .Where(i => !i.EsDescuento && !i.EsMarkup && i.Activo)
+                    .OrderBy(i => i.Item)
+                    .Select(i => new
+                    {
+                        ID = i.IdItem,
+                        Código = i.Item,
+                        Producto = i.Descript,
+                        Precio = i.PrecioLista
+                    });
+
+                var result = new DataGridQueryResult
+                {
+                    Query = query,
+                    EsMaterializada = false
+                };
+
+                await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_view, result);
+
+                // 🔹 Configuración visual
+                dg_view.Columns["ID"].ReadOnly = true;
+                dg_view.Columns["Código"].ReadOnly = true;
+                dg_view.Columns["Producto"].ReadOnly = true;
+                dg_view.Columns["Precio"].DefaultCellStyle.Format = "N2";
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al cargar los ítems: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
         }
 
-        private void cmd_ok_Click(object sender, EventArgs e)
+        private async void cmd_ok_Click(object sender, EventArgs e)
         {
-            if (Interaction.MsgBox("¿Está seguro de que desea aplicar la actualización de precios?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion), "Centrex") == MsgBoxResult.Yes)
+            try
             {
-                int i;
+                // Confirmación del usuario
+                var res = Interaction.MsgBox(
+                    "¿Está seguro de que desea aplicar la actualización de precios?",
+                    (MsgBoxStyle)((int)MsgBoxStyle.YesNo | (int)MsgBoxStyle.Question),
+                    "Centrex");
 
-                var loopTo = dg_view.Rows.Count - 1;
-                for (i = 0; i <= loopTo; i++)
+                if (res != MsgBoxResult.Yes)
                 {
-                    if (!precios.updatePrecios_items(dg_view.Rows[i].Cells[0].Value.ToString(), dg_view.Rows[i].Cells[3].Value.ToString()))
+                    Interaction.MsgBox(
+                        "Todos los cambios realizados se descartarán",
+                        MsgBoxStyle.Information,
+                        "Centrex");
+                    generales.closeandupdate(this);
+                    return;
+                }
+
+                using var ctx = new CentrexDbContext();
+                int actualizados = 0;
+
+                // 🔹 Recorremos cada fila y aplicamos cambios
+                foreach (DataGridViewRow row in dg_view.Rows)
+                {
+                    if (row.IsNewRow) continue;
+
+                    int id = Convert.ToInt32(row.Cells["ID"].Value);
+                    var precioTexto = row.Cells["Precio"].Value?.ToString();
+
+                    if (!decimal.TryParse(precioTexto, NumberStyles.Number, CultureInfo.CurrentCulture, out var nuevoPrecio))
+                        continue;
+
+                    var item = await ctx.ItemEntity.FirstOrDefaultAsync(i => i.IdItem == id);
+                    if (item == null) continue;
+
+                    if (item.PrecioLista != nuevoPrecio)
                     {
-                        Interaction.MsgBox("Ha ocurrido un error al actualizar los precios", (MsgBoxStyle)((int)Constants.vbOKOnly + (int)Constants.vbExclamation), "Centrex");
-                        return;
+                        item.PrecioLista = nuevoPrecio;
+                        ctx.ItemEntity.Update(item);
+                        actualizados++;
                     }
                 }
-                Interaction.MsgBox("Todos los precios se han actualizado correctamente", (MsgBoxStyle)((int)Constants.vbOKOnly + (int)Constants.vbInformation), "Centrex");
+
+                await ctx.SaveChangesAsync();
+
+                // Mensaje final
+                if (actualizados > 0)
+                {
+                    Interaction.MsgBox(
+                        $"Se actualizaron {actualizados} precios correctamente.",
+                        MsgBoxStyle.Information,
+                        "Centrex");
+                }
+                else
+                {
+                    Interaction.MsgBox(
+                        "No hubo cambios de precios para aplicar.",
+                        MsgBoxStyle.Information,
+                        "Centrex");
+                }
+
+                // 🔹 Refrescar grilla (si querés que quede abierta)
+                await RefrescarGrillaAsync();
+
+                // 🔹 O cerrar el formulario directamente:
+                // generales.closeandupdate(this);
             }
-            else
+            catch (Exception ex)
             {
-                Interaction.MsgBox("Todos los cambios realizados se descartarán", (MsgBoxStyle)((int)Constants.vbOKOnly + (int)Constants.vbInformation), "Centrex");
+                Interaction.MsgBox($"Error al actualizar los precios: {ex.Message}",
+                    MsgBoxStyle.Critical, "Centrex");
             }
-            closeandupdate(this);
+        }
+
+        private async Task RefrescarGrillaAsync()
+        {
+            using var ctx = new CentrexDbContext();
+
+            var query = ctx.ItemEntity
+                .AsNoTracking()
+                .Where(i => !i.EsDescuento && !i.EsMarkup && i.Activo)
+                .OrderBy(i => i.Item)
+                .Select(i => new
+                {
+                    ID = i.IdItem,
+                    Código = i.Item,
+                    Producto = i.Descript,
+                    Precio = i.PrecioLista
+                });
+
+            var result = new DataGridQueryResult
+            {
+                Query = query,
+                EsMaterializada = false
+            };
+
+            await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_view, result);
         }
 
         private void cmd_exit_Click(object sender, EventArgs e)
         {
-            closeandupdate(this);
+            generales.closeandupdate(this);
         }
     }
 }
-

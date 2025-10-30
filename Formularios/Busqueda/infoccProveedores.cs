@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -97,11 +97,11 @@ namespace Centrex
 
             cmd_last_Click(null, null); // Bush quiere que aparezca en la última página
 
-            total = ccProveedores.consultaTotalCcProveedor(Conversions.ToInteger(cmb_proveedor.SelectedValue), fechaDesde, fechaHasta);
+            total = ccProveedores.consultaTotalCcProveedor(Conversions.ToInteger(cmb_proveedor.SelectedValue), ConversorFechas.GetFecha(fechaDesde, fechaDesde), ConversorFechas.GetFecha(fechaHasta, fechaHasta));
 
             lbl_total.Text = "$ " + total;
 
-            saldo = ccProveedores.info_ccProveedor(Conversions.ToInteger(cmb_cc.SelectedValue)).saldo.ToString();
+            saldo = ccProveedores.info_ccProveedor(Conversions.ToInteger(cmb_cc.SelectedValue)).Saldo.ToString();
             lbl_saldo.Text = "$ " + saldo;
 
             if (Conversions.ToBoolean(Strings.InStr(saldo, "-")))
@@ -131,10 +131,10 @@ namespace Centrex
 
             // If borrado = False Then edicion = False
             var p = new PedidoEntity();
-            p = Pedidos.infoPedido(seleccionado);
+            p = Pedidos.Info_pedido(Convert.ToInt32(seleccionado));
             VariablesGlobales.id = p.IdPedido;
 
-            frm_prnCmp.ShowDialog();
+         //   frm_prnCmp.ShowDialog();
         }
 
         private void cmb_proveedor_SelectionChangeCommitted(object sender, EventArgs e)

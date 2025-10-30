@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
@@ -30,7 +30,7 @@ namespace Centrex
                 return;
             }
 
-            var tmp = new condicion_compra();
+            var tmp = new CondicionCompraEntity();
 
             tmp.Condicion = txt_condicion.Text;
             tmp.Vencimiento = Conversions.ToInteger(txt_vencimiento.Text);

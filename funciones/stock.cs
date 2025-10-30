@@ -6,16 +6,16 @@ using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class stock
     {
         // ************************************ FUNCIONES DE STOCK ***************************
 
-        public static registro_stock InfoRegistroStock(int id_rs)
+        public static RegistroStockEntity InfoRegistroStock(int id_rs)
         {
-            var tmp = new registro_stock();
+            var tmp = new RegistroStockEntity();
             try
             {
                 using (var ctx = new CentrexDbContext())
@@ -25,12 +25,12 @@ namespace Centrex
                     {
                         tmp.IdRegistro = rs.IdRegistro;
                         tmp.IdIngreso = rs.IdIngreso;
-                        tmp.Fecha = Conversions.ToString(rs.Fecha.Value);
+                        tmp.Fecha = rs.Fecha;
                         tmp.FechaIngreso = rs.FechaIngreso;
                         tmp.Factura = rs.Factura;
                         tmp.IdProveedor = rs.IdProveedor;
                         tmp.IdItem = rs.IdItem;
-                        tmp.Cantidad = (decimal)rs.Cantidad;
+                        tmp.Cantidad = rs.Cantidad;
                         tmp.Costo = rs.Costo;
                         tmp.PrecioLista = rs.PrecioLista;
                         tmp.Factor = rs.Factor;
@@ -50,24 +50,24 @@ namespace Centrex
             return tmp;
         }
 
-        public static registro_stock InfoRegistroStockTmp(int id_rs)
+        public static RegistroStockEntity InfoRegistroStockTmp(int id_rs)
         {
-            var tmp = new registro_stock();
+            var tmp = new RegistroStockEntity();
             try
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var rs = ctx.TmpRegistroStockEntity.AsNoTracking().FirstOrDefault(r => r.IdRegistroTmp == id_rs);
+                    var rs = ctx.TmpRegistroStockEntity.AsNoTracking().FirstOrDefault(r => r.IdRegistrotmp == id_rs);
                     if (rs is not null)
                     {
                         tmp.IdRegistro = rs.IdRegistrotmp;
                         tmp.IdIngreso = rs.IdIngreso;
-                        tmp.Fecha = Conversions.ToString(rs.Fecha.Value);
+                        tmp.Fecha = rs.Fecha.Value;
                         tmp.FechaIngreso = rs.FechaIngreso;
                         tmp.Factura = rs.Factura;
                         tmp.IdProveedor = rs.IdProveedor;
                         tmp.IdItem = rs.IdItem;
-                        tmp.Cantidad = (decimal)rs.Cantidad;
+                        tmp.Cantidad = rs.Cantidad;
                         tmp.Costo = rs.Costo;
                         tmp.PrecioLista = rs.PrecioLista;
                         tmp.Factor = (decimal)rs.Factor;
@@ -87,7 +87,7 @@ namespace Centrex
             return tmp;
         }
 
-        public static bool AddStockTmp(registro_stock rs)
+        public static bool AddStockTmp(RegistroStockEntity rs)
         {
             try
             {
@@ -95,20 +95,20 @@ namespace Centrex
                 {
                     var entity = new TmpRegistroStockEntity()
                     {
-                        Fecha = Conversions.ToDate(rs.fecha),
-                        Factura = rs.factura,
+                        Fecha = rs.Fecha,
+                        Factura = rs.Factura,
                         IdProveedor = rs.IdProveedor,
-                        IdItem = rs.id_item,
-                        Cantidad = (int)Math.Round(rs.cantidad),
-                        Costo = rs.costo,
-                        PrecioLista = rs.precio_lista,
-                        Factor = rs.factor,
-                        CantidadAnterior = rs.cantidad_anterior,
-                        CostoAnterior = rs.costo_anterior,
-                        PrecioListaAnterior = rs.precio_lista_anterior,
-                        FactorAnterior = rs.factor_anterior,
-                        Nota = rs.nota,
-                        Activo = true
+                        IdItem = rs.IdItem,
+                        Cantidad = rs.Cantidad,
+                        Costo = rs.Costo,
+                        PrecioLista = rs.PrecioLista,
+                        Factor = rs.Factor,
+                        CantidadAnterior = rs.CantidadAnterior,
+                        CostoAnterior = rs.CostoAnterior,
+                        PrecioListaAnterior = rs.PrecioListaAnterior,
+                        FactorAnterior = rs.FactorAnterior,
+                        Nota = rs.Nota,
+                        Activo = rs.Activo
                     };
                     ctx.TmpRegistroStockEntity.Add(entity);
                     ctx.SaveChanges();
@@ -122,24 +122,24 @@ namespace Centrex
             }
         }
 
-        public static bool UpdateStockTmp(registro_stock rs)
+        public static bool UpdateStockTmp(RegistroStockEntity rs)
         {
             try
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var entity = ctx.TmpRegistroStockEntity.FirstOrDefault(r => r.IdRegistroTmp == rs.id_registro);
+                    var entity = ctx.TmpRegistroStockEntity.FirstOrDefault(r => r.IdRegistrotmp == rs.IdRegistro);
                     if (entity is not null)
                     {
-                        entity.Fecha = Conversions.ToDate(rs.fecha);
-                        entity.Factura = rs.factura;
+                        entity.Fecha = rs.Fecha;
+                        entity.Factura = rs.Factura;
                         entity.IdProveedor = rs.IdProveedor;
-                        entity.IdItem = rs.id_item;
-                        entity.Cantidad = (int)Math.Round(rs.cantidad);
-                        entity.Costo = rs.costo;
-                        entity.PrecioLista = rs.precio_lista;
-                        entity.Factor = rs.factor;
-                        entity.Nota = rs.nota;
+                        entity.IdItem = rs.IdItem;
+                        entity.Cantidad = rs.Cantidad;
+                        entity.Costo = rs.Costo;
+                        entity.PrecioLista = rs.PrecioLista;
+                        entity.Factor = rs.Factor;
+                        entity.Nota = rs.Nota;
                         ctx.SaveChanges();
                         return true;
                     }
@@ -196,13 +196,13 @@ namespace Centrex
             }
         }
 
-        public static bool BorrarItemRegistroStockTmp(registro_stock rs)
+        public static bool BorrarItemRegistroStockTmp(RegistroStockEntity rs)
         {
             try
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var entity = ctx.TmpRegistroStockEntity.FirstOrDefault(r => r.IdRegistroTmp == rs.id_registro);
+                    var entity = ctx.TmpRegistroStockEntity.FirstOrDefault(r => r.IdRegistrotmp == rs.IdRegistro);
                     if (entity is not null)
                     {
                         ctx.TmpRegistroStockEntity.Remove(entity);
@@ -228,9 +228,14 @@ namespace Centrex
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var registros = ctx.RegistroStockEntity.Where(r => r.FechaIngreso != DbFunctions.TruncateTime(DateTime.Now)).ToList();
+                    var hoy = DateOnly.FromDateTime(DateTime.Now);
+                    var registros = ctx.RegistroStockEntity
+                        .Where(r => r.FechaIngreso != hoy)
+                        .ToList();
+
                     foreach (var r in registros)
-                        ((dynamic)r).Activo = false;
+                        r.Activo = false;
+
                     ctx.SaveChanges();
                 }
             }

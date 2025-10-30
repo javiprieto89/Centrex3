@@ -60,7 +60,7 @@ namespace Centrex
             txt_subTotal.TextChanged += new EventHandler(txt_subTotal_TextChanged);
             lbl_subTotal = new Label();
             cmb_proveedor = new ComboBox();
-            cmb_proveedor.KeyPress += new KeyPressEventHandler(cmb_cliente_KeyPress);
+            cmb_proveedor.KeyPress += new KeyPressEventHandler(cmb_proveedor_KeyPress);
             dg_viewOC = new DataGridView();
             dg_viewOC.DoubleClick += new EventHandler(dg_view_proveedor_DoubleClick);
             dg_viewOC.DoubleClick += new EventHandler(dg_view_DoubleClick);

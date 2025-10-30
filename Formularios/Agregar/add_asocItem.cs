@@ -6,7 +6,7 @@ namespace Centrex
 {
     public partial class add_asocItem
     {
-        private asocItem iAsoc = new asocItem();
+        private AsocItemEntity iAsoc = new AsocItemEntity();
         private ItemEntity item = new ItemEntity();
         private ItemEntity asocItem = new ItemEntity();
 

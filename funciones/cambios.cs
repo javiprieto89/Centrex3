@@ -1,10 +1,9 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
-using Microsoft.VisualBasic;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class cambios
@@ -14,14 +13,15 @@ namespace Centrex
             bool tmp;
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    tmp = context.Cambios.Any(c => c.activo == true);
+                    tmp = context.CambioEntity.Any(c => c.Activo == true);
                     return tmp;
                 }
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 tmp = false;
                 return tmp;
             }
@@ -31,12 +31,12 @@ namespace Centrex
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var cambiosActivos = context.Cambios.Where(c => c.activo == true).ToList();
+                    var cambiosActivos = context.CambioEntity.Where(c => c.Activo == true).ToList();
 
                     foreach (var cambio in cambiosActivos)
-                        cambio.activo = false;
+                        cambio.Activo = false;
 
                     context.SaveChanges();
                     return true;

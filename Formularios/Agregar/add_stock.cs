@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
@@ -22,7 +22,7 @@ namespace Centrex
         private void add_stock_Load(object sender, EventArgs e)
         {
             // Cargar proveedores con EF
-            var proveedores = ctx.Proveedores.Where(p => p.activo == true).OrderBy(p => p.razon_social).ToList();
+            var proveedores = ctx.ProveedorEntity.Where(p => p.Activo == true).OrderBy(p => p.RazonSocial).ToList();
 
             cmb_proveedor.DataSource = proveedores;
             cmb_proveedor.DisplayMember = "RazonSocial";
@@ -30,9 +30,9 @@ namespace Centrex
 
             if (VariablesGlobales.edicion)
             {
-                txt_fecha.Text = DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_registro_stock.fecha.Value)).ToString("dd/MM/yyyy");
-                lbl_fecha_ingreso.Text = DateTime.Parse(VariablesGlobales.edita_registro_stock.FechaIngreso).ToString("dd/MM/yyyy");
-                txt_factura.Text = VariablesGlobales.edita_registro_stock.factura;
+                txt_fecha.Text = DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_registro_stock.Fecha.Value)).ToString("dd/MM/yyyy");
+                lbl_fecha_ingreso.Text = VariablesGlobales.edita_registro_stock.FechaIngreso.ToString("dd/MM/yyyy");
+                txt_factura.Text = VariablesGlobales.edita_registro_stock.Factura;
                 cmb_proveedor.SelectedValue = (byte)VariablesGlobales.edita_registro_stock.IdProveedor;
 
                 if (!editaStock)
@@ -60,10 +60,10 @@ namespace Centrex
                 }
 
                 // Limpiar tabla temporal
-                var tmp = ctx.TmpRegistroStock.ToList();
+                var tmp = ctx.TmpRegistroStockEntity.ToList();
                 if (tmp.Any())
                 {
-                    ctx.TmpRegistroStock.RemoveRange(tmp);
+                    ctx.TmpRegistroStockEntity.RemoveRange(tmp);
                     ctx.SaveChanges();
                 }
             }
@@ -93,11 +93,11 @@ namespace Centrex
 
             if (VariablesGlobales.edicion && editaStock)
             {
-                data = ctx.RegistrosStock.Include("Item").Where(rs => rs.IdIngreso == VariablesGlobales.edita_registro_stock.IdIngreso).Select(rs => new
+                data = ctx.RegistroStockEntity.Include("Item").Where(rs => rs.IdIngreso == VariablesGlobales.edita_registro_stock.IdIngreso).Select(rs => new
                 {
                     ID = rs.IdRegistro,
-                    Código = rs.Item.item,
-                    Producto = rs.Item.descript,
+                    Código = rs.IdItemNavigation.Item,
+                    Producto = rs.IdItemNavigation.Descript,
                     rs.Factura,
                     rs.Fecha,
                     rs.Cantidad,
@@ -109,18 +109,18 @@ namespace Centrex
             }
             else
             {
-                data = ctx.TmpRegistroStock.Include("Item").Where(rst => rst.activo == true).Select(rst => new
+                data = ctx.TmpRegistroStockEntity.Include("Item").Where(rst => rst.Activo == true).Select(rst => new
                 {
-                    ID = rst.IdRegistroTmp,
-                    Código = rst.Item.item,
-                    Producto = rst.Item.descript,
-                    Factura = rst.factura,
-                    Fecha = rst.fecha,
-                    Cantidad = rst.cantidad,
-                    Costo = rst.costo,
+                    ID = rst.IdRegistrotmp,
+                    Código = rst.IdItemNavigation.Item,
+                    Producto = rst.IdItemNavigation.Descript,
+                    Factura = rst.Factura,
+                    Fecha = rst.Fecha,
+                    Cantidad = rst.Cantidad,
+                    Costo = rst.Costo,
                     rst.PrecioLista,
-                    Factor = rst.factor,
-                    Notas = rst.nota
+                    Factor = rst.Factor,
+                    Notas = rst.Nota
                 }).ToList();
             }
 
@@ -139,10 +139,10 @@ namespace Centrex
                 {
                     stock.AddStock();
                     // Limpiar tabla temporal
-                    var tmp = ctx.TmpRegistroStock.ToList();
+                    var tmp = ctx.TmpRegistroStockEntity.ToList();
                     if (tmp.Any())
                     {
-                        ctx.TmpRegistroStock.RemoveRange(tmp);
+                        ctx.TmpRegistroStockEntity.RemoveRange(tmp);
                         ctx.SaveChanges();
                     }
                     Interaction.MsgBox("Se actualizaron los items correctamente", (MsgBoxStyle)Constants.vbOK, "Centrex");
@@ -205,7 +205,7 @@ namespace Centrex
             Enabled = true;
             VariablesGlobales.tabla = tmpTabla;
 
-            var proveedor = ctx.Proveedores.FirstOrDefault(p => p.IdProveedor == VariablesGlobales.id);
+            var proveedor = ctx.ProveedorEntity.FirstOrDefault(p => p.IdProveedor == VariablesGlobales.id);
             if (proveedor is not null)
             {
                 cmb_proveedor.SelectedIndex = cmb_proveedor.FindString(proveedor.RazonSocial);
@@ -226,7 +226,7 @@ namespace Centrex
             int seleccionado = Conversions.ToInteger(dg_view.CurrentRow.Cells[0].Value);
 
             edicion_item_registro_stock = true;
-            VariablesGlobales.edita_item_registro_stock = ctx.RegistrosStock.FirstOrDefault(r => r.IdRegistro == seleccionado);
+            VariablesGlobales.edita_item_registro_stock = ctx.RegistroStockEntity.FirstOrDefault(r => r.IdRegistro == seleccionado);
             if (VariablesGlobales.edita_item_registro_stock is not null)
             {
                 My.MyProject.Forms.infoagregarstock.ShowDialog();
@@ -244,16 +244,16 @@ namespace Centrex
                 return;
 
             int seleccionado = Conversions.ToInteger(dg_view.CurrentRow.Cells[0].Value);
-            var tmpItem = ctx.TmpRegistroStock.FirstOrDefault(t => t.IdRegistroTmp == seleccionado);
+            var tmpItem = ctx.TmpRegistroStockEntity.FirstOrDefault(t => t.IdRegistrotmp == seleccionado);
 
             if (tmpItem is not null)
             {
-                var item = ctx.Items.FirstOrDefault(i => i.IdItem == tmpItem.IdItem);
-                string nombreItem = item is not null ? item.item : "(Desconocido)";
+                var item = ctx.ItemEntity.FirstOrDefault(i => i.IdItem == tmpItem.IdItem);
+                string nombreItem = item is not null ? item.Item : "(Desconocido)";
 
                 if (Interaction.MsgBox("¿Está seguro de borrar el item: " + nombreItem + "?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == Constants.vbYes)
                 {
-                    ctx.TmpRegistroStock.Remove(tmpItem);
+                    ctx.TmpRegistroStockEntity.Remove(tmpItem);
                     ctx.SaveChanges();
                     updateform();
                 }

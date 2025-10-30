@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -57,7 +55,7 @@ namespace Centrex
                 return;
             }
 
-            var cl = new cliente();
+            var cl = new ClienteEntity();
 
             cl.RazonSocial = Strings.Trim(txt_razonSocial.Text);
             cl.NombreFantasia = Strings.Trim(txt_nombreFantasia.Text);
@@ -71,7 +69,7 @@ namespace Centrex
             cl.IdPaisFiscal = ToNullableInt(cmb_paisFiscal.SelectedValue);
             cl.IdPaisEntrega = ToNullableInt(cmb_paisEntrega.SelectedValue);
             cl.IdProvinciaFiscal = ToNullableInt(cmb_provinciaFiscal.SelectedValue);
-            cl.IdProvinciaEntrega = ToNullableInt(cmb_provinciaEntrega.SelectedValue);            
+            cl.IdProvinciaEntrega = ToNullableInt(cmb_provinciaEntrega.SelectedValue);
             cl.DireccionFiscal = txt_direccionFiscal.Text;
             cl.LocalidadFiscal = txt_localidadFiscal.Text;
             cl.CpFiscal = txt_cpFiscal.Text;
@@ -147,9 +145,6 @@ namespace Centrex
                 {
                     cmb_provinciaEntrega.SelectedIndex = -1;
                 }
-                txt_direccionEntrega.Text = "";
-                txt_localidadEntrega.Text = "";
-                txt_cpEntrega.Text = "";
                 chk_esInscripto.Checked = false;
                 chk_activo.Checked = true;
             }
@@ -181,13 +176,13 @@ namespace Centrex
             var ordenDocumento = OrdenAscendente("Documento");
 
             generales.Cargar_Combo(
-                ref cmb_paisFiscal,
-                entidad: "PaisEntity",
-                displaymember: "Pais",
-                valuemember: "IdPais",
-                predet: -1,
-                soloActivos: false,
-                orden: ordenPais);
+             ref cmb_paisFiscal,
+               entidad: "PaisEntity",
+               displaymember: "Pais",
+               valuemember: "IdPais",
+              predet: -1,
+                         soloActivos: false,
+                  orden: ordenPais);
 
             if (VariablesGlobales.id_pais_default > 0 && cmb_paisFiscal.Items.Count > 0)
             {
@@ -201,13 +196,13 @@ namespace Centrex
             }
 
             generales.Cargar_Combo(
-                ref cmb_paisEntrega,
-                entidad: "PaisEntity",
-                displaymember: "Pais",
-                valuemember: "IdPais",
-                predet: -1,
-                soloActivos: false,
-                orden: ordenPais);
+               ref cmb_paisEntrega,
+            entidad: "PaisEntity",
+          displaymember: "Pais",
+                    valuemember: "IdPais",
+              predet: -1,
+                  soloActivos: false,
+              orden: ordenPais);
 
             if (VariablesGlobales.id_pais_default > 0 && cmb_paisEntrega.Items.Count > 0)
             {
@@ -231,27 +226,28 @@ namespace Centrex
             }
 
             generales.Cargar_Combo(
-                ref cmb_claseFiscal,
-                entidad: "SysClaseFiscalEntity",
-                displaymember: "Descript",
-                valuemember: "IdClaseFiscal",
-                predet: -1,
-                soloActivos: false,
-                orden: ordenClaseFiscal);
+             ref cmb_claseFiscal,
+         entidad: "SysClaseFiscalEntity",
+                   displaymember: "Descript",
+          valuemember: "IdClaseFiscal",
+        predet: -1,
+               soloActivos: false,
+           orden: ordenClaseFiscal);
             cmb_claseFiscal.Text = "Seleccione una clase fiscal...";
 
             generales.Cargar_Combo(
-                ref cmb_tipoDocumento,
-                entidad: "TipoDocumentoEntity",
-                displaymember: "Documento",
-                valuemember: "IdTipoDocumento",
-                predet: -1,
-                soloActivos: true,
-                orden: ordenDocumento);
+          ref cmb_tipoDocumento,
+         entidad: "TipoDocumentoEntity",
+         displaymember: "Documento",
+  valuemember: "IdTipoDocumento",
+   predet: -1,
+   soloActivos: true,
+      orden: ordenDocumento);
             if (VariablesGlobales.id_tipoDocumento_default > 0)
             {
                 cmb_tipoDocumento.SelectedValue = VariablesGlobales.id_tipoDocumento_default;
             }
+
             cmb_tipoDocumento_SelectionChangeCommitted(null, null);
 
             // Me.ActiveControl = Me.txt_razonSocial
@@ -422,7 +418,7 @@ namespace Centrex
 
         private void txt_taxNumber_LostFocus(object sender, EventArgs e)
         {
-            cliente cl;
+            ClienteEntity cl;
             if (!string.IsNullOrEmpty(txt_taxNumber.Text))
             {
                 nCliente = clientes.existecliente(txt_taxNumber.Text);
@@ -434,7 +430,7 @@ namespace Centrex
 
             if (nCliente != -1)
             {
-                cl = clientes.info_cliente(nCliente.ToString());
+                cl = clientes.info_cliente(nCliente);
                 txt_taxNumber.Text = cl.TaxNumber;
                 txt_razonSocial.Text = cl.RazonSocial;
                 txt_nombreFantasia.Text = cl.NombreFantasia;
@@ -512,14 +508,14 @@ namespace Centrex
             };
 
             generales.Cargar_Combo(
-                ref comboProvincia,
-                entidad: "ProvinciaEntity",
-                displaymember: "Provincia",
-                valuemember: "IdProvincia",
-                predet: -1,
-                soloActivos: false,
-                filtros: filtros,
-                orden: orden);
+                      ref comboProvincia,
+             entidad: "ProvinciaEntity",
+              displaymember: "Provincia",
+              valuemember: "IdProvincia",
+             predet: -1,
+                      soloActivos: false,
+          filtros: filtros,
+                      orden: orden);
         }
 
         private void SeleccionarPaisYProvincia(ComboBox cmbPais, ref ComboBox cmbProvincia, int? idProvincia)
@@ -533,7 +529,7 @@ namespace Centrex
                 return;
             }
 
-            using var context = GetDbContext();
+            using var context = new CentrexDbContext();
             var provincia = context.ProvinciaEntity.AsNoTracking().FirstOrDefault(p => p.IdProvincia == idProvincia.Value);
             if (provincia is null)
             {

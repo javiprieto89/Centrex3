@@ -1,11 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     public static class combos_ef
@@ -57,34 +56,34 @@ namespace Centrex
         {
             using (var ctx = new CentrexDbContext())
             {
-                var list = ctx.TiposItems.Where(t => t.activo).OrderBy(t => t.tipo).Select(t => new KeyValuePair<int, string>(t.IdTipo, t.tipo)).ToList();
+                var list = ctx.TipoItemEntity.Where(t => t.Activo).OrderBy(t => t.Tipo).Select(t => new KeyValuePair<int, string>(t.IdTipo, t.Tipo)).ToList();
                 return ToDataTable(list, "id_tipo", "tipo");
             }
         }
 
-        public static DataTable ComboMarcas()
-        {
-            using (var ctx = new CentrexDbContext())
-            {
-                var list = ctx.Marcas.OrderBy(m => m.marca).Select(m => new KeyValuePair<int, string>(m.IdMarca, m.marca)).ToList();
-                return ToDataTable(list, "id_marca", "marca");
-            }
-        }
+        //public static DataTable ComboMarcas()
+        //{
+        //    using (var ctx = new CentrexDbContext())
+        //    {
+        //        var list = ctx.MarcaItemEntity.OrderBy(m => m.marca).Select(m => new KeyValuePair<int, string>(m.IdMarca, m.marca)).ToList();
+        //        return ToDataTable(list, "id_marca", "marca");
+        //    }
+        //}
 
-        public static DataTable ComboProveedores()
-        {
-            using (var ctx = new CentrexDbContext())
-            {
-                var list = ctx.Proveedores.Where(p => p.activo).OrderBy(p => p.razon_social).Select(p => new KeyValuePair<int, string>(p.IdProveedor, p.razon_social)).ToList();
-                return ToDataTable(list, "id_proveedor", "razon_social");
-            }
-        }
+        //public static DataTable ComboProveedores()
+        //{
+        //    using (var ctx = new CentrexDbContext())
+        //    {
+        //        var list = ctx.ProveedorEntity.Where(p => p.activo).OrderBy(p => p.razon_social).Select(p => new KeyValuePair<int, string>(p.IdProveedor, p.razon_social)).ToList();
+        //        return ToDataTable(list, "id_proveedor", "razon_social");
+        //    }
+        //}
 
         public static DataTable ComboImpuestosIVAActivos()
         {
             using (var ctx = new CentrexDbContext())
             {
-                var list = ctx.Impuestos.Where(i => i.activo & i.nombre.ToLower().Contains("iva")).OrderByDescending(i => i.nombre).Select(i => new KeyValuePair<int, string>(i.IdImpuesto, i.nombre)).ToList();
+                var list = ctx.ImpuestoEntity.Where(i => i.Activo & i.Nombre.ToLower().Contains("iva")).OrderByDescending(i => i.Nombre).Select(i => new KeyValuePair<int, string>(i.IdImpuesto, i.Nombre)).ToList();
 
                 return ToDataTable(list, "id_impuesto", "nombre");
             }
@@ -98,7 +97,7 @@ namespace Centrex
         {
             using (var ctx = new CentrexDbContext())
             {
-                var list = ctx.Items.OrderBy(i => i.item).Select(i => new KeyValuePair<int, string>(i.IdItem, i.descript)).ToList();
+                var list = ctx.ItemEntity.OrderBy(i => i.Item).Select(i => new KeyValuePair<int, string>(i.IdItem, i.Descript)).ToList();
                 var dt = new DataTable();
                 dt.Columns.Add("id_item", typeof(int));
                 dt.Columns.Add("descript", typeof(string));
@@ -108,48 +107,48 @@ namespace Centrex
             }
         }
 
-        public static DataTable ComboClientesActivos()
-        {
-            using (var ctx = new CentrexDbContext())
-            {
-                var list = ctx.Clientes.Where(c => c.activo).OrderBy(c => c.RazonSocial).Select(c => new { Id = c.IdCliente, Nombre = c.RazonSocial }).ToList();
-                var dt = new DataTable();
-                dt.Columns.Add("id_cliente", typeof(int));
-                dt.Columns.Add("razon_social", typeof(string));
-                foreach (var r in list)
-                    dt.Rows.Add(((dynamic)r).Id, ((dynamic)r).Nombre);
-                return dt;
-            }
-        }
+        //public static DataTable ComboClientesActivos()
+        //{
+        //    using (var ctx = new CentrexDbContext())
+        //    {
+        //        var list = ctx.ClienteEntity.Where(c => c.activo).OrderBy(c => c.RazonSocial).Select(c => new { Id = c.IdCliente, Nombre = c.RazonSocial }).ToList();
+        //        var dt = new DataTable();
+        //        dt.Columns.Add("id_cliente", typeof(int));
+        //        dt.Columns.Add("razon_social", typeof(string));
+        //        foreach (var r in list)
+        //            dt.Rows.Add(((dynamic)r).Id, ((dynamic)r).Nombre);
+        //        return dt;
+        //    }
+        //}
 
-        public static DataTable ComboComprobantesActivos()
-        {
-            using (var ctx = new CentrexDbContext())
-            {
-                var list = ctx.Comprobantes.OrderBy(c => c.comprobante).Select(c => new { Id = c.IdComprobante, Nombre = c.comprobante }).ToList();
-                var dt = new DataTable();
-                dt.Columns.Add("id_comprobante", typeof(int));
-                dt.Columns.Add("comprobante", typeof(string));
-                foreach (var r in list)
-                    dt.Rows.Add(((dynamic)r).Id, ((dynamic)r).Nombre);
-                return dt;
-            }
-        }
+        //public static DataTable ComboComprobantesActivos()
+        //{
+        //    using (var ctx = new CentrexDbContext())
+        //    {
+        //        var list = ctx.ComprobanteEntity.OrderBy(c => c.comprobante).Select(c => new { Id = c.IdComprobante, Nombre = c.comprobante }).ToList();
+        //        var dt = new DataTable();
+        //        dt.Columns.Add("id_comprobante", typeof(int));
+        //        dt.Columns.Add("comprobante", typeof(string));
+        //        foreach (var r in list)
+        //            dt.Rows.Add(((dynamic)r).Id, ((dynamic)r).Nombre);
+        //        return dt;
+        //    }
+        //}
 
-        public static DataTable ComboCcCliente(int idCliente)
-        {
-            using (var ctx = new CentrexDbContext())
-            {
-                var list = ctx.CcClientes.Where(cc => cc.IdCliente == idCliente).OrderBy(cc => cc.IdCc).Select(cc => new { Id = cc.IdCc, Nombre = cc.IdCc }).ToList();
+        //public static DataTable ComboCcCliente(int idCliente)
+        //{
+        //    using (var ctx = new CentrexDbContext())
+        //    {
+        //        var list = ctx.CcClienteEntity.Where(cc => cc.IdCliente == idCliente).OrderBy(cc => cc.IdCc).Select(cc => new { Id = cc.IdCc, Nombre = cc.IdCc }).ToList();
 
-                var dt = new DataTable();
-                dt.Columns.Add("id_cc", typeof(int));
-                dt.Columns.Add("nombre", typeof(string));
-                foreach (var r in list)
-                    dt.Rows.Add(((dynamic)r).Id, ((dynamic)r).Nombre.ToString());
-                return dt;
-            }
-        }
+        //        var dt = new DataTable();
+        //        dt.Columns.Add("id_cc", typeof(int));
+        //        dt.Columns.Add("nombre", typeof(string));
+        //        foreach (var r in list)
+        //            dt.Rows.Add(((dynamic)r).Id, ((dynamic)r).Nombre.ToString());
+        //        return dt;
+        //    }
+        //}
     }
 
     public static class combos_alias

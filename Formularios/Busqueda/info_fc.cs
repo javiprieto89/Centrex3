@@ -29,7 +29,7 @@ cmb_Comprobante = argcombo;
 
         private void cmd_consultar_Click(object sender, EventArgs e)
         {
-            comprobante c;
+            ComprobanteEntity c;
 
             if (cmb_Comprobante.Text == "Seleccione un comprobante...")
             {
@@ -42,15 +42,16 @@ cmb_Comprobante = argcombo;
                 return;
             }
 
-            c = comprobantes.info_comprobante(Conversions.ToString(cmb_Comprobante.SelectedValue));
+            c = comprobantes.info_comprobante(Conversions.ToInteger(cmb_Comprobante.SelectedValue));
 
             // Usar la función de factura_electronica directamente
-            factura_electronica.Consultar_Comprobante(Conversions.ToInteger(txt_puntoVenta.Text), c.IdTipoComprobante, txt_numeroComprobante.Text);
+            factura_electronica.Consultar_Comprobante(Conversions.ToInteger(txt_puntoVenta.Text), c.IdTipoComprobante, (int)Conversion.Int(txt_numeroComprobante.Text));
         }
 
         private void cmb_Comprobante_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            txt_puntoVenta.Text = comprobantes.info_comprobante(Conversions.ToString(cmb_Comprobante.SelectedValue)).PuntoVenta.ToString();
+     var comprobante = comprobantes.info_comprobante(Conversions.ToInteger(cmb_Comprobante.SelectedValue));
+   txt_puntoVenta.Text = comprobante.PuntoVenta.ToString();
         }
     }
 }

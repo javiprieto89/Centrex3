@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -99,7 +98,7 @@ namespace Centrex
                 return;
             }
 
-            var tmp = new ccCliente();
+            var tmp = new CcClienteEntity();
 
             tmp.IdCliente = Convert.ToInt32(cmb_cliente.SelectedValue);
             tmp.IdMoneda = Convert.ToInt32(cmb_moneda.SelectedValue);

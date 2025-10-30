@@ -1,38 +1,38 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class impuestos
     {
 
         // ************************************ FUNCIONES DE IMPUESTOS **********************
-        public static impuesto info_impuesto(object id_impuesto)
+        public static ImpuestoEntity info_impuesto(object IdImpuesto)
         {
-            var tmp = new impuesto();
+            var tmp = new ImpuestoEntity();
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var impuestoEntity = context.ImpuestoEntity.FirstOrDefault(i => i.IdImpuesto == Conversions.ToInteger(id_impuesto));
+                    var impuestoEntity = context.ImpuestoEntity.FirstOrDefault(i => i.IdImpuesto == Conversions.ToInteger(IdImpuesto));
 
                     if (impuestoEntity is not null)
                     {
-                        tmp.id_impuesto = impuestoEntity.IdImpuesto.ToString();
-                        tmp.nombre = impuestoEntity.Nombre;
-                        tmp.porcentaje = Conversions.ToDouble(impuestoEntity.Porcentaje == null ? "0" : impuestoEntity.Porcentaje.ToString());
-                        tmp.esRetencion = (bool)(impuestoEntity.EsRetencion == null ? false : impuestoEntity.EsRetencion);
-                        tmp.esPercepcion = (bool)(impuestoEntity.EsPercepcion == null ? false : impuestoEntity.EsPercepcion);
-                        tmp.activo = impuestoEntity.Activo;
+                        tmp.IdImpuesto = impuestoEntity.IdImpuesto;
+                        tmp.Nombre = impuestoEntity.Nombre;
+                        tmp.Porcentaje = impuestoEntity.Porcentaje;
+                        tmp.EsRetencion = (bool)(impuestoEntity.EsRetencion == null ? false : impuestoEntity.EsRetencion);
+                        tmp.EsPercepcion = (bool)(impuestoEntity.EsPercepcion == null ? false : impuestoEntity.EsPercepcion);
+                        tmp.Activo = impuestoEntity.Activo;
                     }
                     else
                     {
-                        tmp.nombre = "error";
+                        tmp.Nombre = "error";
                     }
                 }
                 return tmp;
@@ -40,25 +40,25 @@ namespace Centrex
             catch (Exception ex)
             {
                 Interaction.MsgBox(ex.Message.ToString());
-                tmp.nombre = "error";
+                tmp.Nombre = "error";
                 return tmp;
             }
         }
 
 
-        public static int addImpuesto(impuesto i)
+        public static int addImpuesto(ImpuestoEntity i)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var impuestoEntity = new ImpuestoEntity()
                     {
-                        Nombre = i.nombre,
-                        Porcentaje = i.porcentaje != Conversions.ToDouble("") ? (decimal)i.porcentaje : 0m,
-                        EsRetencion = i.esRetencion,
-                        EsPercepcion = i.esPercepcion,
-                        Activo = i.activo
+                        Nombre = i.Nombre,
+                        Porcentaje = i.Porcentaje,
+                        EsRetencion = i.EsRetencion,
+                        EsPercepcion = i.EsPercepcion,
+                        Activo = i.Activo
                     };
 
                     context.ImpuestoEntity.Add(impuestoEntity);
@@ -75,13 +75,13 @@ namespace Centrex
             }
         }
 
-        public static bool updateImpuesto(impuesto i, bool borra = false)
+        public static bool updateImpuesto(ImpuestoEntity i, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var impuestoEntity = context.ImpuestoEntity.FirstOrDefault(imp => imp.IdImpuesto == i.id_impuesto);
+                    var impuestoEntity = context.ImpuestoEntity.FirstOrDefault(imp => imp.IdImpuesto == i.IdImpuesto);
 
                     if (impuestoEntity is not null)
                     {
@@ -91,11 +91,11 @@ namespace Centrex
                         }
                         else
                         {
-                            impuestoEntity.Nombre = i.nombre;
-                            impuestoEntity.Porcentaje = i.porcentaje != Conversions.ToDouble("") ? (decimal)i.porcentaje : 0m;
-                            impuestoEntity.EsRetencion = i.esRetencion;
-                            impuestoEntity.EsPercepcion = i.esPercepcion;
-                            impuestoEntity.Activo = i.activo;
+                            impuestoEntity.Nombre = i.Nombre;
+                            impuestoEntity.Porcentaje = i.Porcentaje;
+                            impuestoEntity.EsRetencion = i.EsRetencion;
+                            impuestoEntity.EsPercepcion = i.EsPercepcion;
+                            impuestoEntity.Activo = i.Activo;
                         }
 
                         context.SaveChanges();
@@ -114,13 +114,13 @@ namespace Centrex
             }
         }
 
-        public static bool borrarImpuesto(impuesto i)
+        public static bool borrarImpuesto(ImpuestoEntity i)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var impuestoEntity = context.ImpuestoEntity.FirstOrDefault(imp => imp.IdImpuesto == i.id_impuesto);
+                    var impuestoEntity = context.ImpuestoEntity.FirstOrDefault(imp => imp.IdImpuesto == i.IdImpuesto);
 
                     if (impuestoEntity is not null)
                     {

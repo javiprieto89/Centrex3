@@ -126,4 +126,8 @@ public partial class ClienteEntity
     [ForeignKey("IdPaisEntrega")]
     [InverseProperty("ClienteEntityIdPaisEntregaNavigation")]
     public virtual PaisEntity? IdPaisEntregaNavigation { get; set; }
+
+    [ForeignKey("IdCliente")]
+    [InverseProperty("TransaccionEntity")]
+    public virtual ClienteEntity? IdClienteNavigation { get; set; }
 }

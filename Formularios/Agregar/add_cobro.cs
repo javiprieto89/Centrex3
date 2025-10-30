@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
-using static Centrex.generales;
 
 namespace Centrex
 {
@@ -225,8 +224,7 @@ namespace Centrex
             try
             {
                 var cb = new CobroEntity();
-                double sumaFC = 0d;
-
+                
                 if (cmb_cliente.Text == "Seleccione un cliente")
                 {
                     Interaction.MsgBox("Debe seleccionar un cliente válido", Constants.vbExclamation, "Centrex");

@@ -1,10 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex;
 
@@ -13,10 +10,10 @@ public partial class add_ordenCompra
 
         private double totalOriginal;
         private double subTotalOriginal;
-        public comprobante comprobanteSeleccionado;
+        public ComprobanteEntity comprobanteSeleccionado;
         private int nOC = -1;
         private int idUsuario;
-        private string idUnico;
+        private Guid idUnico;
 
         public add_ordenCompra()
         {
@@ -44,10 +41,10 @@ public partial class add_ordenCompra
 
             if (srch.SelectedIndex > 0)
             {
-                VariablesGlobales.edita_item = mitem.info_item(srch.SelectedIndex.ToString());
+                VariablesGlobales.edita_item = mitem.info_item(srch.SelectedIndex);
                 var agregaItemFrm = new infoagregaitem(false, true, true, idUsuario, idUnico);
                 agregaItemFrm.ShowDialog();
-                VariablesGlobales.edita_item = new item();
+                VariablesGlobales.edita_item = new ItemEntity();
             }
 
             VariablesGlobales.agregaitem = false;
@@ -58,7 +55,7 @@ public partial class add_ordenCompra
         private void add_ordenCompra_FormClosed(object sender, FormClosedEventArgs e)
         {
             VariablesGlobales.id = 0;
-            var oc = new ordenCompra();
+            var oc = new OrdenCompraEntity();
             VariablesGlobales.edita_ordenCompra = oc;
             // borro la tabla temporal
             generales.Borrar_tabla_segun_usuario("tmpOC_items", VariablesGlobales.usuario_logueado.IdUsuario);
@@ -103,29 +100,30 @@ public partial class add_ordenCompra
 
             if (VariablesGlobales.edicion | VariablesGlobales.borrado)
             {
-                // cargo fecha de la orden de compra
-                // cargo Proveedor de la orden de compra
-                // cargo items
-                // cargo total
-                // inhabilito carga secuencial
+            // cargo fecha de la orden de compra
+            // cargo Proveedor de la orden de compra
+            // cargo items
+            // cargo total
+            // inhabilito carga secuencial
 
-                lbl_fechaCarga.Text = Conversions.ToString(DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_ordenCompra.fecha_carga.Value)));
-                dtp_fechaComprobante.Value = DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_ordenCompra.fecha_comprobante.Value));
+            lbl_fechaCarga.Text = ConversorFechas.GetFecha(VariablesGlobales.edita_ordenCompra.FechaCarga);
+            dtp_fechaComprobante.Value = ConversorFechas.GetFecha(VariablesGlobales.edita_ordenCompra.FechaComprobante, dtp_fechaComprobante);
 
 
-                cmb_proveedor.SelectedValue = VariablesGlobales.edita_ordenCompra.IdProveedor;
+
+            cmb_proveedor.SelectedValue = VariablesGlobales.edita_ordenCompra.IdProveedor;
 
                 actualizarDataGrid();
 
-                txt_subTotal.Text = VariablesGlobales.edita_ordenCompra.subtotal.ToString();
-                txt_impuestos.Text = VariablesGlobales.edita_ordenCompra.iva.ToString();
-                txt_total.Text = VariablesGlobales.edita_ordenCompra.total.ToString();
+                txt_subTotal.Text = VariablesGlobales.edita_ordenCompra.Subtotal.ToString();
+                txt_impuestos.Text = VariablesGlobales.edita_ordenCompra.Iva.ToString();
+                txt_total.Text = VariablesGlobales.edita_ordenCompra.Total.ToString();
                 txt_totalO.Text = txt_total.Text;
-                txt_nota.Text = VariablesGlobales.edita_ordenCompra.notas;
+                txt_nota.Text = VariablesGlobales.edita_ordenCompra.Notas;
                 chk_secuencia.Enabled = false;
                 subTotalOriginal = Convert.ToDouble(txt_subTotal.Text);
 
-                lbl_nOrdenCompra.Text = VariablesGlobales.edita_ordenCompra.id_ordenCompra.ToString();
+                lbl_nOrdenCompra.Text = VariablesGlobales.edita_ordenCompra.IdOrdenCompra.ToString();
                 lbl_ordenCompra.Visible = true;
                 lbl_nOrdenCompra.Visible = true;
                 dg_viewOC.ContextMenuStrip = cms_enviado;
@@ -146,7 +144,7 @@ public partial class add_ordenCompra
 
             cmd_ok.Enabled = dg_viewOC.Rows.Count > 0;
 
-            if (VariablesGlobales.edita_ordenCompra.id_ordenCompra != 0 | VariablesGlobales.borrado == true)
+            if (VariablesGlobales.edita_ordenCompra.IdOrdenCompra != 0 | VariablesGlobales.borrado == true)
             {
                 pic_searchProveedor.Enabled = false;
                 dg_viewOC.Enabled = false;
@@ -192,7 +190,7 @@ public partial class add_ordenCompra
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            ordenCompra ultimaOC = null;
+            OrdenCompraEntity ultimaOC = null;
 
             if (cmb_proveedor.SelectedValue is null)
             {
@@ -205,23 +203,23 @@ public partial class add_ordenCompra
                 return;
             }
 
-            var oc = new ordenCompra();
+            var oc = new OrdenCompraEntity();
 
             oc.IdProveedor = Convert.ToInt32(cmb_proveedor.SelectedValue);
-            oc.fecha_carga = lbl_fechaCarga.Text;
-            oc.fecha_comprobante = Conversions.ToString(dtp_fechaComprobante.Value.Date);
+            oc.FechaCarga = ConversorFechas.GetFecha(lbl_fechaCarga.Text, oc.FechaCarga);
+            oc.FechaComprobante = ConversorFechas.GetFecha(dtp_fechaComprobante.Value.Date, oc.FechaComprobante);
             if (lbl_fechaRecepcion.Text != "%fecha_recepcion%")
-                oc.fecha_recepcion = lbl_fechaRecepcion.Text;
-            oc.subtotal = Convert.ToDouble(txt_subTotal.Text);
-            oc.iva = Convert.ToDouble(txt_impuestos.Text);
-            oc.total = Convert.ToDouble(txt_total.Text);
-            oc.notas = txt_nota.Text;
-            oc.activo = true;
+                oc.FechaCarga = ConversorFechas.GetFecha(lbl_fechaRecepcion.Text, oc.FechaCarga);
+            oc.Subtotal = Convert.ToDecimal(txt_subTotal.Text);
+            oc.Iva = Convert.ToDecimal(txt_impuestos.Text);
+            oc.Total = Convert.ToDecimal(txt_total.Text);
+            oc.Notas = txt_nota.Text;
+            oc.Activo = true;
 
             if (VariablesGlobales.edicion == true)
             {
                 // actualizar proveedor
-                oc.id_ordenCompra = VariablesGlobales.edita_ordenCompra.id_ordenCompra;
+                oc.IdOrdenCompra = edita_ordenCompra.IdOrdenCompra;
                 ultimaOC = oc;
                 if (ordenesCompras.updateOrdenCompra(oc) == false)
                 {
@@ -230,7 +228,7 @@ public partial class add_ordenCompra
                 }
                 // actualizar orde de compra (items)            
                 // actualizo, agrego y borro los items de la orden de compra
-                ordenesCompras.guardarOrdenCompra(VariablesGlobales.edita_ordenCompra.id_ordenCompra);
+                ordenesCompras.guardarOrdenCompra(VariablesGlobales.edita_ordenCompra.IdOrdenCompra);
                 generales.Borrar_tabla_segun_usuario("tmpOC_items", VariablesGlobales.usuario_logueado.IdUsuario);
             }
             else
@@ -305,11 +303,11 @@ public partial class add_ordenCompra
             seleccionado = dg_viewOC.CurrentRow.Cells[0].Value.ToString();
             seleccionado = Strings.Right(seleccionado, seleccionado.Length - Strings.InStr(seleccionado, "-"));
 
-            VariablesGlobales.edita_item = mitem.info_item(seleccionado);
+            VariablesGlobales.edita_item = mitem.info_item((int)Conversion.Int(seleccionado));
 
             // Obtengo el ID interno de la tabla tmpOC_items
             seleccionado = dg_viewOC.CurrentRow.Cells[0].Value.ToString();
-            VariablesGlobales.edita_item.id_item_temporal = Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1);
+            VariablesGlobales.edita_item.IdItemTemporal = (int)Conversion.Int(Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1));
 
             var frm_infoAgregaItem = new infoagregaitem(false, true, true, idUsuario, idUnico);
             frm_infoAgregaItem.ShowDialog();
@@ -411,7 +409,7 @@ public partial class add_ordenCompra
 
             if (VariablesGlobales.edicion)
             {
-                query = query.Where(t => t.IdOrdenCompra == VariablesGlobales.edita_ordenCompra.id_ordenCompra);
+                query = query.Where(t => t.IdOrdenCompra == VariablesGlobales.edita_ordenCompra.IdOrdenCompra);
             }
             else
             {
@@ -496,11 +494,11 @@ public partial class add_ordenCompra
             seleccionado = dg_viewOC.CurrentRow.Cells[0].Value.ToString();
             seleccionado = Strings.Right(seleccionado, seleccionado.Length - Strings.InStr(seleccionado, "-"));
 
-            VariablesGlobales.edita_item = mitem.info_item(seleccionado);
+            VariablesGlobales.edita_item = mitem.info_item((int)Conversion.Int(seleccionado));
 
             // Obtengo el ID interno de la tabla tmpOC_items
             seleccionado = dg_viewOC.CurrentRow.Cells[0].Value.ToString();
-            VariablesGlobales.edita_item.id_item_temporal = Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1);
+            VariablesGlobales.edita_item.IdItemTemporal = (int)Conversion.Int(Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1));
 
             var agregaItem = new infoagregaitem(false, true, false, idUsuario, idUnico);
             agregaItem.ShowDialog();
@@ -508,7 +506,7 @@ public partial class add_ordenCompra
 
             using (var context = new CentrexDbContext())
             {
-                int idTmp = Convert.ToInt32(VariablesGlobales.edita_item.id_item_temporal);
+                int idTmp = Convert.ToInt32(VariablesGlobales.edita_item.IdItemTemporal);
                 var tmpItem = context.TmpOcItemEntity.FirstOrDefault(t => t.IdTmpOcitem == idTmp);
                 if (tmpItem is not null)
                 {

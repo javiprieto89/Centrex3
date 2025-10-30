@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -401,24 +401,24 @@ namespace Centrex.My
 
 
             [EditorBrowsable(EditorBrowsableState.Never)]
-            public add_Consulta m_add_Consulta;
+            public add_consulta m_add_consulta;
 
-            public add_Consulta add_Consulta
+            public add_consulta add_Consulta
             {
                 [DebuggerHidden]
                 get
                 {
-                    m_add_Consulta = Create__Instance__(m_add_Consulta);
-                    return m_add_Consulta;
+                    m_add_consulta = Create__Instance__(m_add_consulta);
+                    return m_add_consulta;
                 }
                 [DebuggerHidden]
                 set
                 {
-                    if (ReferenceEquals(value, m_add_Consulta))
+                    if (ReferenceEquals(value, m_add_consulta))
                         return;
                     if (value is not null)
                         throw new ArgumentException("Property can only be set to Nothing");
-                    Dispose__Instance__(ref m_add_Consulta);
+                    Dispose__Instance__(ref m_add_consulta);
                 }
             }
 
@@ -1068,29 +1068,29 @@ namespace Centrex.My
 
 
             [EditorBrowsable(EditorBrowsableState.Never)]
-            public frm_prnReportes m_frm_prnReportes;
+            //public frm_prnReportes m_frm_prnReportes;
 
-            public frm_prnReportes frm_prnReportes
-            {
-                [DebuggerHidden]
-                get
-                {
-                    m_frm_prnReportes = Create__Instance__(m_frm_prnReportes);
-                    return m_frm_prnReportes;
-                }
-                [DebuggerHidden]
-                set
-                {
-                    if (ReferenceEquals(value, m_frm_prnReportes))
-                        return;
-                    if (value is not null)
-                        throw new ArgumentException("Property can only be set to Nothing");
-                    Dispose__Instance__(ref m_frm_prnReportes);
-                }
-            }
+            //public frm_prnReportes frm_prnReportes
+            //{
+            //    [DebuggerHidden]
+            //    get
+            //    {
+            //        m_frm_prnReportes = Create__Instance__(m_frm_prnReportes);
+            //        return m_frm_prnReportes;
+            //    }
+            //    [DebuggerHidden]
+            //    set
+            //    {
+            //        if (ReferenceEquals(value, m_frm_prnReportes))
+            //            return;
+            //        if (value is not null)
+            //            throw new ArgumentException("Property can only be set to Nothing");
+            //        Dispose__Instance__(ref m_frm_prnReportes);
+            //    }
+            //}
 
 
-            [EditorBrowsable(EditorBrowsableState.Never)]
+            //[EditorBrowsable(EditorBrowsableState.Never)]
             public frm_pruebas_afip m_frm_pruebas_afip;
 
             public frm_pruebas_afip frm_pruebas_afip

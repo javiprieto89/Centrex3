@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 
@@ -17,7 +17,7 @@ namespace Centrex
                 Interaction.MsgBox("El campo 'Caja' es obligatorio y está vacio");
             }
 
-            var tmp = new caja();
+            var tmp = new CajaEntity();
 
             tmp.Nombre = txt_caja.Text;
             tmp.EsCc = chk_cc.Checked;

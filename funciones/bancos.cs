@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
     static class bancos
     {

@@ -51,6 +51,9 @@ public partial class ItemEntity
     [Column("activo")]
     public bool Activo { get; set; }
 
+    [NotMapped]
+    public int IdItemTemporal { get; set; }
+
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<AjusteStockEntity> AjusteStockEntity { get; set; } = new List<AjusteStockEntity>();
 
@@ -95,6 +98,9 @@ public partial class ItemEntity
 
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<TmpProduccionItemEntity> TmpProduccionItemEntity { get; set; } = new List<TmpProduccionItemEntity>();
+
+    [InverseProperty("IdItemRecibido")]
+    public virtual ICollection<TmpProduccionItemEntity> TmpProduccionItemRecibidoEntity { get; set; } = new List<TmpProduccionItemEntity>();
 
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<TmpRegistroStockEntity> TmpRegistroStockEntity { get; set; } = new List<TmpRegistroStockEntity>();

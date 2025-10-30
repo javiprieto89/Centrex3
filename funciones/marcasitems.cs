@@ -1,35 +1,35 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class marcasitems
     {
 
         // ************************************ FUNCIONES DE MARCAS DE ITEMS **********************
-        public static marca_item info_marcai(object id_marca)
+        public static MarcaItemEntity info_marcai(object IdMarca)
         {
-            var tmp = new marca_item();
+            var tmp = new MarcaItemEntity();
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var marcaEntity = context.Marcas.FirstOrDefault(m => m.IdMarca == Conversions.ToInteger(id_marca));
+                    var marcaEntity = context.MarcaItemEntity.FirstOrDefault(m => m.IdMarca == Conversions.ToInteger(IdMarca));
 
                     if (marcaEntity is not null)
                     {
-                        tmp.id_marca = marcaEntity.IdMarca.ToString();
-                        tmp.marca = marcaEntity.marca;
-                        tmp.activo = marcaEntity.activo;
+                        tmp.IdMarca = marcaEntity.IdMarca;
+                        tmp.Marca = marcaEntity.Marca;
+                        tmp.Activo = marcaEntity.Activo;
                     }
                     else
                     {
-                        tmp.marca = "error";
+                        tmp.Marca = "error";
                     }
                 }
                 return tmp;
@@ -37,7 +37,7 @@ namespace Centrex
             catch (Exception ex)
             {
                 Interaction.MsgBox(ex.Message.ToString());
-                tmp.marca = "error";
+                tmp.Marca = "error";
                 return tmp;
             }
         }
@@ -46,15 +46,15 @@ namespace Centrex
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var marcaEntity = new MarcaEntity()
                     {
                         Marca = marcai.Marca,
-                        activo = marcai.Activo
+                        Activo = marcai.Activo
                     };
 
-                    context.Marcas.Add(marcaEntity);
+                    context.MarcaItemEntity.Add(marcaEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -70,20 +70,20 @@ namespace Centrex
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var marcaEntity = context.Marcas.FirstOrDefault(m => m.IdMarca == (int)marcai.id_marca);
+                    var marcaEntity = context.MarcaItemEntity.FirstOrDefault(m => m.IdMarca == (int)marcai.IdMarca);
 
                     if (marcaEntity is not null)
                     {
                         if (borra == true)
                         {
-                            marcaEntity.activo = false;
+                            marcaEntity.Activo = false;
                         }
                         else
                         {
-                            marcaEntity.marca = marcai.Marca;
-                            marcaEntity.activo = marcai.Activo;
+                            marcaEntity.Marca = marcai.Marca;
+                            marcaEntity.Activo = marcai.Activo;
                         }
 
                         context.SaveChanges();
@@ -106,13 +106,13 @@ namespace Centrex
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var marcaEntity = context.Marcas.FirstOrDefault(m => m.IdMarca == (int)marcai.IdMarca);
+                    var marcaEntity = context.MarcaItemEntity.FirstOrDefault(m => m.IdMarca == (int)marcai.IdMarca);
 
                     if (marcaEntity is not null)
                     {
-                        context.Marcas.Remove(marcaEntity);
+                        context.MarcaItemEntity.Remove(marcaEntity);
                         context.SaveChanges();
                         return true;
                     }

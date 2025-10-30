@@ -45,6 +45,10 @@ public partial class TmpProduccionItemEntity
     [InverseProperty("TmpProduccionItemEntity")]
     public virtual ItemEntity? IdItemNavigation { get; set; }
 
+    [ForeignKey("IdItemRecibido")]
+    [InverseProperty("TmpProduccionItemEntity")]
+    public virtual ItemEntity? IdItemRecibidoNavigation { get; set; }
+
     [ForeignKey("IdProduccion")]
     [InverseProperty("TmpProduccionItemEntity")]
     public virtual ProduccionEntity? IdProduccionNavigation { get; set; }

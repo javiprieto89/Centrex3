@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class cobros_retenciones

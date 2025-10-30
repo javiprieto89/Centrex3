@@ -1,10 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 // Imports System
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {

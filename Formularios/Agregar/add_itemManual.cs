@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
@@ -10,7 +10,7 @@ namespace Centrex
         // Private esEdicion As Boolean
 
         private int idUsuario;
-        private string idUnico;
+        private Guid idUnico;
 
         public add_itemManual() : base()
         {
@@ -21,22 +21,22 @@ namespace Centrex
 
         }
 
-        public add_itemManual(item i, int _idUsuario, string _idUnico) : base()
+        public add_itemManual(ItemEntity i, int _idUsuario, Guid _idUnico) : base()
         {
             // Esta llamada es exigida por el diseñador.
             InitializeComponent();
 
             // Agregue cualquier inicialización después de la llamada a InitializeComponent().
-            txt_item.Text = i.descript;
-            txt_cantidad.Text = i.cantidad.ToString();
-            txt_precio.Text = i.precio_lista.ToString();
+            txt_item.Text = i.Descript;
+            txt_cantidad.Text = i.Cantidad.ToString();
+            txt_precio.Text = i.PrecioLista.ToString();
             // esEdicion = True
 
             idUsuario = _idUsuario;
             idUnico = _idUnico;
         }
 
-        public add_itemManual(int _idUsuario, string _idUnico)
+        public add_itemManual(int _idUsuario, Guid _idUnico)
         {
 
             // Esta llamada es exigida por el diseñador.
@@ -90,12 +90,12 @@ namespace Centrex
 
             var i = new ItemEntity();
 
-            i.cantidad = Conversions.ToInteger(txt_cantidad.Text);
-            i.descript = txt_item.Text;
-            i.precio_lista = Conversions.ToDecimal(txt_precio.Text);
-            i.item = "MANUAL";
+            i.Cantidad = Conversions.ToInteger(txt_cantidad.Text);
+            i.Descript = txt_item.Text;
+            i.PrecioLista = Conversions.ToDecimal(txt_precio.Text);
+            i.Descript = "MANUAL";
 
-            Pedidos.AddItemPedidoTmp(i, i.cantidad, i.precio_lista, idUsuario, idUnico, (VariablesGlobales.edita_item?.IdItemTemporal) ?? -1);
+            Pedidos.AddItemPedidoTmp(i, i.Cantidad ?? 0, Conversions.ToDecimal(i.PrecioLista), idUsuario, idUnico, i.IdTmpPedidoItem > 0 ? i.IdTmpPedidoItem : -1);
 
             Dispose();
         }

@@ -1,7 +1,8 @@
-using System;
-using System.Windows.Forms;
-using Microsoft.VisualBasic;
+﻿using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
+using System;
+using System.Globalization;
+using System.Windows.Forms;
 
 namespace Centrex
 {
@@ -15,7 +16,7 @@ namespace Centrex
         private int id_comprobanteCompra = -1;
         private bool actualiza = true;
         private int idUsuario;
-        private string idUnico;
+        private Guid idUnico;
         public int cant;
 
         public infoagregaitem()
@@ -28,7 +29,7 @@ namespace Centrex
 
         }
 
-        public infoagregaitem(int _idUsuario, string _idUnico)
+        public infoagregaitem(int _idUsuario, Guid _idUnico)
         {
 
             // Esta llamada es exigida por el diseñador.
@@ -39,7 +40,7 @@ namespace Centrex
             idUnico = _idUnico;
         }
 
-        public infoagregaitem(bool _produccion, bool _ordenCompra, bool _actualiza, int _idUsuario, string _idUnico)
+        public infoagregaitem(bool _produccion, bool _ordenCompra, bool _actualiza, int _idUsuario, Guid _idUnico)
         {
 
             // Esta llamada es exigida por el diseñador.
@@ -73,9 +74,9 @@ namespace Centrex
         private void infoagregaitem_Load(object sender, EventArgs e)
         {
 
-            lbl_item.Text = VariablesGlobales.edita_item.item;
-            lbl_desc.Text = VariablesGlobales.edita_item.descript;
-            lbl_stock.Text = Conversions.ToString(VariablesGlobales.edita_item.cantidad.Value);
+            lbl_item.Text = VariablesGlobales.edita_item.Item;
+            lbl_desc.Text = VariablesGlobales.edita_item.Descript;
+            lbl_stock.Text = Conversions.ToString(VariablesGlobales.edita_item.Cantidad.Value);
 
             if (produccion)
                 txt_precio.Enabled = false;
@@ -143,7 +144,7 @@ namespace Centrex
                 // Es un pedido de produccion
                 if (!VariablesGlobales.agregaitem)
                 {
-                    addItemProducciontmp(VariablesGlobales.ConvertToItem(VariablesGlobales.edita_item), txt_cantidad.Text, VariablesGlobales.edita_item.IdItemTemporal);
+                    addItemProducciontmp(VariablesGlobales.ConvertToItem(VariablesGlobales.edita_item), (int)Conversion.Int(txt_cantidad.Text), VariablesGlobales.edita_item.IdItemTemporal);
                 }
                 else
                 {
@@ -155,26 +156,26 @@ namespace Centrex
                 // Es una orden de compra
                 if (!VariablesGlobales.agregaitem)
                 {
-                    ordenesCompras.addItemOCtmp(VariablesGlobales.ConvertToItem(VariablesGlobales.edita_item), txt_cantidad.Text, txt_precio.Text, VariablesGlobales.edita_item.IdItemTemporal);
+                    ordenesCompras.addItemOCtmp(VariablesGlobales.ConvertToItem(VariablesGlobales.edita_item), (int)Conversion.Int(txt_cantidad.Text), decimal.Parse(txt_precio.Text, CultureInfo.CurrentCulture), VariablesGlobales.edita_item.IdItemTemporal);
                 }
                 else
                 {
-                    ordenesCompras.addItemOCtmp(VariablesGlobales.ConvertToItem(VariablesGlobales.edita_item), Conversions.ToInteger(txt_cantidad.Text), Conversions.ToDouble(txt_precio.Text));
+                    ordenesCompras.addItemOCtmp(VariablesGlobales.ConvertToItem(VariablesGlobales.edita_item), Conversions.ToInteger(txt_cantidad.Text), Conversions.ToDecimal(txt_precio.Text));
                 }
             }
             else if (comprobanteCompra)
             {
                 // Es un comprobante de compra
-                comprobantes_compras.add_item_comprobanteCompra(id_comprobanteCompra, VariablesGlobales.edita_item.IdItem, Conversions.ToInteger(txt_cantidad.Text), Conversions.ToDouble(txt_precio.Text));
+                comprobantes_compras.add_item_comprobanteCompra(id_comprobanteCompra, VariablesGlobales.edita_item.IdItem, Conversions.ToInteger(txt_cantidad.Text), Conversions.ToDecimal(txt_precio.Text));
             }
             // Pedido normal
             else if (!VariablesGlobales.agregaitem)
             {
-                Pedidos.AddItemPedidoTmp(VariablesGlobales.edita_item, Conversions.ToDouble(txt_cantidad.Text), Conversions.ToDouble(txt_precio.Text), idUsuario, idUnico, VariablesGlobales.edita_item.IdItemTemporal);
+                Pedidos.AddItemPedidoTmp(VariablesGlobales.edita_item, Conversions.ToInteger(txt_cantidad.Text), Conversions.ToDecimal(txt_precio.Text), idUsuario, idUnico, VariablesGlobales.edita_item.IdItemTemporal);
             }
             else
             {
-                Pedidos.AddItemPedidoTmp(VariablesGlobales.edita_item, Conversions.ToDouble(txt_cantidad.Text), Conversions.ToDouble(txt_precio.Text), idUsuario, idUnico);
+                Pedidos.AddItemPedidoTmp(VariablesGlobales.edita_item, Conversions.ToInteger(txt_cantidad.Text), Conversions.ToDecimal(txt_precio.Text), idUsuario, idUnico);
             }
 
             Dispose();

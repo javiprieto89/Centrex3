@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.VisualBasic;
@@ -99,7 +99,7 @@ namespace Centrex
                 return;
             }
 
-            var tmp = new ccProveedor();
+            var tmp = new CcProveedorEntity();
 
             tmp.IdProveedor = Convert.ToInt32(cmb_proveedor.SelectedValue);
             tmp.IdMoneda = Convert.ToInt32(cmb_moneda.SelectedValue);

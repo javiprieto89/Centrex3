@@ -318,12 +318,12 @@ namespace Centrex
                 {
                     case "productos":
                         {
-                            VariablesGlobales.edita_item = mitem.info_item(seleccionado.ToString());
+                            VariablesGlobales.edita_item = mitem.info_item(seleccionado);
                             VariablesGlobales.agregaitem = true;
                             var agregaItemFrm = new infoagregaitem(true, id_comprobante_compra);
                             agregaItemFrm.ShowDialog();
                             VariablesGlobales.agregaitem = false;
-                            VariablesGlobales.edita_item = new item();
+                            VariablesGlobales.edita_item = new ItemEntity();
                             break;
                         }
                     case "impuestos":
@@ -348,7 +348,7 @@ namespace Centrex
 
         private void cmd_confirmar_Click(object sender, EventArgs e)
         {
-            var cc = new comprobante_compra();
+            var cc = new ComprobanteCompraEntity();
             int id_cc;
 
             if (cmb_proveedor.Text == "Seleccione un proveedor...")
@@ -377,16 +377,16 @@ namespace Centrex
                 return;
             }
 
-            cc.fecha_comprobante = dtp_fechaComprobanteCompra.Value.Date.ToShortDateString();
+           cc.FechaComprobante = DateOnly.FromDateTime(dtp_fechaComprobanteCompra.Value);
             cc.IdProveedor = Conversions.ToInteger(cmb_proveedor.SelectedValue);
-            cc.id_cc = Conversions.ToInteger(cmb_cc.SelectedValue);
-            cc.id_condicion_compra = Conversions.ToInteger(cmb_condicionCompra.SelectedValue);
-            cc.id_tipoComprobante = Conversions.ToInteger(cmb_tipoComprobante.SelectedValue);
-            cc.id_moneda = Conversions.ToInteger(cmb_moneda.SelectedValue);
-            cc.tasaCambio = Conversions.ToDouble(txt_tasaCambio.Text);
-            cc.puntoVenta = txt_puntoVenta.Text;
-            cc.numeroComprobante = txt_numeroComprobante.Text;
-            cc.cae = txt_CAE.Text;
+            cc.IdCc = Conversions.ToInteger(cmb_cc.SelectedValue);
+            cc.IdCondicionCompra = Conversions.ToInteger(cmb_condicionCompra.SelectedValue);
+            cc.IdTipoComprobante = Conversions.ToInteger(cmb_tipoComprobante.SelectedValue);
+            cc.IdMoneda = Conversions.ToInteger(cmb_moneda.SelectedValue);
+            cc.TasaCambio = Convert.ToDecimal(txt_tasaCambio.Text);
+            cc.PuntoVenta = txt_puntoVenta.Text;
+            cc.NumeroComprobante = txt_numeroComprobante.Text;
+            cc.Cae = txt_CAE.Text;
 
             if (id_comprobante_compra == -1)
             {
@@ -401,7 +401,7 @@ namespace Centrex
             }
             else
             {
-                cc.id_comprobanteCompra = id_comprobante_compra;
+                cc.IdComprobanteCompra = id_comprobante_compra;
                 if (!comprobantes_compras.update_comprobante_compra(cc))
                 {
                     Interaction.MsgBox("Ocurrió un error al actualizar el comprobante de compra, consulte con el programador.", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
@@ -575,9 +575,12 @@ namespace Centrex
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            var cc = new comprobante_compra();
-            var ccp = new ccProveedor();
-            var tc = new TipoComprobante(Conversions.ToInteger(cmb_tipoComprobante.SelectedValue));
+            var cc = new ComprobanteCompraEntity();
+            var ccp = new CcProveedorEntity();
+            var tc = new TipoComprobanteEntity
+            {
+                IdTipoComprobante = Conversions.ToInteger(cmb_tipoComprobante.SelectedValue)
+            };
 
             if (txt_totalFactura.Text == "0" | string.IsNullOrEmpty(txt_totalFactura.Text))
             {
@@ -586,13 +589,13 @@ namespace Centrex
             }
 
             ccp = ccProveedores.info_ccProveedor(Conversions.ToInteger(cmb_cc.SelectedValue));
-            cc = comprobantes_compras.info_comprobante_compra(id_comprobante_compra.ToString());
-            cc.id_comprobanteCompra = id_comprobante_compra;
-            cc.subtotal = Conversions.ToDouble(txt_totalItems.Text);
-            cc.impuestos = Conversions.ToDouble(txt_totalImpuestos.Text);
-            cc.conceptos = Conversions.ToDouble(txt_totalConceptos.Text);
-            cc.total = Conversions.ToDouble(txt_totalFactura.Text);
-            cc.nota = txt_notas.Text;
+            cc = comprobantes_compras.info_comprobante_compra(id_comprobante_compra);
+            cc.IdComprobanteCompra = id_comprobante_compra;
+            cc.Subtotal = Conversions.ToDecimal(txt_totalItems.Text);
+            cc.Impuestos = Conversions.ToDecimal(txt_totalImpuestos.Text);
+            cc.Conceptos = Conversions.ToDecimal(txt_totalConceptos.Text);
+            cc.Conceptos = Conversions.ToDecimal(txt_totalFactura.Text);
+            cc.Nota = txt_notas.Text;
 
             if (!comprobantes_compras.cerrar_comprobante_compra(cc))
             {
@@ -602,36 +605,50 @@ namespace Centrex
             }
             else
             {
-                if (Conversions.ToString(tc.signoProveedor) == "+")
+                if (Conversions.ToString(tc.SignoProveedor) == "+")
                 {
-                    ccp.saldo += cc.total;
+                    ccp.Saldo += (decimal)cc.Total;
                 }
                 else
                 {
-                    ccp.saldo += cc.total;
+                    ccp.Saldo += (decimal)cc.Total;
                 }
                 ccProveedores.updateCCProveedor(ccp);
                 // Dim frm As New frm_prnReportes("rpt_ordenDePago", "datos_empresa", "SP_pago_cabecera", "SP_detalle_pagos_cheques", "SP_detalle_pagos_transferencias", "DS_Datos_Empresa",
                 // "DS_Pago_Cabecera", "DS_Detalle_Pagos_Cheques", "DS_Detalle_Pagos_Transferencias", id_comprobante_compra, True)
                 // frm.ShowDialog()
                 // Se agrega la operación a la tabla transacciones
-                var t = new transaccion();
-                t.id_comprobanteCompra = id_comprobante_compra;
-                t.fecha = cc.fecha_comprobante;
+                var t = new TransaccionEntity();
+                t.IdComprobanteCompra = id_comprobante_compra;
+                t.Fecha = cc.FechaComprobante;
                 // t.id_tipoComprobante = info_comprobante(p.id_comprobante).id_tipoComprobante
-                t.id_tipoComprobante = cc.id_tipoComprobante;
-                t.numeroComprobante = cc.numeroComprobante;
-                t.puntoVenta = Conversions.ToInteger(cc.puntoVenta);
-                t.total = cc.total;
-                t.id_cc = cc.id_cc;
+                t.IdTipoComprobante = cc.IdTipoComprobante;
+                if (int.TryParse(cc.NumeroComprobante, out int numeroComprobanteInt))
+                {
+                    t.NumeroComprobante = numeroComprobanteInt;
+                }
+                else
+                {
+                    t.NumeroComprobante = null;
+                }
+                if (int.TryParse(cc.PuntoVenta, out int puestoVentaInt))
+                {
+                    t.PuntoVenta = puestoVentaInt;
+                }
+                else
+                {
+                    t.PuntoVenta = null;
+                }                
+                t.Total = cc.Total;
+                t.IdCc = cc.IdCc;
                 t.IdProveedor = cc.IdProveedor;
                 if (!transacciones.Agregar_Transaccion_Desde_Comprobante_Compra(t))
                 {
                     Interaction.MsgBox("Ha ocurrido un error al agregar la transaccion en el proveedor, verifique el mismo o vuelva a intentarlo más tarde.", Constants.vbExclamation, "Centrex");
                     return;
                 }
-                var rptOrdenDePago = new frm_prnOrdenDePago(id_comprobante_compra);
-                rptOrdenDePago.Show();
+                //var rptOrdenDePago = new frm_prnOrdenDePago(id_comprobante_compra);
+                //rptOrdenDePago.Show();
             }
 
             cerrarOk = true;

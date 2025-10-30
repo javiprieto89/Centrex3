@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 
@@ -64,8 +64,8 @@ namespace Centrex
             if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_marca.Text = VariablesGlobales.edita_marcai.marca;
-                chk_activo.Checked = VariablesGlobales.edita_marcai.activo;
+                txt_marca.Text = VariablesGlobales.edita_marcai.Marca;
+                chk_activo.Checked = VariablesGlobales.edita_marcai.Activo;
             }
 
             if (VariablesGlobales.borrado == true)

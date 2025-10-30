@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+using Centrex.Funciones;
 
 namespace Centrex
 {
@@ -85,7 +84,7 @@ namespace Centrex
                 string arglpFile = txt_rutaBackup.Text;
                 string arglpParameters = "";
                 string arglpDirectory = "";
-                config.ShellExecute(0L, ref arglpOperation, ref arglpFile, ref arglpParameters, ref arglpDirectory, 1L);
+                config.ShellExecute(0L, arglpOperation, arglpFile, arglpParameters, arglpDirectory, 1L);
                 txt_rutaBackup.Text = arglpFile; // Para Abrir Carpetas
             }
             else
@@ -96,6 +95,11 @@ namespace Centrex
         }
 
         private void cmd_cierre_diario_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tBackup_Click(object sender, EventArgs e)
         {
 
         }

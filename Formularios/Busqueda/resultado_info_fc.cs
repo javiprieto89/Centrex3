@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Centrex
 {
@@ -22,9 +22,9 @@ namespace Centrex
             InitializeComponent();
 
             // Agregue cualquier inicialización después de la llamada a InitializeComponent().
-            var c = new cliente();
+            var c = new ClienteEntity();
 
-            c = clientes.info_cliente(clientes.existecliente(_cuit).ToString());
+            c = clientes.info_cliente(clientes.existecliente(_cuit));
 
 
             txt_cae.Text = _cae;
@@ -32,7 +32,7 @@ namespace Centrex
             txt_impuestos.Text = "$ " + _impuestos;
             txt_total.Text = "$ " + _total;
             txt_CUIT.Text = _cuit;
-            txt_cliente.Text = c.razon_social;
+            txt_cliente.Text = c.RazonSocial;
         }
 
         private void resultado_info_fc_Load(object sender, EventArgs e)

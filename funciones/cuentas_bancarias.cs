@@ -1,48 +1,42 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class cuentas_bancarias
     {
         // ************************************ FUNCIONES DE CUENTAS BANCARIAS (VERSIÓN EF) ***************************
-        private static CentrexDbContext ctx = new CentrexDbContext();
 
         // ----------------------------------------------------------
         // Obtener información de una cuenta bancaria por ID
         // ----------------------------------------------------------
-        public static cuenta_bancaria info_cuentaBancaria(string id_cuentaBancaria)
+        public static CuentaBancariaEntity info_cuentaBancaria(int IdCuentaBancaria)
         {
-            var tmp = new cuenta_bancaria();
+            var tmp = new CuentaBancariaEntity();
             try
             {
-                int id = Conversions.ToInteger(id_cuentaBancaria);
-                var entidad = ctx.CuentasBancarias.FirstOrDefault(c => c.IdCuentaBancaria == id);
+                using (CentrexDbContext context = new CentrexDbContext())
+                {                    
+                    var entidad = context.CuentaBancariaEntity.AsNoTracking().FirstOrDefault(c => c.IdCuentaBancaria == IdCuentaBancaria);
 
-                if (entidad is null)
-                {
-                    tmp.nombre = "error";
-                    return tmp;
+                    if (entidad is not null)
+                    {
+                        tmp.Nombre = "error";
+                        return tmp;
+                    }
+                    else
+                    {
+
+                        tmp.Nombre = "error";
+                        return tmp;
+                    }
                 }
-
-                tmp.id_cuentaBancaria = entidad.IdCuentaBancaria;
-                tmp.id_banco = entidad.IdBanco;
-                tmp.nombre = entidad.nombre;
-                tmp.id_moneda = entidad.IdMoneda;
-                tmp.saldo = (double)entidad.saldo;
-                tmp.activo = entidad.activo;
-
-                return tmp;
             }
             catch (Exception ex)
             {
                 Interaction.MsgBox(ex.Message.ToString());
-                tmp.nombre = "error";
+                tmp.Nombre = "error";
                 return tmp;
             }
         }
@@ -54,19 +48,20 @@ namespace Centrex
         {
             try
             {
-                var nueva = new CuentaBancariaEntity()
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    IdBanco = cb.id_banco,
-                    nombre = cb.nombre,
-                    IdMoneda = cb.id_moneda,
-                    saldo = cb.saldo,
-                    activo = cb.activo
-                };
+                    var bancoEntity = new CuentaBancariaEntity();
 
-                ctx.CuentasBancarias.Add(nueva);
-                ctx.SaveChanges();
+                    bancoEntity.Nombre = cb.Nombre;
+                    bancoEntity.IdMoneda = cb.IdMoneda;
+                    bancoEntity.Saldo = cb.Saldo;
+                    bancoEntity.Activo = cb.Activo;
 
-                return true;
+                    context.CuentaBancariaEntity.Add(bancoEntity);
+                    context.SaveChanges();
+
+                    return true;
+                }
             }
             catch (Exception ex)
             {
@@ -82,32 +77,35 @@ namespace Centrex
         {
             try
             {
-                int id = cb.id_cuentaBancaria;
-                var entidad = ctx.CuentasBancarias.FirstOrDefault(c => c.IdCuentaBancaria == id);
-
-                if (entidad is null)
+                int id = cb.IdCuentaBancaria;
+                using (CentrexDbContext ctx = new CentrexDbContext())
                 {
-                    Interaction.MsgBox("No se encontró la cuenta bancaria especificada.", Constants.vbExclamation);
-                    return false;
-                }
+                    var entidad = ctx.CuentaBancariaEntity.FirstOrDefault(c => c.IdCuentaBancaria == id);
 
-                if (borra)
-                {
-                    entidad.activo = false;
-                }
-                else
-                {
-                    entidad.IdBanco = cb.id_banco;
-                    entidad.nombre = cb.nombre;
-                    entidad.IdMoneda = cb.id_moneda;
-                    entidad.saldo = cb.saldo;
-                    entidad.activo = cb.activo;
-                }
+                    if (entidad is null)
+                    {
+                        Interaction.MsgBox("No se encontró la cuenta bancaria especificada.", Constants.vbExclamation);
+                        return false;
+                    }
 
-                ctx.Entry(entidad).State = EntityState.Modified;
-                ctx.SaveChanges();
+                    if (borra)
+                    {
+                        entidad.Activo = false;
+                    }
+                    else
+                    {
+                        entidad.IdBanco = cb.IdBanco;
+                        entidad.Nombre = cb.Nombre;
+                        entidad.IdMoneda = cb.IdMoneda;
+                        entidad.Saldo = cb.Saldo;
+                        entidad.Activo = cb.Activo;
+                    }
 
-                return true;
+                    ctx.Entry(entidad).State = EntityState.Modified;
+                    ctx.SaveChanges();
+
+                    return true;
+                }
             }
             catch (Exception ex)
             {
@@ -119,23 +117,26 @@ namespace Centrex
         // ----------------------------------------------------------
         // Borrar completamente una cuenta bancaria
         // ----------------------------------------------------------
-        public static bool borrarcuenta_Bancaria(cuenta_bancaria cb)
+        public static bool borrarcuenta_Bancaria(CuentaBancariaEntity cb)
         {
             try
             {
-                int id = cb.id_cuentaBancaria;
-                var entidad = ctx.CuentasBancarias.FirstOrDefault(c => c.IdCuentaBancaria == id);
-
-                if (entidad is null)
+                using (CentrexDbContext ctx = new CentrexDbContext())
                 {
-                    Interaction.MsgBox("No se encontró la cuenta bancaria a eliminar.", Constants.vbExclamation);
-                    return false;
+                    int id = cb.IdCuentaBancaria;
+                    var entidad = ctx.CuentaBancariaEntity.FirstOrDefault(c => c.IdCuentaBancaria == id);
+
+                    if (entidad is null)
+                    {
+                        Interaction.MsgBox("No se encontró la cuenta bancaria a eliminar.", Constants.vbExclamation);
+                        return false;
+                    }
+
+                    ctx.CuentaBancariaEntity.Remove(entidad);
+                    ctx.SaveChanges();
+
+                    return true;
                 }
-
-                ctx.CuentasBancarias.Remove(entidad);
-                ctx.SaveChanges();
-
-                return true;
             }
             catch (Exception ex)
             {

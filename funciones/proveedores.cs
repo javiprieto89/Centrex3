@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class proveedores
@@ -26,7 +26,7 @@ namespace Centrex
 
             try
             {
-                using (var context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     int id;
                     int.TryParse(id_proveedor, out id);
@@ -80,6 +80,12 @@ namespace Centrex
             return tmp;
         }
 
+        public static ProveedorEntity info_proveedor(int id)
+        {
+            using var ctx = new CentrexDbContext();
+            return ctx.ProveedorEntity.AsNoTracking().FirstOrDefault(p => p.IdProveedor == id);
+        }
+
         // ===========================================
         // FUNCIÓN: addproveedor
         // ===========================================
@@ -87,7 +93,7 @@ namespace Centrex
         {
             try
             {
-                using (var context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var proveedorEntity = new ProveedorEntity()
                     {
@@ -134,7 +140,7 @@ namespace Centrex
         {
             try
             {
-                using (var context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var proveedorEntity = context.ProveedorEntity.FirstOrDefault(p => p.IdProveedor == pr.IdProveedor);
 
@@ -193,7 +199,7 @@ namespace Centrex
         {
             try
             {
-                using (var context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var proveedorEntity = context.ProveedorEntity.FirstOrDefault(p => p.IdProveedor == pr.IdProveedor);
 
@@ -223,7 +229,7 @@ namespace Centrex
         {
             try
             {
-                using (var context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     // Usar el Stored Procedure del contexto EF Core
                     var results = context.Procedures.SP_consulta_CC_ProveedorAsync(

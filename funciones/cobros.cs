@@ -3,7 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class cobros
@@ -25,7 +25,7 @@ namespace Centrex
             }
         }
 
-        public static int addcobro(cobro c)
+        public static int addcobro(CobroEntity c)
         {
             try
             {
@@ -33,27 +33,27 @@ namespace Centrex
                 {
                     var cobroEntity = new CobroEntity()
                     {
-                        IdCobroOficial = c.id_cobro_oficial,
-                        IdCobroNoOficial = c.id_cobro_no_oficial,
-                        FechaCarga = DateOnly.FromDateTime(DateTime.Now),
-                        FechaCobro = !string.IsNullOrEmpty(c.fecha_cobro) ? DateOnly.FromDateTime(Conversions.ToDate(c.fecha_cobro)) : DateOnly.FromDateTime(DateTime.Now),
-                        IdCliente = c.id_cliente,
-                        IdCc = c.id_cc,
-                        DineroEnCc = (decimal)c.dineroEnCc,
-                        Efectivo = (decimal)c.efectivo,
-                        TotalTransferencia = (decimal)c.totalTransferencia,
-                        TotalCh = (decimal)c.totalCh,
-                        TotalRetencion = (decimal)c.totalRetencion,
-                        Total = (decimal)c.total,
-                        HayCheque = c.hayCheque,
-                        HayTransferencia = c.hayTransferencia,
-                        HayRetencion = c.hayRetencion,
+                        IdCobroOficial = c.IdCobroOficial,
+                        IdCobroNoOficial = c.IdCobroNoOficial,
+                        //FechaCarga = DateOnly.FromDateTime(DateTime.Now),
+                        FechaCobro = c.FechaCobro == default(DateOnly) ? DateOnly.FromDateTime(DateTime.Now) : c.FechaCobro,
+                        IdCliente = c.IdCliente,
+                        IdCc = c.IdCc,
+                        DineroEnCc = c.DineroEnCc,
+                        Efectivo = c.Efectivo,
+                        TotalTransferencia = c.TotalTransferencia,
+                        TotalCh = c.TotalCh,
+                        TotalRetencion = c.TotalRetencion,
+                        Total = c.Total,
+                        HayCheque = c.HayCheque,
+                        HayTransferencia = c.HayTransferencia,
+                        HayRetencion = c.HayRetencion,
                         Activo = true,
-                        IdAnulaCobro = c.id_anulaCobro != -1 ? c.id_anulaCobro : default,
-                        Notas = c.notas ?? "",
-                        Firmante = c.firmante ?? ""
+                        IdAnulaCobro = c.IdAnulaCobro != -1 ? c.IdAnulaCobro : default,
+                        Notas = c.Notas ?? "",
+                        Firmante = c.Firmante ?? ""
                     };
-
+                    
                     context.CobroEntity.Add(cobroEntity);
                     context.SaveChanges();
 
@@ -67,45 +67,45 @@ namespace Centrex
             }
         }
 
-        public static bool borrarcobro(cobro c)
+        public static bool borrarcobro(CobroEntity c)
         {
             try
             {
-                var ac = new cobro();
-                var cc = new ccCliente();
+                var ac = new CobroEntity();
+                var cc = new CcClienteEntity();
 
                 ac = c;
-                ac.dineroEnCc = ac.dineroEnCc * -1;
-                ac.efectivo = ac.efectivo * -1;
-                ac.totalTransferencia = ac.totalTransferencia * -1;
-                ac.totalCh = ac.totalCh * -1;
-                ac.totalRetencion = ac.totalRetencion * -1;
-                ac.total = ac.total * -1;
-                ac.id_anulaCobro = c.id_cobro;
-                if (ac.id_cobro_no_oficial == -1)
+                ac.DineroEnCc = ac.DineroEnCc * -1;
+                ac.Efectivo = ac.Efectivo * -1;
+                ac.TotalTransferencia = ac.TotalTransferencia * -1;
+                ac.TotalCh = ac.TotalCh * -1;
+                ac.TotalRetencion = ac.TotalRetencion * -1;
+                ac.Total = ac.Total * -1;
+                ac.IdAnulaCobro = c.IdCobro;
+                if (ac.IdCobroNoOficial == -1)
                 {
-                    ac.notas += Constants.vbCr + "Anula cobro: " + ac.id_cobro_oficial.ToString();
+                    ac.Notas += Constants.vbCr + "Anula Cobro: " + ac.IdCobroOficial.ToString();
                 }
                 else
                 {
-                    ac.notas += Constants.vbCr + "Anula cobro: " + ac.id_cobro_no_oficial.ToString();
+                    ac.Notas += Constants.vbCr + "Anula cobro: " + ac.IdCobroNoOficial.ToString();
                 }
 
                 // Agrego un cobro exactamente al revez, referenciando al cobro original
-                ac.id_cobro = addcobro(ac);
+                ac.IdCobro = addcobro(ac);
 
                 // Borro todas las transferencias que pertenecen a ese cobro
-                borrar_transferencias(c.id_cobro);
+                borrar_transferencias(c.IdCobro);
 
                 // Borro todas las retenciones que pertenecen a ese cobro
-                borrar_retenciones(c.id_cobro);
+                borrar_retenciones(c.IdCobro);
 
-                if (ac.id_cobro > 0)
+                if (ac.IdCobro > 0)
                 {
                     // Borro los cheques asignados al cobro para liberarlos y actualizo el saldo
-                    borrar_chequeCobrado(ac.id_cobro);
-                    cc = ccClientes.info_ccCliente(c.id_cc);
-                    cc.saldo -= c.total;
+                    borrar_chequeCobrado(ac.IdCobro);
+                    cc = ccClientes.info_ccCliente(c.IdCc);
+                    cc.Saldo -= c.Total;
                     ccClientes.updateCCCliente(cc);
                     return true;
                 }
@@ -384,6 +384,6 @@ namespace Centrex
                 return -1;
             }
         }
-        // ************************************ FUNCIONES DE COBROS ***************************
+        //// ************************************ FUNCIONES DE COBROS ***************************
     }
 }

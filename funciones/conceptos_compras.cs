@@ -1,36 +1,32 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class conceptos_compra
     {
 
         // ************************************ FUNCIONES DE CONCEPTOS DE COMPRA **********************
-        public static concepto_compra info_concepto_compra(string id_concepto)
+        public static ConceptoCompraEntity info_concepto_compra(string id_concepto)
         {
-            var tmp = new concepto_compra();
+            var tmp = new ConceptoCompraEntity();
 
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var conceptoEntity = context.ConceptosCompra.FirstOrDefault(c => c.IdConcepto == Conversions.ToInteger(id_concepto));
+                    var conceptoEntity = context.ConceptoCompraEntity.FirstOrDefault(c => c.IdConceptoCompra == Conversions.ToInteger(id_concepto));
 
                     if (conceptoEntity is not null)
                     {
-                        tmp.id_concepto_compra = conceptoEntity.IdConcepto.ToString();
-                        tmp.concepto = conceptoEntity.concepto;
-                        tmp.activo = conceptoEntity.activo;
+                        tmp.IdConceptoCompra = conceptoEntity.IdConceptoCompra;
+                        tmp.Concepto = conceptoEntity.Concepto;
+                        tmp.Activo = conceptoEntity.Activo;
                     }
                     else
                     {
-                        tmp.concepto = "error";
+                        tmp.Concepto = "error";
                     }
                 }
 
@@ -38,24 +34,24 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                tmp.concepto = "error";
+                tmp.Concepto = "error";
                 return tmp;
             }
         }
 
-        public static bool addConcepto_compra(concepto_compra concepto)
+        public static bool addConcepto_compra(ConceptoCompraEntity Concepto)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var conceptoEntity = new ConceptoCompraEntity()
                     {
-                        concepto = concepto.concepto,
-                        activo = concepto.activo
+                        Concepto = Concepto.Concepto,
+                        Activo = Concepto.Activo
                     };
 
-                    context.ConceptosCompra.Add(conceptoEntity);
+                    context.ConceptoCompraEntity.Add(conceptoEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -67,24 +63,24 @@ namespace Centrex
             }
         }
 
-        public static bool updateConcepto_compra(concepto_compra concepto, bool borra = false)
+        public static bool updateConcepto_compra(ConceptoCompraEntity Concepto, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var conceptoEntity = context.ConceptosCompra.FirstOrDefault(c => c.IdConcepto == concepto.id_concepto_compra);
+                    var conceptoEntity = context.ConceptoCompraEntity.FirstOrDefault(c => c.IdConceptoCompra == Concepto.IdConceptoCompra);
 
                     if (conceptoEntity is not null)
                     {
                         if (borra == true)
                         {
-                            conceptoEntity.activo = false;
+                            conceptoEntity.Activo = false;
                         }
                         else
                         {
-                            conceptoEntity.concepto = concepto.concepto;
-                            conceptoEntity.activo = concepto.activo;
+                            conceptoEntity.Concepto = Concepto.Concepto;
+                            conceptoEntity.Activo = Concepto.Activo;
                         }
 
                         context.SaveChanges();
@@ -103,17 +99,19 @@ namespace Centrex
             }
         }
 
-        public static bool borrarConcepto_compra(concepto_compra concepto)
+        public static bool borrarConcepto_compra(ConceptoCompraEntity Concepto)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new ())
                 {
-                    var conceptoEntity = context.ConceptosCompra.FirstOrDefault(c => c.IdConcepto == concepto.id_concepto_compra);
+                    var conceptoEntity = context.ConceptoCompraEntity.FirstOrDefault(c => c.IdConceptoCompra == Concepto.IdConceptoCompra);
 
                     if (conceptoEntity is not null)
                     {
-                        context.ConceptosCompra.Remove(conceptoEntity);
+
+
+                        context.ConceptoCompraEntity.Remove(conceptoEntity);
                         context.SaveChanges();
                         return true;
                     }

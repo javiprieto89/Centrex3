@@ -1,23 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+using Centrex.Funciones;
+using Centrex.Models;
 
 namespace Centrex
 {
-
-    public partial class add_produccion
+    public partial class add_produccion : Form
     {
-
         private bool recibido = false;
         private int idUsuario;
-        private string idUnico;
-
-        private CentrexDbContext ctx = new CentrexDbContext();
+        private Guid idUnico;
+        private readonly CentrexDbContext ctx = new CentrexDbContext();
 
         public add_produccion()
         {
@@ -29,18 +25,22 @@ namespace Centrex
             idUsuario = VariablesGlobales.usuario_logueado?.IdUsuario ?? 0;
             idUnico = generales.Generar_ID_Unico();
 
-            // Cargo proveedores usando EF
-            var proveedores = ctx.Proveedores.Where(p => p.activo == true).OrderBy(p => p.razon_social).ToList();
-
-            cmb_proveedor.DataSource = proveedores;
-            cmb_proveedor.DisplayMember = "RazonSocial";
-            cmb_proveedor.ValueMember = "IdProveedor";
-            cmb_proveedor.SelectedIndex = -1;
+            // Cargar combo de proveedores
+            generales.Cargar_Combo(
+                ref cmb_proveedor,
+                "ProveedorEntity",
+                "RazonSocial",
+                "IdProveedor",
+                -1,
+                true,
+                null,
+                null
+            );
             cmb_proveedor.Text = "Seleccione un proveedor...";
 
-            if (VariablesGlobales.edicion | VariablesGlobales.borrado == true)
+            if (VariablesGlobales.edicion || VariablesGlobales.borrado)
             {
-                lbl_nProduccion.Text = VariablesGlobales.edita_produccion.IdProduccion;
+                lbl_nProduccion.Text = VariablesGlobales.edita_produccion.IdProduccion.ToString();
                 lbl_produccion.Visible = true;
                 lbl_nProduccion.Visible = true;
                 lbl_fechaCarga.Text = VariablesGlobales.edita_produccion.FechaCarga.ToString("dd/MM/yyyy");
@@ -52,35 +52,27 @@ namespace Centrex
                     dg_viewProduccion.ContextMenuStrip = cms_enviado;
                     recibido = true;
                 }
-                else
-                {
-                    lbl_fechaEnvio.Text = "";
-                }
+                else lbl_fechaEnvio.Text = "";
 
                 if (VariablesGlobales.edita_produccion.FechaRecepcion.HasValue)
-                {
                     lbl_fechaRecepcion.Text = VariablesGlobales.edita_produccion.FechaRecepcion.Value.ToString("dd/MM/yyyy");
-                }
-                else
-                {
-                    lbl_fechaRecepcion.Text = "";
-                }
+                else lbl_fechaRecepcion.Text = "";
 
                 cmb_proveedor.SelectedValue = VariablesGlobales.edita_produccion.IdProveedor;
                 cmb_proveedor.Enabled = false;
 
-                actualizarDataGrid();
+                CargarGrillaProduccion();
             }
             else
             {
-                borrarTmpProduccion(VariablesGlobales.usuario_logueado.IdUsuario);
+                generales.borrarTmpProduccion(idUsuario);
                 lbl_fechaCarga.Text = generales.Hoy();
                 lbl_fechaEnvio.Text = "";
                 lbl_fechaRecepcion.Text = "";
             }
 
-            // Si está borrado o inactivo
-            if (VariablesGlobales.borrado | (VariablesGlobales.edita_produccion.IdProduccion != 0 && !VariablesGlobales.edita_produccion.activo))
+            if (VariablesGlobales.borrado ||
+                (VariablesGlobales.edita_produccion.IdProduccion != 0 && !VariablesGlobales.edita_produccion.Activo))
             {
                 cmb_proveedor.Enabled = false;
                 cmd_add_item.Enabled = false;
@@ -90,109 +82,84 @@ namespace Centrex
                 cmd_ok.Enabled = false;
                 cmd_enviar.Enabled = false;
             }
-
-            // Si está en modo borrado
-            if (VariablesGlobales.borrado)
-            {
-                if (!VariablesGlobales.edita_produccion.activo)
-                {
-                    Interaction.MsgBox("No se puede borrar un pedido de producción ya recibido", Constants.vbExclamation, "Centrex");
-                    closeandupdate(this);
-                    return;
-                }
-
-                cmd_exit.Enabled = false;
-                if (Interaction.MsgBox("¿Está seguro que desea borrar este pedido de producción?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == Constants.vbYes)
-                {
-                    borrarTmpProduccion(VariablesGlobales.usuario_logueado.IdUsuario);
-
-                    // Borrar items y produccion con EF
-                    var prod = ctx.Produccion.Include("ProduccionItems").FirstOrDefault(p => p.IdProduccion == VariablesGlobales.edita_produccion.IdProduccion);
-
-                    if (prod is not null)
-                    {
-                        ctx.ProduccionItems.RemoveRange((IEnumerable<ProduccionItemEntity>)prod.ProduccionItems);
-                        ctx.Produccion.Remove(prod);
-                        ctx.SaveChanges();
-                    }
-                }
-                closeandupdate(this);
-            }
         }
 
         private void add_produccion_FormClosed(object sender, FormClosedEventArgs e)
         {
             VariablesGlobales.id = 0;
             VariablesGlobales.edita_produccion = new ProduccionEntity();
-            borrarTmpProduccion(VariablesGlobales.usuario_logueado.IdUsuario);
+            generales.borrarTmpProduccion(idUsuario);
             generales.ActivaItems("produccion_items");
             VariablesGlobales.edicion = false;
-            closeandupdate(this);
+            generales.closeandupdate(this);
         }
 
         private void cmd_add_item_Click(object sender, EventArgs e)
         {
-            string tmpTabla = VariablesGlobales.tabla;
-            bool tmpActivo = VariablesGlobales.activo;
+            var tmpTabla = VariablesGlobales.tabla;
+            var tmpActivo = VariablesGlobales.activo;
             VariablesGlobales.tabla = "items_sinDescuento";
             VariablesGlobales.activo = true;
-
             VariablesGlobales.agregaitem = true;
-            Enabled = false;
 
+            Enabled = false;
             var srch = new search(true, false, true);
             srch.ShowDialog();
             VariablesGlobales.tabla = tmpTabla;
             VariablesGlobales.activo = tmpActivo;
+            VariablesGlobales.agregaitem = false;
             Enabled = true;
 
-            int seleccionado = VariablesGlobales.id;
-            if (seleccionado > 0)
+            if (VariablesGlobales.id > 0)
             {
-                VariablesGlobales.edita_item = mitem.info_item(seleccionado.ToString());
+                VariablesGlobales.edita_item = mitem.info_item(VariablesGlobales.id);
                 var agregaItemFrm = new infoagregaitem(true, false, true, idUsuario, idUnico);
                 agregaItemFrm.ShowDialog();
-                VariablesGlobales.edita_item = new item();
+                VariablesGlobales.edita_item = null;
             }
 
-            if (asocitems.Tiene_Items_Asociados(seleccionado.ToString()))
+            if (asocitems.Tiene_Items_Asociados(VariablesGlobales.id))
             {
-                var frm_detalle_prod = new frm_detalle_asoc_produccion(seleccionado);
+                var frm_detalle_prod = new frm_detalle_asoc_produccion(VariablesGlobales.id);
                 frm_detalle_prod.ShowDialog();
             }
 
-            VariablesGlobales.agregaitem = false;
             VariablesGlobales.id = 0;
-            actualizarDataGrid();
-
+            CargarGrillaProduccion();
         }
 
         private void cmd_exit_Click(object sender, EventArgs e)
         {
-            closeandupdate(this);
+            generales.closeandupdate(this);
         }
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
             if (cmb_proveedor.SelectedIndex == -1)
             {
-                Interaction.MsgBox("El campo 'Proveedor' es obligatorio.", Constants.vbExclamation);
-                return;
-            }
-            else if (dg_viewProduccion.Rows.Count == 0)
-            {
-                Interaction.MsgBox("No hay items cargados.");
+                Interaction.MsgBox("Debe seleccionar un proveedor.", MsgBoxStyle.Exclamation, "Centrex");
                 return;
             }
 
-            var p = new ProduccionEntity()
+            if (dg_viewProduccion.Rows.Count == 0)
             {
-                IdProveedor = cmb_proveedor.SelectedValue,
-                FechaCarga = DateTime.Now,
-                enviado = !string.IsNullOrEmpty(lbl_fechaEnvio.Text),
-                recibido = !string.IsNullOrEmpty(lbl_fechaRecepcion.Text),
-                activo = string.IsNullOrEmpty(lbl_fechaRecepcion.Text)
-            };
+                Interaction.MsgBox("No hay ítems cargados.", MsgBoxStyle.Exclamation, "Centrex");
+                return;
+            }
+
+            var p = new ProduccionEntity();
+
+            p.IdProveedor = (int)cmb_proveedor.SelectedValue;
+            p.FechaCarga = ConversorFechas.GetFecha(lbl_fechaCarga, p.FechaCarga);
+            p.Enviado = !string.IsNullOrWhiteSpace(lbl_fechaEnvio.Text);
+            p.Recibido = !string.IsNullOrWhiteSpace(lbl_fechaRecepcion.Text);
+            p.Activo = string.IsNullOrWhiteSpace(lbl_fechaRecepcion.Text);
+            
+
+            if (!string.IsNullOrWhiteSpace(lbl_fechaEnvio.Text))
+                p.FechaEnvio = ConversorFechas.GetFecha(lbl_fechaEnvio, p.FechaEnvio);
+            if (!string.IsNullOrWhiteSpace(lbl_fechaRecepcion.Text))
+                p.FechaRecepcion = ConversorFechas.GetFecha(lbl_fechaRecepcion, p.FechaRecepcion);
 
             if (VariablesGlobales.edicion)
             {
@@ -201,150 +168,186 @@ namespace Centrex
             }
             else
             {
-                ctx.Produccion.Add(p);
+                ctx.ProduccionEntity.Add(p);
             }
 
             ctx.SaveChanges();
 
-            // Guardar items temporales vinculados
-            var tmpItems = ctx.TmpProduccionItems.Where(t => t.IdUsuario == VariablesGlobales.usuario_logueado.IdUsuario).ToList();
+            generales.borrarTmpProduccion(idUsuario);
 
-            foreach (var t in tmpItems)
+            if (chk_imprimir.Checked)
             {
-                var nuevoItem = new ProduccionItemEntity()
-                {
-                    id_produccion = p.IdProduccion,
-                    id_item = Conversions.ToInteger(((dynamic)t).IdItem),
-                    cantidad = Conversions.ToInteger(((dynamic)t).Cantidad),
-                    id_item_recibido = (int?)((dynamic)t).IdItemRecibido,
-                    cantidad_recibida = (int?)((dynamic)t).CantidadRecibida,
-                    activo = (bool?)((dynamic)t).Activo
-                };
-                ctx.ProduccionItems.Add(nuevoItem);
+                //var frm = new frm_prnOrdenProduccion(p.IdProduccion);
+                //frm.ShowDialog();
             }
-            ctx.SaveChanges();
-
-            borrarTmpProduccion(VariablesGlobales.usuario_logueado.IdUsuario);
-            Interaction.MsgBox("Producción guardada correctamente.", Constants.vbInformation);
 
             if (chk_secuencia.Checked)
-            {
-                actualizarDataGrid();
-            }
+                CargarGrillaProduccion();
             else
-            {
-                closeandupdate(this);
-            }
+                generales.closeandupdate(this);
         }
 
         private void cmd_enviar_Click(object sender, EventArgs e)
         {
             if (recibido)
             {
-                if (Interaction.MsgBox("ATENCIÓN: Si finaliza la recepción, no podrá realizar más modificaciones.", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == Constants.vbYes)
-                {
+                if (Interaction.MsgBox("¿Finalizar recepción? No se podrá modificar luego.", MsgBoxStyle.YesNo | MsgBoxStyle.Question) == MsgBoxResult.Yes)
                     lbl_fechaRecepcion.Text = generales.Hoy();
-                }
                 else
-                {
                     return;
-                }
             }
             else
             {
                 lbl_fechaEnvio.Text = generales.Hoy();
             }
+
             cmd_ok_Click(null, null);
         }
 
-        // ======================
-        // BINDING AUTOMÁTICO DE DATAGRID
-        // ======================
-        private void actualizarDataGrid()
+        private void CargarGrillaProduccion()
         {
-            var tmpItems = ctx.TmpProduccionItems.Include(t => t.IdItem).Include(t => t.IdItemRecibido).Where(t => (t.activo is { } arg1 ? arg1 == true : (bool?)null) && t.IdUsuario == VariablesGlobales.usuario_logueado.IdUsuario).ToList();
-
-            dg_viewProduccion.AutoGenerateColumns = false;
-            dg_viewProduccion.DataSource = tmpItems;
-
-            if (dg_viewProduccion.Columns.Count == 0)
+            try
             {
-                dg_viewProduccion.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "ID", DataPropertyName = "IdTmpProduccionItem" });
-                dg_viewProduccion.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "Producto", DataPropertyName = "Item.Descript" });
-                dg_viewProduccion.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "Cantidad", DataPropertyName = "Cantidad" });
-                dg_viewProduccion.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "Producto Recibido", DataPropertyName = "ItemRecibido.Descript" });
-                dg_viewProduccion.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "Cantidad Recibida", DataPropertyName = "CantidadRecibida" });
+                var query = ctx.TmpProduccionItemEntity
+                    .Include(t => t.IdItemNavigation)
+                    .Include(t => t.IdItemRecibidoNavigation)
+                    .Where(t => t.Activo == true && t.IdUsuario == idUsuario)
+                    .OrderBy(t => t.IdTmpProduccionItem);
+
+                var result = new DataGridQueryResult
+                {
+                    Query = query,
+                    GridName = "produccion",
+                    EsMaterializada = false
+                };
+
+                LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_viewProduccion, result).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al cargar grilla: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
             }
         }
 
+        private void EditarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dg_viewProduccion.CurrentRow == null)
+                    return;
 
-        // ==========================================================
-        // MODIFICAR ARTÍCULO RECIBIDO  — versión EF
-        // ==========================================================
+                // Simula doble click (igual al VB original)
+                //dg_viewProduccion_DoubleClick(null, null);
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al editar el ítem: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
+        }
+
+        private void BorrarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dg_viewProduccion.CurrentRow == null)
+                    return;
+
+                var idTmp = dg_viewProduccion.CurrentRow.Cells[0].Value?.ToString();
+                if (string.IsNullOrWhiteSpace(idTmp))
+                    return;
+
+                // Extrae el ID temporal antes del guion
+                var idTmpProduccionItem = idTmp.Split('-')[0];
+
+                if (Interaction.MsgBox("¿Seguro que desea eliminar el ítem seleccionado?",
+                                       MsgBoxStyle.YesNo | MsgBoxStyle.Question, "Centrex") != MsgBoxResult.Yes)
+                    return;
+
+                generales.ejecutarSQL($"DELETE FROM tmpproduccion_items WHERE id_tmpProduccionItem = '{idTmpProduccionItem}'");
+
+                CargarGrillaProduccion();
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al borrar ítem: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
+        }
+
+        private void dg_view_MouseDown(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                if (e.Button == MouseButtons.Right)
+                {
+                    var hit = dg_viewProduccion.HitTest(e.X, e.Y);
+                    if (hit.Type == DataGridViewHitTestType.Cell)
+                    {
+                        dg_viewProduccion.CurrentCell = dg_viewProduccion.Rows[hit.RowIndex].Cells[hit.ColumnIndex];
+                        cms_general.Show(dg_viewProduccion, e.Location);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al abrir menú contextual: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
+        }
+
         private void ModificarArtículoRecibidoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (dg_viewProduccion.CurrentRow is null)
-                return;
-
-            string seleccionado = dg_viewProduccion.CurrentRow.Cells[0].Value.ToString();
-            int id_item_tmp = Conversions.ToInteger(Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1));
-
-            string tmpTabla = VariablesGlobales.tabla;
-            bool tmpActivo = VariablesGlobales.activo;
-            VariablesGlobales.tabla = "items_sinDescuento";
-            VariablesGlobales.activo = true;
-
-            Enabled = false;
-            var srch = new search(true, false, false);
-            srch.ShowDialog();
-            int id_item = VariablesGlobales.id;
-
-            VariablesGlobales.tabla = tmpTabla;
-            VariablesGlobales.activo = tmpActivo;
-            Enabled = true;
-
-            // === EF: actualizar id_item_recibido ===
-            var tmpItem = ctx.TmpProduccionItems.FirstOrDefault(t => t.IdTmpProduccionItem == id_item_tmp);
-            if (tmpItem is not null)
+            try
             {
-                tmpItem.IdItemRecibido = id_item;
-                ctx.Entry(tmpItem).State = EntityState.Modified;
-                ctx.SaveChanges();
-            }
+                if (dg_viewProduccion.CurrentRow == null) return;
 
-            VariablesGlobales.id = 0;
-            actualizarDataGrid();
+                var seleccionado = dg_viewProduccion.CurrentRow.Cells[0].Value?.ToString();
+                if (string.IsNullOrWhiteSpace(seleccionado)) return;
+
+                int idTmpItem = int.Parse(seleccionado.Split('-')[0]);
+
+                VariablesGlobales.tabla = "items_sinDescuento";
+                VariablesGlobales.activo = true;
+                Enabled = false;
+
+                var srch = new search(true, false, false);
+                srch.ShowDialog();
+                Enabled = true;
+
+                int idItemNuevo = VariablesGlobales.id;
+                if (idItemNuevo <= 0) return;
+
+                generales.ejecutarSQL($"UPDATE tmpproduccion_items SET id_item_recibido = '{idItemNuevo}' WHERE id_tmpProduccionItem = '{idTmpItem}'");
+                CargarGrillaProduccion();
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al modificar artículo recibido: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
         }
 
-
-        // ==========================================================
-        // MODIFICAR CANTIDAD RECIBIDA — versión EF
-        // ==========================================================
         private void ModificarCantidadRecibidaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (dg_viewProduccion.CurrentRow is null)
-                return;
-
-            string seleccionado = dg_viewProduccion.CurrentRow.Cells[0].Value.ToString();
-            int id_item_tmp = Conversions.ToInteger(Strings.Left(seleccionado, Strings.InStr(seleccionado, "-") - 1));
-
-            // Abre el formulario de edición de cantidad
-            var agregaItem = new infoagregaitem(true, false, false, idUsuario, idUnico);
-            agregaItem.ShowDialog();
-
-            decimal cantidad_recibida = agregaItem.cant;
-
-            // === EF: actualizar cantidad_recibida ===
-            var tmpItem = ctx.TmpProduccionItems.FirstOrDefault(t => t.IdTmpProduccionItem == id_item_tmp);
-            if (tmpItem is not null)
+            try
             {
-                tmpItem.CantidadRecibida = cantidad_recibida;
-                ctx.Entry(tmpItem).State = EntityState.Modified;
-                ctx.SaveChanges();
+                if (dg_viewProduccion.CurrentRow == null) return;
+
+                var seleccionado = dg_viewProduccion.CurrentRow.Cells[0].Value?.ToString();
+                if (string.IsNullOrWhiteSpace(seleccionado)) return;
+
+                int idTmpItem = int.Parse(seleccionado.Split('-')[0]);
+
+                var agregaFrm = new infoagregaitem(true, false, false, idUsuario, idUnico);
+                agregaFrm.ShowDialog();
+
+                int nuevaCantidad = agregaFrm.cant;
+                if (nuevaCantidad < 0) return;
+
+                generales.ejecutarSQL($"UPDATE tmpproduccion_items SET cantidad_recibida = '{nuevaCantidad}' WHERE id_tmpProduccionItem = '{idTmpItem}'");
+                CargarGrillaProduccion();
             }
-
-            actualizarDataGrid();
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al modificar cantidad recibida: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
         }
-
     }
 }
