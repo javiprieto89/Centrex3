@@ -9,7 +9,7 @@ namespace Centrex.Funciones
     {
 
         // ************************************ FUNCIONES DE CUENTAS CORRIENTES DE PROVEEDORES **********************
-        public static CcProveedorEntity info_ccProveedor(int  _ccP)
+        public static CcProveedorEntity info_ccProveedor(int _ccP)
         {
             try
             {
@@ -19,14 +19,15 @@ namespace Centrex.Funciones
                     {
                         return context.CcProveedorEntity.FirstOrDefault(c => c.IdProveedor == _ccP);
                     }
-                    else                     {
+                    else
+                    {
                         return null;
                     }
-                }                
+                }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());                
+                Interaction.MsgBox(ex.Message.ToString());
                 return null;
             }
         }

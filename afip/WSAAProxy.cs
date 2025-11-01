@@ -1,6 +1,5 @@
-using System;
-using System.IO;
-using System.Net;
+﻿using System;
+using System.Net.Http;
 using System.Security;
 using System.Text;
 using System.Xml;
@@ -32,54 +31,34 @@ namespace Centrex.Afip
                 // Crear el SOAP envelope
                 string soapEnvelope = CreateLoginCmsSoapEnvelope(cmsSigned);
 
-                // Crear la petición HTTP
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
-                request.Method = "POST";
-                request.ContentType = "text/xml; charset=utf-8";
-                request.Timeout = _timeout;
-                request.Headers.Add("SOAPAction", "http://ar.gov.afip.dif.facturaelectronica/loginCms");
-
-                // Escribir el SOAP en el body
-                byte[] bytes = Encoding.UTF8.GetBytes(soapEnvelope);
-                request.ContentLength = bytes.Length;
-
-                using (var stream = request.GetRequestStream())
+                using var httpClient = new HttpClient
                 {
-                    stream.Write(bytes, 0, bytes.Length);
+                    Timeout = TimeSpan.FromMilliseconds(_timeout)
+                };
+
+                using var requestMessage = new HttpRequestMessage(HttpMethod.Post, _url)
+                {
+                    Content = new StringContent(soapEnvelope, Encoding.UTF8, "text/xml")
+                };
+                requestMessage.Headers.Add("SOAPAction", "http://ar.gov.afip.dif.facturaelectronica/loginCms");
+
+                using var response = httpClient.Send(requestMessage);
+                string responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string details = string.IsNullOrWhiteSpace(responseText)
+                        ? response.ReasonPhrase ?? "Respuesta vacía"
+                        : responseText;
+                    throw new ApplicationException($"Error en llamada WSAA ({(int)response.StatusCode}): {details}");
                 }
 
-                // Obtener respuesta
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                {
-                    using (var responseStream = response.GetResponseStream())
-                    {
-                        using (var reader = new StreamReader(responseStream))
-                        {
-                            string responseText = reader.ReadToEnd();
-                            return ExtractLoginCmsResponse(responseText);
-                        }
-                    }
-                }
+                return ExtractLoginCmsResponse(responseText);
             }
 
-            catch (WebException ex)
+            catch (HttpRequestException ex)
             {
-                string errorMessage = "Error en llamada WSAA: ";
-                if (ex.Response is not null)
-                {
-                    using (var responseStream = ex.Response.GetResponseStream())
-                    {
-                        using (var reader = new StreamReader(responseStream))
-                        {
-                            errorMessage += reader.ReadToEnd();
-                        }
-                    }
-                }
-                else
-                {
-                    errorMessage += ex.Message;
-                }
-                throw new ApplicationException(errorMessage, ex);
+                throw new ApplicationException("Error en llamada WSAA: " + ex.Message, ex);
             }
         }
 

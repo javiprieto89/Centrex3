@@ -21,7 +21,6 @@ namespace Centrex
         private int _idUsuario = -1;
         private Guid _idUnico = Guid.Empty;
 
-        private int _desde = 0;
         private int _pagina = 1;
         private int _totalRegistros = 0;
         private int _totalPaginas = 0;
@@ -101,10 +100,10 @@ namespace Centrex
             {
                 Cursor = Cursors.WaitCursor;
                 SelectedIndex = -1;
-                VariablesGlobales.id = 0;
+                id = 0;
 
                 if (string.IsNullOrEmpty(_tabla))
-                    _tabla = VariablesGlobales.tabla ?? "clientes";
+                    _tabla = tabla ?? "clientes";
 
                 lblbusqueda.Text = $"Búsqueda ({_tabla})";
 
@@ -451,8 +450,7 @@ namespace Centrex
                 if (string.IsNullOrEmpty(valor) || !int.TryParse(valor, out var id))
                     return;
 
-                SelectedIndex = id;
-                VariablesGlobales.id = id;
+                id= SelectedIndex;                
 
                 // Lógica similar a VB: depende de la tabla y el contexto
                 if (_tabla.StartsWith("items"))

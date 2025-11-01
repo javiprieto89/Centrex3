@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
+using System.Net.Http;
 using System.Security;
 using System.Text;
 using System.Xml;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex.Afip.Proxy
 {
@@ -164,50 +162,34 @@ namespace Centrex.Afip.Proxy
             {
                 string soapEnvelope = CreateSoapEnvelope(soapBody);
 
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
-                request.Method = "POST";
-                request.ContentType = "text/xml; charset=utf-8";
-                request.Timeout = _timeout;
-                request.Headers.Add("SOAPAction", $"http://ar.gov.afip.dif.FEV1/{methodName}");
-
-                byte[] bytes = Encoding.UTF8.GetBytes(soapEnvelope);
-                request.ContentLength = bytes.Length;
-
-                using (var stream = request.GetRequestStream())
+                using var httpClient = new HttpClient
                 {
-                    stream.Write(bytes, 0, bytes.Length);
+                    Timeout = TimeSpan.FromMilliseconds(_timeout)
+                };
+
+                using var requestMessage = new HttpRequestMessage(HttpMethod.Post, _url)
+                {
+                    Content = new StringContent(soapEnvelope, Encoding.UTF8, "text/xml")
+                };
+                requestMessage.Headers.Add("SOAPAction", $"http://ar.gov.afip.dif.FEV1/{methodName}");
+
+                using var response = httpClient.Send(requestMessage);
+                string responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string details = string.IsNullOrWhiteSpace(responseText)
+                        ? response.ReasonPhrase ?? "Respuesta vacía"
+                        : responseText;
+                    throw new ApplicationException($"Error en llamada WSFE ({(int)response.StatusCode}): {details}");
                 }
 
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                {
-                    using (var responseStream = response.GetResponseStream())
-                    {
-                        using (var reader = new StreamReader(responseStream))
-                        {
-                            return reader.ReadToEnd();
-                        }
-                    }
-                }
+                return responseText;
             }
 
-            catch (WebException ex)
+            catch (HttpRequestException ex)
             {
-                string errorMessage = "Error en llamada WSFE: ";
-                if (ex.Response is not null)
-                {
-                    using (var responseStream = ex.Response.GetResponseStream())
-                    {
-                        using (var reader = new StreamReader(responseStream))
-                        {
-                            errorMessage += reader.ReadToEnd();
-                        }
-                    }
-                }
-                else
-                {
-                    errorMessage += ex.Message;
-                }
-                throw new ApplicationException(errorMessage, ex);
+                throw new ApplicationException("Error en llamada WSFE: " + ex.Message, ex);
             }
         }
 

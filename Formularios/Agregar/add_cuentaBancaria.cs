@@ -1,7 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -28,11 +27,11 @@ namespace Centrex
 
             CargarMonedas();
 
-            if (VariablesGlobales.edicion | VariablesGlobales.borrado)
+            if (edicion | borrado)
             {
-                cmb_banco.SelectedValue = VariablesGlobales.edita_cuentaBancaria.IdBanco;
-                txt_cuentaBancaria.Text = VariablesGlobales.edita_cuentaBancaria.Nombre;
-                cmb_moneda.SelectedValue = VariablesGlobales.edita_cuentaBancaria.IdMoneda;
+                cmb_banco.SelectedValue = edita_cuentaBancaria.IdBanco;
+                txt_cuentaBancaria.Text = edita_cuentaBancaria.Nombre;
+                cmb_moneda.SelectedValue = edita_cuentaBancaria.IdMoneda;
             }
             else
             {
@@ -42,7 +41,7 @@ namespace Centrex
                 cmb_moneda.Text = "Seleccione una moneda...";
             }
 
-            if (VariablesGlobales.borrado)
+            if (borrado)
             {
                 cmb_banco.Enabled = false;
                 txt_cuentaBancaria.Enabled = false;
@@ -52,12 +51,12 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta cuenta bancaria?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (cuentas_bancarias.borrarcuenta_Bancaria(VariablesGlobales.edita_cuentaBancaria) == false)
+                    if (cuentas_bancarias.borrarcuenta_Bancaria(edita_cuentaBancaria) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la cuenta, ¿desea intectar desactivarla para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (cuentas_bancarias.updatecuentaBancaria(VariablesGlobales.edita_cuentaBancaria, true) == true)
+                            if (cuentas_bancarias.updatecuentaBancaria(edita_cuentaBancaria, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la cuenta no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que la cuenta, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }
@@ -102,9 +101,9 @@ namespace Centrex
             cb.IdMoneda = Convert.ToInt32(cmb_moneda.SelectedValue);
             cb.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion)
+            if (edicion)
             {
-                cb.IdCuentaBancaria = VariablesGlobales.edita_cuentaBancaria.IdCuentaBancaria;
+                cb.IdCuentaBancaria = edita_cuentaBancaria.IdCuentaBancaria;
                 if (!cuentas_bancarias.updatecuentaBancaria(cb))
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar la cuenta bancaria, consulte con su programdor", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
@@ -144,18 +143,18 @@ namespace Centrex
         private void psearch_banco_Click(object sender, EventArgs e)
         {
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "bancos";
+            tmp = tabla;
+            tabla = "bancos";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo
-            if (VariablesGlobales.id > 0)
+            if (id > 0)
             {
-                cmb_banco.SelectedValue = VariablesGlobales.id;
+                cmb_banco.SelectedValue = id;
             }
-            VariablesGlobales.id = 0;
+            id = 0;
         }
 
         private void add_cuentaBancaria_FormClosed(object sender, FormClosedEventArgs e)

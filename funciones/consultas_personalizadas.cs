@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.VisualBasic;
-using Centrex.Models;
 
 namespace Centrex.Funciones
 {

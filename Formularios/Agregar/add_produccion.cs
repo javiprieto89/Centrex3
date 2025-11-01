@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using Centrex.Funciones;
-using Centrex.Models;
 
 namespace Centrex
 {
@@ -22,8 +18,8 @@ namespace Centrex
 
         private void add_produccion_Load(object sender, EventArgs e)
         {
-            idUsuario = VariablesGlobales.usuario_logueado?.IdUsuario ?? 0;
-            idUnico = generales.Generar_ID_Unico();
+            idUsuario = usuario_logueado?.IdUsuario ?? 0;
+            idUnico = Generar_ID_Unico();
 
             // Cargar combo de proveedores
             generales.Cargar_Combo(
@@ -38,41 +34,41 @@ namespace Centrex
             );
             cmb_proveedor.Text = "Seleccione un proveedor...";
 
-            if (VariablesGlobales.edicion || VariablesGlobales.borrado)
+            if (edicion || borrado)
             {
-                lbl_nProduccion.Text = VariablesGlobales.edita_produccion.IdProduccion.ToString();
+                lbl_nProduccion.Text = edita_produccion.IdProduccion.ToString();
                 lbl_produccion.Visible = true;
                 lbl_nProduccion.Visible = true;
-                lbl_fechaCarga.Text = VariablesGlobales.edita_produccion.FechaCarga.ToString("dd/MM/yyyy");
+                lbl_fechaCarga.Text = edita_produccion.FechaCarga.ToString("dd/MM/yyyy");
 
-                if (VariablesGlobales.edita_produccion.FechaEnvio.HasValue)
+                if (edita_produccion.FechaEnvio.HasValue)
                 {
-                    lbl_fechaEnvio.Text = VariablesGlobales.edita_produccion.FechaEnvio.Value.ToString("dd/MM/yyyy");
+                    lbl_fechaEnvio.Text = edita_produccion.FechaEnvio.Value.ToString("dd/MM/yyyy");
                     cmd_enviar.Text = "Cerrar pedido";
                     dg_viewProduccion.ContextMenuStrip = cms_enviado;
                     recibido = true;
                 }
                 else lbl_fechaEnvio.Text = "";
 
-                if (VariablesGlobales.edita_produccion.FechaRecepcion.HasValue)
-                    lbl_fechaRecepcion.Text = VariablesGlobales.edita_produccion.FechaRecepcion.Value.ToString("dd/MM/yyyy");
+                if (edita_produccion.FechaRecepcion.HasValue)
+                    lbl_fechaRecepcion.Text = edita_produccion.FechaRecepcion.Value.ToString("dd/MM/yyyy");
                 else lbl_fechaRecepcion.Text = "";
 
-                cmb_proveedor.SelectedValue = VariablesGlobales.edita_produccion.IdProveedor;
+                cmb_proveedor.SelectedValue = edita_produccion.IdProveedor;
                 cmb_proveedor.Enabled = false;
 
                 CargarGrillaProduccion();
             }
             else
             {
-                generales.borrarTmpProduccion(idUsuario);
+                borrarTmpProduccion(idUsuario);
                 lbl_fechaCarga.Text = generales.Hoy();
                 lbl_fechaEnvio.Text = "";
                 lbl_fechaRecepcion.Text = "";
             }
 
-            if (VariablesGlobales.borrado ||
-                (VariablesGlobales.edita_produccion.IdProduccion != 0 && !VariablesGlobales.edita_produccion.Activo))
+            if (borrado ||
+                (edita_produccion.IdProduccion != 0 && !edita_produccion.Activo))
             {
                 cmb_proveedor.Enabled = false;
                 cmd_add_item.Enabled = false;
@@ -86,45 +82,45 @@ namespace Centrex
 
         private void add_produccion_FormClosed(object sender, FormClosedEventArgs e)
         {
-            VariablesGlobales.id = 0;
-            VariablesGlobales.edita_produccion = new ProduccionEntity();
-            generales.borrarTmpProduccion(idUsuario);
+            id = 0;
+            edita_produccion = new ProduccionEntity();
+            borrarTmpProduccion(idUsuario);
             generales.ActivaItems("produccion_items");
-            VariablesGlobales.edicion = false;
+            edicion = false;
             generales.closeandupdate(this);
         }
 
         private void cmd_add_item_Click(object sender, EventArgs e)
         {
-            var tmpTabla = VariablesGlobales.tabla;
-            var tmpActivo = VariablesGlobales.activo;
-            VariablesGlobales.tabla = "items_sinDescuento";
-            VariablesGlobales.activo = true;
-            VariablesGlobales.agregaitem = true;
+            var tmpTabla = tabla;
+            var tmpActivo = activo;
+            tabla = "items_sinDescuento";
+            activo = true;
+            agregaitem = true;
 
             Enabled = false;
             var srch = new search(true, false, true);
             srch.ShowDialog();
-            VariablesGlobales.tabla = tmpTabla;
-            VariablesGlobales.activo = tmpActivo;
-            VariablesGlobales.agregaitem = false;
+            tabla = tmpTabla;
+            activo = tmpActivo;
+            agregaitem = false;
             Enabled = true;
 
-            if (VariablesGlobales.id > 0)
+            if (id > 0)
             {
-                VariablesGlobales.edita_item = mitem.info_item(VariablesGlobales.id);
+                edita_item = mitem.info_item(id);
                 var agregaItemFrm = new infoagregaitem(true, false, true, idUsuario, idUnico);
                 agregaItemFrm.ShowDialog();
-                VariablesGlobales.edita_item = null;
+                edita_item = null;
             }
 
-            if (asocitems.Tiene_Items_Asociados(VariablesGlobales.id))
+            if (asocitems.Tiene_Items_Asociados(id))
             {
-                var frm_detalle_prod = new frm_detalle_asoc_produccion(VariablesGlobales.id);
+                var frm_detalle_prod = new frm_detalle_asoc_produccion(id);
                 frm_detalle_prod.ShowDialog();
             }
 
-            VariablesGlobales.id = 0;
+            id = 0;
             CargarGrillaProduccion();
         }
 
@@ -154,16 +150,16 @@ namespace Centrex
             p.Enviado = !string.IsNullOrWhiteSpace(lbl_fechaEnvio.Text);
             p.Recibido = !string.IsNullOrWhiteSpace(lbl_fechaRecepcion.Text);
             p.Activo = string.IsNullOrWhiteSpace(lbl_fechaRecepcion.Text);
-            
+
 
             if (!string.IsNullOrWhiteSpace(lbl_fechaEnvio.Text))
                 p.FechaEnvio = ConversorFechas.GetFecha(lbl_fechaEnvio, p.FechaEnvio);
             if (!string.IsNullOrWhiteSpace(lbl_fechaRecepcion.Text))
                 p.FechaRecepcion = ConversorFechas.GetFecha(lbl_fechaRecepcion, p.FechaRecepcion);
 
-            if (VariablesGlobales.edicion)
+            if (edicion)
             {
-                p.IdProduccion = VariablesGlobales.edita_produccion.IdProduccion;
+                p.IdProduccion = edita_produccion.IdProduccion;
                 ctx.Entry(p).State = EntityState.Modified;
             }
             else
@@ -173,7 +169,7 @@ namespace Centrex
 
             ctx.SaveChanges();
 
-            generales.borrarTmpProduccion(idUsuario);
+            borrarTmpProduccion(idUsuario);
 
             if (chk_imprimir.Checked)
             {
@@ -304,15 +300,15 @@ namespace Centrex
 
                 int idTmpItem = int.Parse(seleccionado.Split('-')[0]);
 
-                VariablesGlobales.tabla = "items_sinDescuento";
-                VariablesGlobales.activo = true;
+                tabla = "items_sinDescuento";
+                activo = true;
                 Enabled = false;
 
                 var srch = new search(true, false, false);
                 srch.ShowDialog();
                 Enabled = true;
 
-                int idItemNuevo = VariablesGlobales.id;
+                int idItemNuevo = id;
                 if (idItemNuevo <= 0) return;
 
                 generales.ejecutarSQL($"UPDATE tmpproduccion_items SET id_item_recibido = '{idItemNuevo}' WHERE id_tmpProduccionItem = '{idTmpItem}'");

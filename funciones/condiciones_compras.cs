@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
 {
@@ -8,37 +9,29 @@ namespace Centrex.Funciones
     {
 
         // ************************************ FUNCIONES DE CONDICIONES DE COMPRA **********************
-        public static CondicionCompraEntity info_condicion_compra(string id_condicion)
+        public static CondicionCompraEntity info_condicion_compra(int id_condicion_compra)
         {
-            var tmp = new CondicionCompraEntity();
-
             try
             {
                 using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    
-                    var condicionEntity = context.CondicionCompraEntity.FirstOrDefault(c => c.IdCondicionCompra == Conversions.ToInteger(id_condicion));
 
-                    if (condicionEntity is not null)
+                    var condicionCompraEntity = context.CondicionCompraEntity.FirstOrDefault(c => c.IdCondicionCompra == id_condicion_compra);                    
+
+                    if (condicionCompraEntity is not null)
                     {
-                        tmp.IdCondicionCompra = condicionEntity.IdCondicionCompra;
-                        tmp.Condicion = condicionEntity.Condicion;
-                        tmp.Vencimiento = condicionEntity.Vencimiento;
-                        tmp.Recargo = Conversions.ToDecimal(condicionEntity.Recargo.ToString());
-                        tmp.Activo = condicionEntity.Activo;
+                        return condicionCompraEntity;
                     }
                     else
                     {
-                        tmp.Condicion = "error";
+                        return null;
                     }
                 }
-
-                return tmp;
             }
             catch (Exception ex)
             {
-                tmp.Condicion = "error";
-                return tmp;
+                MessageBox.Show("Error al obtener condición de compra: " + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
         }
 
@@ -135,3 +128,4 @@ namespace Centrex.Funciones
         // ************************************ FUNCIONES DE CONDICIONES COMPRA **********************
     }
 }
+

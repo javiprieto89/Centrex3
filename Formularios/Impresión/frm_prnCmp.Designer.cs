@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -41,7 +41,7 @@ namespace Centrex
         }
 
         // 🔹 Diseñador (auto-generado)
-        private System.ComponentModel.IContainer components;
+        private System.ComponentModel.IContainer components = null!;
 
         [DebuggerStepThrough]
         private void InitializeComponent()

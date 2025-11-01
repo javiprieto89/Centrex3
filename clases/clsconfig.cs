@@ -1,13 +1,11 @@
-﻿using System.Collections;
-// Imports System
+﻿using System;
+using System.Collections;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
 namespace Centrex
 {
-    // Imports System.Collections
-
     public class configInit
     {
         private string path;
@@ -24,6 +22,12 @@ namespace Centrex
         public configInit()
         {
             path = Application.StartupPath + @"\initConfig.jav";
+
+            // Si el archivo no existe, crear uno por defecto
+            if (!File.Exists(path))
+            {
+                CrearConfiguracionPorDefecto();
+            }
         }
 
         public string nameDB
@@ -35,7 +39,7 @@ namespace Centrex
             set
             {
                 db = value;
-                VariablesGlobales.basedb = value;
+                basedb = value;
             }
         }
 
@@ -48,7 +52,7 @@ namespace Centrex
             set
             {
                 srvSQL = value;
-                VariablesGlobales.serversql = value;
+                serversql = value;
             }
         }
 
@@ -61,7 +65,7 @@ namespace Centrex
             set
             {
                 usrDB = value;
-                VariablesGlobales.usuariodb = value;
+                usuariodb = value;
             }
         }
 
@@ -74,7 +78,7 @@ namespace Centrex
             set
             {
                 pswDB = value;
-                VariablesGlobales.passdb = value;
+                passdb = value;
             }
         }
 
@@ -87,7 +91,7 @@ namespace Centrex
             set
             {
                 bckupDir = value;
-                VariablesGlobales.rutaBackup = value;
+                rutaBackup = value;
             }
         }
 
@@ -100,7 +104,7 @@ namespace Centrex
             set
             {
                 bckupFile = value;
-                VariablesGlobales.archivoBackup = value;
+                archivoBackup = value;
             }
         }
 
@@ -113,7 +117,7 @@ namespace Centrex
             set
             {
                 sepdec = value;
-                VariablesGlobales.sepDecimal = value;
+                sepDecimal = value;
             }
         }
 
@@ -125,7 +129,7 @@ namespace Centrex
             }
             set
             {
-                itPerPage = Conversions.ToInteger(value);
+                itPerPage = int.Parse(value);
             }
         }
 
@@ -171,72 +175,145 @@ namespace Centrex
             var fs = File.Create(path);
             byte[] str;
 
-            str = new UTF8Encoding(true).GetBytes("basedb = " + db + Constants.vbCrLf + "serversql = " + srvSQL + Constants.vbCrLf + "usuariodb = " + strEncrypt.Encriptar(usrDB) + Constants.vbCrLf + "passdb = " + strEncrypt.Encriptar(pswDB) + Constants.vbCrLf + "rutaBackup = " + bckupDir + Constants.vbCrLf + "nombreBackup = " + bckupFile + Constants.vbCrLf + "sepDecimal = " + sepdec + Constants.vbCrLf + "itPerPage = " + itPerPage + Constants.vbCrLf + "modificacionesDB = " + modDB);
+            str = new UTF8Encoding(true).GetBytes("basedb = " + db + Environment.NewLine + "serversql = " + srvSQL + Environment.NewLine + "usuariodb = " + strEncrypt.Encriptar(usrDB) + Environment.NewLine + "passdb = " + strEncrypt.Encriptar(pswDB) + Environment.NewLine + "rutaBackup = " + bckupDir + Environment.NewLine + "nombreBackup = " + bckupFile + Environment.NewLine + "sepDecimal = " + sepdec + Environment.NewLine + "itPerPage = " + itPerPage + Environment.NewLine + "modificacionesDB = " + modDB);
 
             fs.Write(str, 0, str.Length);
             fs.Close();
         }
 
+        private void CrearConfiguracionPorDefecto()
+        {
+            try
+            {
+                // Valores por defecto
+                db = "dbCentrex";
+                srvSQL = "127.0.0.1";
+                usrDB = "sa";
+                pswDB = "";
+                bckupDir = Application.StartupPath + @"\Backups";
+                bckupFile = "backup_" + DateTime.Now.ToString("yyyyMMdd") + ".bak";
+                sepdec = ",";
+                itPerPage = 20;
+                modDB = false;
+
+                // Crear directorio de backups si no existe
+                if (!Directory.Exists(bckupDir))
+                {
+                    Directory.CreateDirectory(bckupDir);
+                }
+
+                // Guardar configuración
+                guardarConfig();
+
+                MessageBox.Show(
+                    "Se ha creado un archivo de configuración por defecto.\n\n" +
+                   "Por favor, verifique la configuración en:\n" +
+                   "Configuración > Configuración del sistema",
+               "Configuración Inicial",
+                MessageBoxButtons.OK,
+                         MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+            "Error al crear configuración por defecto: " + ex.Message,
+                     "Error",
+            MessageBoxButtons.OK,
+               MessageBoxIcon.Error);
+            }
+        }
+
         public void leerConfig()
         {
-            var strDesc = new EncriptarType();
-            var objReader = new StreamReader(path);
-            string str = "";
-            var arrSTR = new ArrayList();
-            int c = 0;
-
-            do
+            // Verificar nuevamente si existe el archivo
+            if (!File.Exists(path))
             {
-                c = c + 1;
-                str = objReader.ReadLine();
-                if (c == 1)
+                CrearConfiguracionPorDefecto();
+                return;
+            }
+
+            var strDesc = new EncriptarType();
+            StreamReader objReader = null;
+
+            try
+            {
+                objReader = new StreamReader(path);
+                string str = "";
+                var arrSTR = new ArrayList();
+                int c = 0;
+
+                do
                 {
-                    VariablesGlobales.basedb = generales.obtieneValorConfig(str);
-                    db = VariablesGlobales.basedb;
+                    c = c + 1;
+                    str = objReader.ReadLine();
+                    if (c == 1)
+                    {
+                        basedb = generales.obtieneValorConfig(str);
+                        db = basedb;
+                    }
+                    else if (c == 2)
+                    {
+                        serversql = generales.obtieneValorConfig(str);
+                        srvSQL = serversql;
+                    }
+                    else if (c == 3)
+                    {
+                        usuariodb = strDesc.Desencriptar(generales.obtieneValorConfig(str));
+                        usrDB = usuariodb;
+                    }
+                    else if (c == 4)
+                    {
+                        passdb = strDesc.Desencriptar(generales.obtieneValorConfig(str));
+                        pswDB = passdb;
+                    }
+                    else if (c == 5)
+                    {
+                        rutaBackup = generales.obtieneValorConfig(str);
+                        bckupDir = rutaBackup;
+                    }
+                    else if (c == 6)
+                    {
+                        archivoBackup = generales.obtieneValorConfig(str);
+                        bckupFile = archivoBackup;
+                    }
+                    else if (c == 7)
+                    {
+                        sepDecimal = generales.obtieneValorConfig(str);
+                        sepdec = sepDecimal;
+                    }
+                    else if (c == 8)
+                    {
+                        string valorItPerPage = generales.obtieneValorConfig(str);
+                        itXPage = int.Parse(valorItPerPage);
+                        itPerPage = itXPage;
+                    }
+                    else if (c == 9)
+                    {
+                        string valorModDB = generales.obtieneValorConfig(str);
+                        modificacionesDB = bool.Parse(valorModDB);
+                        modDB = modificacionesDB;
+                    }
                 }
-                else if (c == 2)
+                while (!(str is null));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                 "Error al leer configuración: " + ex.Message + "\n\n" +
+                "Se creará una configuración por defecto.",
+                  "Error de Configuración",
+                  MessageBoxButtons.OK,
+             MessageBoxIcon.Warning);
+
+                CrearConfiguracionPorDefecto();
+            }
+            finally
+            {
+                if (objReader != null)
                 {
-                    VariablesGlobales.serversql = generales.obtieneValorConfig(str);
-                    srvSQL = VariablesGlobales.serversql;
-                }
-                else if (c == 3)
-                {
-                    VariablesGlobales.usuariodb = strDesc.Desencriptar(generales.obtieneValorConfig(str));
-                    usrDB = VariablesGlobales.usuariodb;
-                }
-                else if (c == 4)
-                {
-                    VariablesGlobales.passdb = strDesc.Desencriptar(generales.obtieneValorConfig(str));
-                    pswDB = VariablesGlobales.passdb;
-                }
-                else if (c == 5)
-                {
-                    VariablesGlobales.rutaBackup = generales.obtieneValorConfig(str);
-                    bckupDir = VariablesGlobales.rutaBackup;
-                }
-                else if (c == 6)
-                {
-                    VariablesGlobales.archivoBackup = generales.obtieneValorConfig(str);
-                    bckupFile = VariablesGlobales.archivoBackup;
-                }
-                else if (c == 7)
-                {
-                    VariablesGlobales.sepDecimal = generales.obtieneValorConfig(str);
-                    sepdec = VariablesGlobales.sepDecimal;
-                }
-                else if (c == 8)
-                {
-                    VariablesGlobales.itXPage = Conversions.ToInteger(generales.obtieneValorConfig(str));
-                    itPerPage = VariablesGlobales.itXPage;
-                }
-                else if (c == 9)
-                {
-                    VariablesGlobales.modificacionesDB = Conversions.ToBoolean(generales.obtieneValorConfig(str));
-                    modDB = VariablesGlobales.modificacionesDB;
+                    objReader.Close();
                 }
             }
-            while (!(str is null));
-            objReader.Close();
         }
     }
 }

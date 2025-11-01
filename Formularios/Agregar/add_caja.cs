@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -23,9 +22,9 @@ namespace Centrex
             tmp.EsCc = chk_cc.Checked;
             tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                tmp.IdCaja = VariablesGlobales.edita_caja.IdCaja;
+                tmp.IdCaja = edita_caja.IdCaja;
                 if (cajas.updateCaja(tmp) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar la caja, consulte con su programdor", Constants.vbExclamation);
@@ -61,15 +60,15 @@ namespace Centrex
         private void Add_caja_Load(object sender, EventArgs e)
         {
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_caja.Text = VariablesGlobales.edita_caja.Nombre;
-                chk_cc.Checked = VariablesGlobales.edita_caja.EsCc;
-                chk_activo.Checked = VariablesGlobales.edita_caja.Activo;
+                txt_caja.Text = edita_caja.Nombre;
+                chk_cc.Checked = edita_caja.EsCc;
+                chk_activo.Checked = edita_caja.Activo;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_caja.Enabled = false;
                 chk_activo.Enabled = false;
@@ -78,12 +77,12 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta caja?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (cajas.borrarCaja(VariablesGlobales.edita_caja) == false)
+                    if (cajas.borrarCaja(edita_caja) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la caja, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (cajas.updateCaja(VariablesGlobales.edita_caja, true) == true)
+                            if (cajas.updateCaja(edita_caja, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la caja no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que la caja, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }

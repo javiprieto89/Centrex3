@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex.Funciones
 {
@@ -11,7 +7,7 @@ namespace Centrex.Funciones
     static class tipositems
     {
         // ************************************ FUNCIONES DE TIPOS DE ITEMS ***********************
-        public static TipoItemEntity InfoTipoItem(object IdTipo)
+        public static TipoItemEntity info_tipoitem(object IdTipo)
         {
             var tmp = new TipoItemEntity();
             try

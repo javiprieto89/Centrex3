@@ -8,10 +8,10 @@ namespace Centrex.Funciones
     static class comprobantes_compras
     {
         /// <summary>
-    /// Obtiene información de un comprobante de compra por su ID
-    /// </summary>
-    /// <param name="IdComprobanteCompra">ID del comprobante de compra</param>
-    /// <returns>Objeto comprobante_compra (clase legacy) con los datos, o Nothing si no existe</returns>
+        /// Obtiene información de un comprobante de compra por su ID
+        /// </summary>
+        /// <param name="IdComprobanteCompra">ID del comprobante de compra</param>
+        /// <returns>Objeto comprobante_compra (clase legacy) con los datos, o Nothing si no existe</returns>
         public static ComprobanteCompraEntity info_comprobante_compra(int IdComprobanteCompra)
         {
 
@@ -67,16 +67,16 @@ namespace Centrex.Funciones
             catch (Exception ex)
             {
                 Interaction.MsgBox(ex.Message.ToString());
-                tmp.IdComprobanteCompra =-1;
+                tmp.IdComprobanteCompra = -1;
                 return tmp;
             }
         }
 
         /// <summary>
-    /// Agrega un nuevo comprobante de compra
-    /// </summary>
-    /// <param name="cc">Clase legacy comprobante_compra con los datos</param>
-    /// <returns>ID del comprobante creado, o -1 si falla</returns>
+        /// Agrega un nuevo comprobante de compra
+        /// </summary>
+        /// <param name="cc">Clase legacy comprobante_compra con los datos</param>
+        /// <returns>ID del comprobante creado, o -1 si falla</returns>
         public static int add_comprobante_compra(ComprobanteCompraEntity cc)
         {
             try
@@ -115,10 +115,10 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Actualiza un comprobante de compra existente
-    /// </summary>
-    /// <param name="cc">Clase legacy comprobante_compra con los datos</param>
-    /// <returns>True si tuvo éxito, False si falló</returns>
+        /// Actualiza un comprobante de compra existente
+        /// </summary>
+        /// <param name="cc">Clase legacy comprobante_compra con los datos</param>
+        /// <returns>True si tuvo éxito, False si falló</returns>
         public static bool update_comprobante_compra(ComprobanteCompraEntity cc)
         {
             try
@@ -160,10 +160,10 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Cierra un comprobante de compra actualizando totales y marcándolo como inactivo
-    /// </summary>
-    /// <param name="cc">Clase legacy comprobante_compra con los datos finales</param>
-    /// <returns>True si tuvo éxito, False si falló</returns>
+        /// Cierra un comprobante de compra actualizando totales y marcándolo como inactivo
+        /// </summary>
+        /// <param name="cc">Clase legacy comprobante_compra con los datos finales</param>
+        /// <returns>True si tuvo éxito, False si falló</returns>
         public static bool cerrar_comprobante_compra(ComprobanteCompraEntity cc)
         {
             try
@@ -197,13 +197,13 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Agrega un item a un comprobante de compra
-    /// </summary>
-    /// <param name="id_comprobanteCompra">ID del comprobante de compra</param>
-    /// <param name="id_item">ID del item</param>
-    /// <param name="cantidad">Cantidad del item</param>
-    /// <param name="precio">Precio unitario</param>
-    /// <returns>True si tuvo éxito, False si falló</returns>
+        /// Agrega un item a un comprobante de compra
+        /// </summary>
+        /// <param name="id_comprobanteCompra">ID del comprobante de compra</param>
+        /// <param name="id_item">ID del item</param>
+        /// <param name="cantidad">Cantidad del item</param>
+        /// <param name="precio">Precio unitario</param>
+        /// <returns>True si tuvo éxito, False si falló</returns>
         public static bool add_item_comprobanteCompra(int id_comprobanteCompra, int id_item, int cantidad, decimal precio)
         {
             try
@@ -214,8 +214,8 @@ namespace Centrex.Funciones
                     {
                         IdComprobanteCompra = id_comprobanteCompra,
                         IdItem = id_item,
-                        Cantidad =cantidad,
-                        Precio = precio,                         
+                        Cantidad = cantidad,
+                        Precio = precio,
                     };
 
                     context.ComprobanteCompraItemEntity.Add(nuevoItem);
@@ -232,12 +232,12 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Agrega un impuesto a un comprobante de compra
-    /// </summary>
-    /// <param name="id_comprobanteCompra">ID del comprobante de compra</param>
-    /// <param name="id_impuesto">ID del impuesto</param>
-    /// <param name="importe">Importe del impuesto</param>
-    /// <returns>True si tuvo éxito, False si falló</returns>
+        /// Agrega un impuesto a un comprobante de compra
+        /// </summary>
+        /// <param name="id_comprobanteCompra">ID del comprobante de compra</param>
+        /// <param name="id_impuesto">ID del impuesto</param>
+        /// <param name="importe">Importe del impuesto</param>
+        /// <returns>True si tuvo éxito, False si falló</returns>
         public static bool add_impuesto_comprobanteCompra(int id_comprobanteCompra, int id_impuesto, decimal importe)
         {
             try
@@ -247,7 +247,7 @@ namespace Centrex.Funciones
                     var nuevoImpuesto = new ComprobanteCompraImpuestoEntity()
                     {
                         IdComprobanteCompra = id_comprobanteCompra,
-                        IdImpuesto = id_impuesto,                        
+                        IdImpuesto = id_impuesto,
                         Importe = importe
                     };
 
@@ -265,14 +265,14 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Agrega un concepto a un comprobante de compra
-    /// </summary>
-    /// <param name="id_comprobanteCompra">ID del comprobante de compra</param>
-    /// <param name="id_concepto_compra">ID del concepto de compra</param>
-    /// <param name="subtotal">Subtotal del concepto</param>
-    /// <param name="iva">IVA del concepto</param>
-    /// <param name="Total">Total del concepto</param>
-    /// <returns>True si tuvo éxito, False si falló</returns>
+        /// Agrega un concepto a un comprobante de compra
+        /// </summary>
+        /// <param name="id_comprobanteCompra">ID del comprobante de compra</param>
+        /// <param name="id_concepto_compra">ID del concepto de compra</param>
+        /// <param name="subtotal">Subtotal del concepto</param>
+        /// <param name="iva">IVA del concepto</param>
+        /// <param name="Total">Total del concepto</param>
+        /// <returns>True si tuvo éxito, False si falló</returns>
         public static bool add_concepto_comprobanteCompra(int id_comprobanteCompra, int id_concepto_compra, decimal subtotal, decimal iva, decimal total)
         {
             try
@@ -304,11 +304,11 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Borra comprobantes de compra y sus asociaciones (items, impuestos, conceptos)
-    /// Si no se pasa IdComprobanteCompra, sale sin hacer nada (los activos ya no se borran automáticamente)
-    /// Si se pasa un IdComprobanteCompra, borra ese comprobante y todas sus asociaciones
-    /// </summary>
-    /// <param name="IdComprobanteCompra">ID del comprobante a borrar, o -1 para no hacer nada</param>
+        /// Borra comprobantes de compra y sus asociaciones (items, impuestos, conceptos)
+        /// Si no se pasa IdComprobanteCompra, sale sin hacer nada (los activos ya no se borran automáticamente)
+        /// Si se pasa un IdComprobanteCompra, borra ese comprobante y todas sus asociaciones
+        /// </summary>
+        /// <param name="IdComprobanteCompra">ID del comprobante a borrar, o -1 para no hacer nada</param>
         public static void borrar_comprobantes_compras_activos(int IdComprobanteCompra = -1)
         {
             if (IdComprobanteCompra == -1)
@@ -351,10 +351,10 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Obtiene el último ID de cuenta corriente usado para un proveedor
-    /// </summary>
-    /// <param name="id_proveedor">ID del proveedor</param>
-    /// <returns>ID de la cuenta corriente, o -1 si no se encuentra</returns>
+        /// Obtiene el último ID de cuenta corriente usado para un proveedor
+        /// </summary>
+        /// <param name="id_proveedor">ID del proveedor</param>
+        /// <returns>ID de la cuenta corriente, o -1 si no se encuentra</returns>
         public static int Ultima_CC_comprobante_compra_proveedor(int id_proveedor)
         {
             int IdCc = -1;
@@ -371,7 +371,7 @@ namespace Centrex.Funciones
 
                     if (ultimoComprobante > 0)
                     {
-                       IdCc = ultimoComprobante;
+                        IdCc = ultimoComprobante;
                     }
 
                     return IdCc;

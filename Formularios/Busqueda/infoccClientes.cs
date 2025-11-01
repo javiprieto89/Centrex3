@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex
 {
@@ -53,12 +50,12 @@ namespace Centrex
 
             if (cmb_cliente.Text == "Seleccione un cliente...")
             {
-                Interaction.MsgBox("El campo 'Cliente' es obligatorio y está vacio", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                MessageBox.Show("El campo 'Cliente' es obligatorio y está vacio", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (cmb_cc.Text == "Seleccione una cuenta corriente...")
             {
-                Interaction.MsgBox("Debe elegir una cuenta corriente del cliente seleccionado para poder realizar la consulta.", (MsgBoxStyle)((int)MsgBoxStyle.Exclamation + (int)Constants.vbOKOnly), "Centrex");
+                MessageBox.Show("Debe elegir una cuenta corriente del cliente seleccionado para poder realizar la consulta.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
@@ -93,17 +90,15 @@ namespace Centrex
             cmd_go.Enabled = true;
             pExportXLS.Enabled = true;
 
-            // cmd_last_Click(Nothing, Nothing) 'Bush quiere que aparezca en la última página
-
-            total = ccClientes.consultaTotalCcCliente(Conversions.ToInteger(cmb_cliente.SelectedValue), fechaDesde, fechaHasta);
+            total = ccClientes.consultaTotalCcCliente(Convert.ToInt32(cmb_cliente.SelectedValue), fechaDesde, fechaHasta);
 
             lbl_total.Text = "$ " + total;
 
-            var ccInfo = ccClientes.info_ccCliente(Conversions.ToInteger(cmb_cc.SelectedValue));
+            var ccInfo = ccClientes.info_ccCliente(Convert.ToInt32(cmb_cc.SelectedValue));
             saldo = ccInfo.Saldo.ToString();
             lbl_saldo.Text = "$ " + saldo;
 
-            if (Conversions.ToBoolean(Strings.InStr(saldo, "-")))
+            if (saldo.Contains("-"))
             {
                 lbl_saldo.ForeColor = Color.Red;
             }
@@ -123,7 +118,7 @@ namespace Centrex
 
             //seleccionado = dg_view.CurrentRow.Cells[0].Value.ToString();
 
-            //VariablesGlobales.id = transacciones.InfoTransaccion(seleccionado).IdPedido;
+            //id = transacciones.InfoTransaccion(seleccionado).IdPedido;
 
             //frmPrn.ShowDialog();
         }
@@ -141,7 +136,7 @@ namespace Centrex
 
             var filtros = new Dictionary<string, object>
             {
-                ["IdCliente"] = Conversions.ToInteger(cmb_cliente.SelectedValue)
+                ["IdCliente"] = Convert.ToInt32(cmb_cliente.SelectedValue)
             };
             var ordenCc = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
             generales.Cargar_Combo(
@@ -169,17 +164,17 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "clientes";
+            tmp = tabla;
+            tabla = "clientes";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
 
-            generales.updateform(VariablesGlobales.id.ToString(), ref cmb_cliente);
+            generales.updateform(id.ToString(), ref cmb_cliente);
             cmb_cliente_SelectionChangeCommitted(null, null);
         }
 
@@ -187,13 +182,13 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "archivoCCClientes";
+            tmp = tabla;
+            tabla = "archivoCCClientes";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
-            generales.updateform(VariablesGlobales.id.ToString(), ref cmb_cc);
+            generales.updateform(id.ToString(), ref cmb_cc);
         }
 
         private void chk_desdeSiempre_CheckedChanged(object sender, EventArgs e)
@@ -223,27 +218,27 @@ namespace Centrex
                 rutaArchivo = withBlock.FileName;
                 if (string.IsNullOrEmpty(rutaArchivo))
                 {
-                    Interaction.MsgBox("Exportación cancelada.", (MsgBoxStyle)((int)Constants.vbInformation + (int)Constants.vbOKOnly), "Centrex");
+                    MessageBox.Show("Exportación cancelada.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
             }
 
-            ccClientes.consultaCcCliente(ref dgView_paraExportar, Conversions.ToInteger(cmb_cliente.SelectedValue), Conversions.ToInteger(cmb_cc.SelectedValue), fechaDesde, fechaHasta, desde, ref nRegs, ref tPaginas, pagina, ref txt_nPage, true);
+            ccClientes.consultaCcCliente(ref dgView_paraExportar, Convert.ToInt32(cmb_cliente.SelectedValue), Convert.ToInt32(cmb_cc.SelectedValue), fechaDesde, fechaHasta, desde, ref nRegs, ref tPaginas, pagina, ref txt_nPage, true);
 
             generales.exportarExcel(dgView_paraExportar, rutaArchivo);
-            Interaction.MsgBox("Archivo exportado a: " + SaveFileDialog1.FileName, (MsgBoxStyle)((int)Constants.vbInformation + (int)Constants.vbOKOnly), "Centrex");
+            MessageBox.Show("Archivo exportado a: " + SaveFileDialog1.FileName, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void ActualizarDatagrid()
         {
-            ccClientes.consultaCcCliente(ref dg_view, Conversions.ToInteger(cmb_cliente.SelectedValue), Conversions.ToInteger(cmb_cc.SelectedValue), fechaDesde, fechaHasta, desde, ref nRegs, ref tPaginas, pagina, ref txt_nPage, false);
+            ccClientes.consultaCcCliente(ref dg_view, Convert.ToInt32(cmb_cliente.SelectedValue), Convert.ToInt32(cmb_cc.SelectedValue), fechaDesde, fechaHasta, desde, ref nRegs, ref tPaginas, pagina, ref txt_nPage, false);
         }
 
         private void cmd_next_Click(object sender, EventArgs e)
         {
-            if (pagina == Math.Ceiling(nRegs / (double)VariablesGlobales.itXPage))
+            if (pagina == Math.Ceiling(nRegs / (double)itXPage))
                 return;
-            desde += VariablesGlobales.itXPage;
+            desde += itXPage;
             pagina += 1;
             ActualizarDatagrid();
         }
@@ -252,7 +247,7 @@ namespace Centrex
         {
             if (pagina == 1)
                 return;
-            desde -= VariablesGlobales.itXPage;
+            desde -= itXPage;
             pagina -= 1;
             ActualizarDatagrid();
         }
@@ -267,16 +262,16 @@ namespace Centrex
         private void cmd_last_Click(object sender, EventArgs e)
         {
             pagina = tPaginas;
-            desde = nRegs - VariablesGlobales.itXPage;
+            desde = nRegs - itXPage;
             ActualizarDatagrid();
         }
 
         private void cmd_go_Click(object sender, EventArgs e)
         {
-            pagina = Conversions.ToInteger(txt_nPage.Text);
+            pagina = int.Parse(txt_nPage.Text);
             if (pagina > tPaginas)
                 pagina = tPaginas;
-            desde = (pagina - 1) * VariablesGlobales.itXPage;
+            desde = (pagina - 1) * itXPage;
             ActualizarDatagrid();
         }
     }

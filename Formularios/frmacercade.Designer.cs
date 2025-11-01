@@ -36,7 +36,7 @@ namespace Centrex
         internal Label LabelCopyright;
 
         // Requerido por el Diseñador de Windows Forms
-        private System.ComponentModel.IContainer components;
+        private System.ComponentModel.IContainer components = null!;
 
         // NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
         // Se puede modificar usando el Diseñador de Windows Forms.  

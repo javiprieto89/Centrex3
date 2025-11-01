@@ -978,6 +978,9 @@ public partial class CentrexDbContext : DbContext
             entity.HasOne(d => d.IdPedidoNavigation).WithMany(p => p.TransaccionEntity).HasConstraintName("FK_transacciones_pedidos");
 
             entity.HasOne(d => d.IdTipoComprobanteNavigation).WithMany(p => p.TransaccionEntity).HasConstraintName("FK_transacciones_tipos_comprobantes");
+
+            entity.HasOne(d => d.IdClienteNavigation).WithMany(p => p.TransaccionEntity)
+    .HasConstraintName("FK_transacciones_clientes");
         });
 
         modelBuilder.Entity<TransferenciaEntity>(entity =>

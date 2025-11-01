@@ -78,10 +78,10 @@ namespace Centrex
 
             //    try
             //    {
-            //        abrirdb(VariablesGlobales.serversql, VariablesGlobales.basedb, VariablesGlobales.usuariodb, VariablesGlobales.passdb);
+            //        abrirdb(serversql, basedb, usuariodb, passdb);
 
             //        comando.CommandType = CommandType.Text;
-            //        comando.Connection = (SqlConnection)VariablesGlobales.CN;
+            //        comando.Connection = (SqlConnection)CN;
 
             //        sqlstr = "EXEC	[dbo].[datos_empresa]";
             //        comando.CommandText = sqlstr;

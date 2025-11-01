@@ -8,8 +8,8 @@ global using static Centrex.VariablesGlobales;
 global using Centrex.Funciones;
 
 //global using Centrex.Generales;
-global using static Centrex.DataGridQueryResult;
-global using static Centrex.LoadDataGridDynamic;
+global using static Centrex.Funciones.DataGridQueryResult;
+global using static Centrex.Funciones.LoadDataGridDynamic;
 global using static Centrex.Funciones.generales;
 global using static Centrex.Funciones.ajustes_stock;
 global using static Centrex.Funciones.asocitems;
@@ -52,4 +52,6 @@ global using static Centrex.Funciones.transacciones;
 global using static Centrex.Funciones.transferencias;
 global using static Centrex.Funciones.usuarios;
 global using static Centrex.Funciones.ConversorFechas;
+global using static Centrex.Funciones.generales_multiUsuario;
+global using static Centrex.Funciones.ErrorLogger;
 

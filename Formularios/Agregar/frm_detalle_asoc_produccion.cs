@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace Centrex
     {
         private int id_item;
         private int id_produccion;
-        private DataTable dt_cantidades_items_asociados;
+        private DataTable dt_cantidades_items_asociados = new DataTable();
 
         public frm_detalle_asoc_produccion()
         {

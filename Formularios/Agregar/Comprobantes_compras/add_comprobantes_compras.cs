@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Centrex
 {
@@ -59,7 +59,7 @@ namespace Centrex
             {
                 try
                 {
-                    cmb_condicionCompra.SelectedValue = VariablesGlobales.id_condicion_compra_default;
+                    cmb_condicionCompra.SelectedValue = id_condicion_compra_default;
                 }
                 catch
                 {
@@ -173,7 +173,7 @@ namespace Centrex
             }
 
             cmb_moneda.Enabled = false;
-            if (ccp.IdMoneda != VariablesGlobales.ID_PESO)
+            if (ccp.IdMoneda != ID_PESO)
             {
                 txt_tasaCambio.Enabled = true;
             }
@@ -233,17 +233,17 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "proveedores";
+            tmp = tabla;
+            tabla = "proveedores";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_proveedor;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_proveedor = argcmb;
         }
 
@@ -256,22 +256,22 @@ namespace Centrex
             if (Conversions.ToBoolean(Operators.OrObject(cmb_proveedor.Text == "Seleccione un proveedor...", Operators.ConditionalCompareObjectEqual(cmb_proveedor.SelectedValue, 0, false))))
                 return;
 
-            tmp = VariablesGlobales.tabla;
-            tmpProveedor = VariablesGlobales.edita_proveedor;
-            // VariablesGlobales.edita_cliente = info_cliente(cmb_proveedor.SelectedValue)
-            VariablesGlobales.edita_proveedor = proveedores.info_proveedor(Conversions.ToString(cmb_proveedor.SelectedValue));
-            VariablesGlobales.tabla = "cc_proveedores";
+            tmp = tabla;
+            tmpProveedor = edita_proveedor;
+            // edita_cliente = info_cliente(cmb_proveedor.SelectedValue)
+            edita_proveedor = proveedores.info_proveedor(Conversions.ToString(cmb_proveedor.SelectedValue));
+            tabla = "cc_proveedores";
             Enabled = false;
 
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
-            VariablesGlobales.edita_proveedor = tmpProveedor;
+            tabla = tmp;
+            edita_proveedor = tmpProveedor;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_cc;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_cc = argcmb;
         }
 
@@ -280,25 +280,25 @@ namespace Centrex
             string tmpTabla;
             bool tmpActivo;
 
-            tmpTabla = VariablesGlobales.tabla;
-            tmpActivo = VariablesGlobales.activo;
+            tmpTabla = tabla;
+            tmpActivo = activo;
 
             switch (tbl_comprobantesCompras.SelectedTab.Name ?? "")
             {
                 case "productos":
                     {
-                        VariablesGlobales.tabla = "items_sinDescuento";
-                        VariablesGlobales.activo = true;
+                        tabla = "items_sinDescuento";
+                        activo = true;
                         break;
                     }
                 case "impuestos":
                     {
-                        VariablesGlobales.tabla = "impuestos";
+                        tabla = "impuestos";
                         break;
                     }
                 case "conceptos":
                     {
-                        VariablesGlobales.tabla = "conceptos_compra";
+                        tabla = "conceptos_compra";
                         break;
                     }
             }
@@ -307,23 +307,23 @@ namespace Centrex
 
             var frmSearch = new search(true, id_comprobante_compra);
             frmSearch.ShowDialog();
-            VariablesGlobales.tabla = tmpTabla;
-            VariablesGlobales.activo = tmpActivo;
+            tabla = tmpTabla;
+            activo = tmpActivo;
             Enabled = true;
 
-            int seleccionado = VariablesGlobales.id;
+            int seleccionado = id;
             if (seleccionado > 0)
             {
                 switch (tbl_comprobantesCompras.SelectedTab.Name ?? string.Empty)
                 {
                     case "productos":
                         {
-                            VariablesGlobales.edita_item = mitem.info_item(seleccionado);
-                            VariablesGlobales.agregaitem = true;
+                            edita_item = mitem.info_item(seleccionado);
+                            agregaitem = true;
                             var agregaItemFrm = new infoagregaitem(true, id_comprobante_compra);
                             agregaItemFrm.ShowDialog();
-                            VariablesGlobales.agregaitem = false;
-                            VariablesGlobales.edita_item = new ItemEntity();
+                            agregaitem = false;
+                            edita_item = new ItemEntity();
                             break;
                         }
                     case "impuestos":
@@ -341,8 +341,8 @@ namespace Centrex
                 }
             }
 
-            VariablesGlobales.agregaitem = false;
-            VariablesGlobales.id = 0;
+            agregaitem = false;
+            id = 0;
             update_form();
         }
 
@@ -366,7 +366,7 @@ namespace Centrex
                 Interaction.MsgBox("Debe seleccionar una condición de compra.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
-            else if (Conversions.ToBoolean(Operators.AndObject(Operators.ConditionalCompareObjectNotEqual(cmb_moneda.SelectedValue, VariablesGlobales.ID_PESO, false), string.IsNullOrEmpty(txt_tasaCambio.Text))))
+            else if (Conversions.ToBoolean(Operators.AndObject(Operators.ConditionalCompareObjectNotEqual(cmb_moneda.SelectedValue, ID_PESO, false), string.IsNullOrEmpty(txt_tasaCambio.Text))))
             {
                 Interaction.MsgBox("La moneda seleccionada es extranjera, por lo cual escribir la tasa de cambio", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
@@ -377,7 +377,7 @@ namespace Centrex
                 return;
             }
 
-           cc.FechaComprobante = DateOnly.FromDateTime(dtp_fechaComprobanteCompra.Value);
+            cc.FechaComprobante = DateOnly.FromDateTime(dtp_fechaComprobanteCompra.Value);
             cc.IdProveedor = Conversions.ToInteger(cmb_proveedor.SelectedValue);
             cc.IdCc = Conversions.ToInteger(cmb_cc.SelectedValue);
             cc.IdCondicionCompra = Conversions.ToInteger(cmb_condicionCompra.SelectedValue);
@@ -638,7 +638,7 @@ namespace Centrex
                 else
                 {
                     t.PuntoVenta = null;
-                }                
+                }
                 t.Total = cc.Total;
                 t.IdCc = cc.IdCc;
                 t.IdProveedor = cc.IdProveedor;
@@ -667,17 +667,17 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "BY";
+            tmp = tabla;
+            tabla = "BY";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_proveedor;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_proveedor = argcmb;
         }
 
@@ -685,17 +685,17 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "tipos_Comprobantes";
+            tmp = tabla;
+            tabla = "tipos_Comprobantes";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_proveedor;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_proveedor = argcmb;
         }
 

@@ -179,27 +179,15 @@ namespace Centrex.Funciones
             {
                 using (var context = new CentrexDbContext())
                 {
-                    // Buscar dinámicamente el DbSet por nombre
-                    var dbSetProp = context.GetType()
-                        .GetProperties()
-                        .FirstOrDefault(p => p.Name.Equals(tbl, StringComparison.OrdinalIgnoreCase));
-
-                    if (dbSetProp == null)
+                    var entityInfo = ResolveEntitySet(context, tbl);
+                    if (entityInfo is null)
                     {
                         Interaction.MsgBox($"La entidad '{tbl}' no existe en el contexto.", Constants.vbExclamation, "Centrex");
                         return 0;
                     }
 
-                    // Obtener el DbSet (IQueryable<object>)
-                    var dbSet = dbSetProp.GetValue(context, null) as IQueryable<object>;
-                    if (dbSet == null)
-                    {
-                        Interaction.MsgBox($"No se pudo acceder al conjunto de datos '{tbl}'.", Constants.vbCritical, "Centrex");
-                        return 0;
-                    }
-
                     // Cargar y eliminar todos los registros
-                    var registros = dbSet.ToList();
+                    var registros = entityInfo.Query.ToList();
                     if (registros.Count > 0)
                     {
                         context.RemoveRange(registros);
@@ -211,7 +199,8 @@ namespace Centrex.Funciones
                     {
                         try
                         {
-                            string reseedSql = $"DBCC CHECKIDENT ('[{tbl}]', RESEED, 0);";
+                            string tableName = entityInfo.TableName ?? tbl;
+                            string reseedSql = $"DBCC CHECKIDENT ('[{tableName}]', RESEED, 0);";
                             context.Database.ExecuteSqlRaw(reseedSql);
                         }
                         catch
@@ -583,25 +572,25 @@ namespace Centrex.Funciones
         public static double calculoTotalPuro(DataGridView datagrid)
         {
             double total = 0d;
-            string item_id;
+            string itemId;
 
             try
             {
                 // Calcular precios normales
-                for (int c = 0, loopTo = datagrid.Rows.Count - 1; c <= loopTo; c++)
+                for (int c = 0; c < datagrid.Rows.Count; c++)
                 {
                     if (datagrid.Rows[c].Cells.Count > 0 && datagrid.Rows[c].Cells[0].Value is not null)
                     {
-                        item_id = datagrid.Rows[c].Cells[0].Value.ToString();
-                        if (item_id.Contains("-"))
+                        itemId = datagrid.Rows[c].Cells[0].Value.ToString();
+                        if (!string.IsNullOrEmpty(itemId) && itemId.Contains("-"))
                         {
-                            item_id = Strings.Right(item_id, item_id.Length - Strings.InStr(item_id, "-"));
+                            itemId = Strings.Right(itemId, itemId.Length - Strings.InStr(itemId, "-"));
                         }
 
-                        if (!string.IsNullOrEmpty(item_id))
+                        if (!string.IsNullOrEmpty(itemId))
                         {
-                            var item = mitem.info_item(Conversions.ToInteger(item_id));
-                            if (item.EsDescuento == false & item.EsMarkup == false)
+                            var item = mitem.info_item(Conversions.ToInteger(itemId));
+                            if (!item.EsDescuento && !item.EsMarkup)
                             {
                                 if (datagrid.Rows[c].Cells.Count > 4 && datagrid.Rows[c].Cells[4].Value is not null && datagrid.Rows[c].Cells[3].Value is not null)
                                 {
@@ -613,19 +602,19 @@ namespace Centrex.Funciones
                 }
 
                 // Calcular descuentos
-                for (int c = 0, loopTo1 = datagrid.Rows.Count - 1; c <= loopTo1; c++)
+                for (int c = 0; c < datagrid.Rows.Count; c++)
                 {
                     if (datagrid.Rows[c].Cells.Count > 0 && datagrid.Rows[c].Cells[0].Value is not null)
                     {
-                        item_id = datagrid.Rows[c].Cells[0].Value.ToString();
-                        if (item_id.Contains("-"))
+                        itemId = datagrid.Rows[c].Cells[0].Value.ToString();
+                        if (!string.IsNullOrEmpty(itemId) && itemId.Contains("-"))
                         {
-                            item_id = Strings.Right(item_id, item_id.Length - Strings.InStr(item_id, "-"));
+                            itemId = Strings.Right(itemId, itemId.Length - Strings.InStr(itemId, "-"));
                         }
 
-                        if (!string.IsNullOrEmpty(item_id))
+                        if (!string.IsNullOrEmpty(itemId))
                         {
-                            var item = mitem.info_item(Conversions.ToInteger(item_id));
+                            var item = mitem.info_item(Conversions.ToInteger(itemId));
                             if (item.EsDescuento)
                             {
                                 if (datagrid.Rows[c].Cells.Count > 4 && datagrid.Rows[c].Cells[4].Value is not null)
@@ -637,16 +626,14 @@ namespace Centrex.Funciones
                     }
                 }
             }
-
             catch (Exception ex)
             {
-                // En caso de error, retornar 0
                 total = 0d;
+                Interaction.MsgBox("Error al calcular totales: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
             }
 
             return total;
         }
-
         public static void updateform([Optional, DefaultParameterValue("")] string seleccionado, [Optional] ref ComboBox cmb)
         {
             if (cmb is null)
@@ -695,7 +682,7 @@ namespace Centrex.Funciones
 
             if (string.IsNullOrEmpty(fecha_afip))
             {
-                return "";                
+                return "";
             }
 
             anio = Strings.Left(fecha_afip, 4);
@@ -764,119 +751,6 @@ namespace Centrex.Funciones
             }
         }
 
-        // ************************************* FUNCIONES MULTI-USUARIO CON ENTITY FRAMEWORK *****************************
-
-        /// <summary>
-        // ************************************* FUNCIONES MULTI-USUARIO CON ENTITY FRAMEWORK *****************************
-
-        /// <summary>
-        /// Borra tabla de pedidos temporales según usuario - Migrado a EF
-        /// </summary>
-        public static byte borrar_tabla_pedidos_temporales(int idUsuario)
-        {
-            try
-            {
-                using (var context = new CentrexDbContext())
-                {
-
-                    var itemsTemp = context.TmpPedidoItemEntity.Where(t => t.IdUsuario == idUsuario).ToList();
-                    if (itemsTemp.Count == 0)
-                    {
-                        return Conversions.ToByte(true);
-                    }
-
-                    context.TmpPedidoItemEntity.RemoveRange(itemsTemp);
-                    context.SaveChanges();
-                    return Conversions.ToByte(true);
-                }
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox(ex.Message);
-                return Conversions.ToByte(false);
-            }
-        }
-
-        // NOTA: Función duplicada en produccion.vb, esta versión está comentada para evitar ambigüedad
-        public static void borrarTmpProduccionGeneral(int id_usuario)
-        {
-            Borrar_tabla_segun_usuario("tmpproduccion_asocItems", id_usuario);
-            Borrar_tabla_segun_usuario("tmpproduccion_items", id_usuario);
-        }
-
-        /// <summary>
-        /// Borra tabla según usuario - Migrado a EF
-        /// </summary>
-        public static bool Borrar_tabla_segun_usuario(string tbl, int id_usuario)
-        {
-            try
-            {
-                using (var context = new CentrexDbContext())
-                using (var dbTrans = context.Database.BeginTransaction())
-                {
-                    try
-                    {
-                        if (string.IsNullOrWhiteSpace(tbl) || tbl.Any(c => !char.IsLetterOrDigit(c) && c != '_'))
-                            throw new ArgumentException("Nombre de tabla inválido: " + tbl);
-
-                        string sqlDelete = $"DELETE FROM [{tbl}] WHERE id_usuario = {id_usuario};";
-                        context.Database.ExecuteSqlRaw(sqlDelete);
-
-                        string sqlReseed = $"DBCC CHECKIDENT ('[{tbl}]', RESEED, 0);";
-                        context.Database.ExecuteSqlRaw(sqlReseed);
-
-                        dbTrans.Commit();
-                        return true;
-                    }
-                    catch (Exception innerEx)
-                    {
-                        dbTrans.Rollback();
-                        Interaction.MsgBox(
-                            $"Error al limpiar tabla '{tbl}': {innerEx.Message}",
-                            MsgBoxStyle.Critical,
-                            "Centrex"
-                        );
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox(
-                    $"Error general en Borrar_tabla_segun_usuario: {ex.Message}",
-                    MsgBoxStyle.Critical,
-                    "Centrex"
-                );
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Borra registros temporales de producción para un usuario específico
-        /// </summary>
-        public static void borrarTmpProduccion(int id_usuario)
-        {
-            try
-            {
-                using (var context = new CentrexDbContext())
-                {
-                    var tmpItems = context.TmpProduccionItemEntity.Where(t => t.IdUsuario == id_usuario).ToList();
-                    if (tmpItems.Count > 0)
-                        context.TmpProduccionItemEntity.RemoveRange(tmpItems);
-
-                    var tmpAsocItems = context.TmpProduccionAsocItemEntity.Where(t => t.IdUsuario == id_usuario).ToList();
-                    if (tmpAsocItems.Count > 0)
-                        context.TmpProduccionAsocItemEntity.RemoveRange(tmpAsocItems);
-
-                    context.SaveChanges();
-                }
-            }
-            catch
-            {
-                // Intencionalmente silencioso para mantener comportamiento legacy
-            }
-        }
-
         /// <summary>
         /// Cierra el formulario actual y reactiva a su propietario.
         /// </summary>
@@ -922,6 +796,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
+                Interaction.MsgBox("Error al verificar cambios pendientes: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
                 return false;
             }
         }
@@ -935,27 +810,15 @@ namespace Centrex.Funciones
             {
                 using (var context = new CentrexDbContext())
                 {
-                    // Buscar dinámicamente el DbSet por nombre
-                    var dbSetProp = context.GetType()
-                        .GetProperties()
-                        .FirstOrDefault(p => p.Name.Equals(tbl, StringComparison.OrdinalIgnoreCase));
-
-                    if (dbSetProp == null)
+                    var entityInfo = ResolveEntitySet(context, tbl);
+                    if (entityInfo is null)
                     {
                         Interaction.MsgBox($"La entidad '{tbl}' no existe en el contexto.", Constants.vbExclamation, "Centrex");
                         return 0;
                     }
 
-                    // Obtener el DbSet genérico como IQueryable
-                    var dbSet = dbSetProp.GetValue(context, null) as IQueryable<object>;
-                    if (dbSet == null)
-                    {
-                        Interaction.MsgBox($"No se pudo acceder al conjunto de datos '{tbl}'.", Constants.vbCritical, "Centrex");
-                        return 0;
-                    }
-
                     // Contar registros usando EF nativo
-                    return dbSet.Count();
+                    return entityInfo.Query.Count();
                 }
             }
             catch (Exception ex)
@@ -965,22 +828,56 @@ namespace Centrex.Funciones
             }
         }
 
-
-        /// <summary>
-        /// Genera ID único usando NEWID() de SQL Server
-        /// </summary>
-        public static Guid Generar_ID_Unico()
+        private sealed class EntitySetInfo
         {
-            try
+            public EntitySetInfo(IQueryable<object> query, string? tableName, string entityName)
             {
-                // 🔹 Generar un GUID nativo en formato estándar
-                return Guid.NewGuid();
+                Query = query;
+                TableName = tableName;
+                EntityName = entityName;
             }
-            catch (Exception)
+
+            public IQueryable<object> Query { get; }
+
+            public string? TableName { get; }
+
+            public string EntityName { get; }
+        }
+
+        private static EntitySetInfo? ResolveEntitySet(CentrexDbContext context, string identifier)
+        {
+            // Intentar resolver por nombre de DbSet declarado en el contexto
+            var dbSetProp = context.GetType()
+                .GetProperties()
+                .FirstOrDefault(p => p.Name.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+
+            if (dbSetProp is not null && dbSetProp.GetValue(context, null) is IQueryable rawQuery)
             {
-                // 🔸 En caso de error (extremadamente raro), devolver un GUID vacío
-                return Guid.Empty;
+                var entityClr = dbSetProp.PropertyType.GenericTypeArguments.FirstOrDefault();
+                var entityType = entityClr is not null ? context.Model.FindEntityType(entityClr) : null;
+                return new EntitySetInfo(rawQuery.Cast<object>(), entityType?.GetTableName(), dbSetProp.Name);
             }
+
+            // Intentar resolver por nombre físico de tabla
+            var entityByTable = context.Model.GetEntityTypes()
+                .FirstOrDefault(t => string.Equals(t.GetTableName(), identifier, StringComparison.OrdinalIgnoreCase));
+
+            if (entityByTable is not null)
+            {
+                var prop = context.GetType()
+                    .GetProperties()
+                    .FirstOrDefault(p =>
+                        p.PropertyType.IsGenericType &&
+                        p.PropertyType.GenericTypeArguments.Length == 1 &&
+                        p.PropertyType.GenericTypeArguments[0] == entityByTable.ClrType);
+
+                if (prop?.GetValue(context, null) is IQueryable setQuery)
+                {
+                    return new EntitySetInfo(setQuery.Cast<object>(), entityByTable.GetTableName(), prop.Name);
+                }
+            }
+
+            return null;
         }
 
         // ============= FUNCIONES DE COMPATIBILIDAD LEGACY =============
@@ -1196,12 +1093,12 @@ namespace Centrex.Funciones
         // ================================================================
         public static string obtieneValorConfig(string linea)
         {
-            if (string.IsNullOrEmpty(linea) || !linea.Contains("="))
+            if (string.IsNullOrWhiteSpace(linea))
                 return "";
-            string[] partes = linea.Split('=');
-            if (partes.Length < 2)
+            int idx = linea.IndexOf('=');
+            if (idx < 0)
                 return "";
-            return partes[1].Trim();
+            return linea.Substring(idx + 1).Trim();
         }
 
 
@@ -1225,6 +1122,7 @@ namespace Centrex.Funciones
             catch (Exception ex)
             {
                 max = -1;
+                Interaction.MsgBox("Error al buscar elemento: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
             }
 
             if (!found)
@@ -1243,7 +1141,6 @@ namespace Centrex.Funciones
             var arrayB = new int[1];
             int c;
             int x = 0;
-            int borrados = 0;
             int max = Information.UBound(array);
 
             var loopTo = max;
@@ -1387,10 +1284,10 @@ namespace Centrex.Funciones
             }
         }
 
-    //public static string Precio(decimal valor)
-    //{
-    //    return $"$ {valor:N2}";
-    //}
+        //public static string Precio(decimal valor)
+        //{
+        //    return $"$ {valor:N2}";
+        //}
 
         // =====================================
         // SOBRECARGA DE PRECIO (acepta decimal)
@@ -1406,10 +1303,5 @@ namespace Centrex.Funciones
                 return "$ 0,00";
             }
         }
-    } 
+    }
 }
-
-
-
-
-

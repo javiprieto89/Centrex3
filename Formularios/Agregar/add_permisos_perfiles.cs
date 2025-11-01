@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -47,28 +45,28 @@ namespace Centrex
             cmb_perfiles.Text = "Seleccione un perfil...";
 
 
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                cmb_permisos.SelectedValue = VariablesGlobales.edita_permiso_perfil.IdPermiso;
-                cmb_perfiles.SelectedValue = VariablesGlobales.edita_permiso_perfil.IdPefil;
+                cmb_permisos.SelectedValue = edita_permiso_perfil.IdPermiso;
+                cmb_perfiles.SelectedValue = edita_permiso_perfil.IdPefil;
                 cmb_permisos.Enabled = false;
                 cmb_perfiles.Enabled = false;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 cmd_exit.Visible = false;
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta relación entre el perfil y el permiso?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    // If (borrarTarjeta(VariablesGlobales.edita_tarjeta)) = False Then
+                    // If (borrarTarjeta(edita_tarjeta)) = False Then
                     // MsgBox("No se ha podido borrar la relación, consulte con el programador")
                     // End If
                 }
                 closeandupdate(this);
             }
-            else if (VariablesGlobales.edicion == true)
+            else if (edicion == true)
             {
                 Interaction.MsgBox("La relación entre un permiso y un perfil no puede editarse", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 closeandupdate(this);

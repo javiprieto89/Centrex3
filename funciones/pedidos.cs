@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using System.Windows.Forms;
-using Centrex.Models;
 
 namespace Centrex.Funciones
 {
@@ -39,8 +35,7 @@ namespace Centrex.Funciones
         {
             if (items == null) return 0m;
             return items.Sum(i =>
-                Convert.ToDecimal(i.Cantidad == null ? 0 : i.Cantidad) *
-                Convert.ToDecimal(i.Precio == null ? 0 : i.Precio)
+                Convert.ToDecimal(i.Cantidad) * i.Precio
             );
         }
 
@@ -111,11 +106,11 @@ namespace Centrex.Funciones
                             if (esPresupuesto && esIVA)
                                 continue;
                             else
-                                totalImpuestos += Convert.ToDecimal(imp.Porcentaje == null ? 0 : imp.Porcentaje);
+                                totalImpuestos += Convert.ToDecimal(imp.Porcentaje);
                         }
                         else
                         {
-                            totalImpuestos += Convert.ToDecimal(imp.Porcentaje == null ? 0 : imp.Porcentaje);
+                            totalImpuestos += Convert.ToDecimal(imp.Porcentaje);
                         }
                     }
 
@@ -162,8 +157,8 @@ namespace Centrex.Funciones
                     {
                         var porcImpuesto = CalcularImpuestosItem(tmp.IdTmpPedidoItem, tmp.IdItem == null ? 0 : (int)tmp.IdItem, comprobante, chkPresupuesto.Checked);
                         ivaTotal += Redondear(
-                            (Convert.ToDecimal(tmp.Precio == null ? 0 : tmp.Precio) *
-                             Convert.ToDecimal(tmp.Cantidad == null ? 0 : tmp.Cantidad)) *
+                            (tmp.Precio *
+                             Convert.ToDecimal(tmp.Cantidad)) *
                             (porcImpuesto / 100m)
                         );
                     }
@@ -316,7 +311,7 @@ namespace Centrex.Funciones
             }
         }
 
-        public static void PedidoAPedidoTmp(int idPedido, int idUsuario, Guid idUnico)
+        public static void pedido_a_pedidoTmp(int idPedido, int idUsuario, Guid idUnico)
         {
             using (var ctx = new CentrexDbContext())
             {
@@ -421,7 +416,7 @@ namespace Centrex.Funciones
                         {
                             IdTmpPedidoItem = idTmpPedidoItem,
                             IdItem = item.IdItem,
-                            Descript = item.Descript ?? string.Empty,                           
+                            Descript = item.Descript ?? string.Empty,
                             Cantidad = cantidad,
                             Precio = precio,
                             IdUsuario = idUsuario,
@@ -596,7 +591,7 @@ namespace Centrex.Funciones
         }
 
 
-        public static PedidoEntity Info_pedido(int idPedido)
+        public static PedidoEntity info_pedido(int idPedido)
         {
             try
             {
@@ -708,3 +703,4 @@ namespace Centrex.Funciones
 
     }
 }
+

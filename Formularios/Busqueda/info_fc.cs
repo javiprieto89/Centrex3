@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -15,15 +13,15 @@ namespace Centrex
         {
             var argcombo = cmb_Comprobante;
             generales.Cargar_Combo(
-      ref argcombo, 
+      ref argcombo,
       entidad: "ComprobanteEntity",
-                displaymember: "Comprobante", 
+                displaymember: "Comprobante",
            valuemember: "IdComprobante",
   predet: -1,
     soloActivos: true,
                 filtros: new Dictionary<string, object> { ["EsElectronica"] = true },
             orden: new List<Tuple<string, bool>> { Tuple.Create("Comprobante", true) });
-cmb_Comprobante = argcombo;
+            cmb_Comprobante = argcombo;
             cmb_Comprobante.Text = "Seleccione un comprobante...";
         }
 
@@ -50,8 +48,8 @@ cmb_Comprobante = argcombo;
 
         private void cmb_Comprobante_SelectionChangeCommitted(object sender, EventArgs e)
         {
-     var comprobante = comprobantes.info_comprobante(Conversions.ToInteger(cmb_Comprobante.SelectedValue));
-   txt_puntoVenta.Text = comprobante.PuntoVenta.ToString();
+            var comprobante = comprobantes.info_comprobante(Conversions.ToInteger(cmb_Comprobante.SelectedValue));
+            txt_puntoVenta.Text = comprobante.PuntoVenta.ToString();
         }
     }
 }

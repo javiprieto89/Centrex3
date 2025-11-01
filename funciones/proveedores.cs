@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Funciones
 {
@@ -233,9 +228,9 @@ namespace Centrex.Funciones
                 {
                     // Usar el Stored Procedure del contexto EF Core
                     var results = context.Procedures.SP_consulta_CC_ProveedorAsync(
-                        id_proveedor, 
-                        id_Cc, 
-                        fecha_desde.ToString("yyyy-MM-dd"), 
+                        id_proveedor,
+                        id_Cc,
+                        fecha_desde.ToString("yyyy-MM-dd"),
                         fecha_hasta.ToString("yyyy-MM-dd")
                     ).Result;
 
@@ -257,7 +252,7 @@ namespace Centrex.Funciones
                         if (!traerTodo)
                         {
                             nRegs = results.Count;
-                            tPaginas = (int)Math.Round(Math.Ceiling(nRegs / (double)VariablesGlobales.itXPage));
+                            tPaginas = (int)Math.Round(Math.Ceiling(nRegs / (double)itXPage));
                             txtnPage.Text = pagina + " / " + tPaginas;
                         }
                     }

@@ -2,9 +2,6 @@
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex.Funciones
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
 {
@@ -18,7 +19,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al obtener el cheque: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
+                MessageBox.Show("Error al obtener el cheque: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
         }
@@ -32,7 +33,6 @@ namespace Centrex.Funciones
                 {
                     var chequeEntity = new ChequeEntity()
                     {
-                        //FechaIngreso = DateOnly.FromDateTime(DateTime.Now),
                         FechaEmision = ch.FechaEmision,
                         IdCliente = ch.IdCliente != 0 ? ch.IdCliente : default,
                         IdProveedor = ch.IdProveedor != 0 ? ch.IdProveedor : default,
@@ -58,7 +58,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -79,22 +79,15 @@ namespace Centrex.Funciones
                         }
                         else
                         {
-
                             chequeEntity.FechaEmision = ch.FechaEmision;
-
                             chequeEntity.IdBanco = ch.IdBanco;
                             chequeEntity.NCheque = ch.NCheque2;
                             chequeEntity.NCheque2 = ch.NCheque2;
                             chequeEntity.Importe = ch.Importe;
                             chequeEntity.IdEstadoch = ch.IdEstadoch;
-
                             chequeEntity.FechaCobro = ch.FechaCobro;
-
-
                             chequeEntity.FechaSalida = ch.FechaSalida;
-
                             chequeEntity.FechaDeposito = ch.FechaDeposito;
-
                             chequeEntity.Recibido = ch.Recibido;
                             chequeEntity.Emitido = ch.Emitido;
                             chequeEntity.ECheck = ch.ECheck;
@@ -119,7 +112,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -146,7 +139,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -173,7 +166,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -188,7 +181,7 @@ namespace Centrex.Funciones
 
                     if (chequeEntity is not null)
                     {
-                        chequeEntity.IdEstadoch = VariablesGlobales.ID_CH_DEPOSITADO;
+                        chequeEntity.IdEstadoch = ID_CH_DEPOSITADO;
                         chequeEntity.FechaDeposito = ch.FechaDeposito;
                         chequeEntity.IdCuentaBancaria = ch.IdCuentaBancaria;
 
@@ -203,7 +196,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -218,7 +211,7 @@ namespace Centrex.Funciones
 
                     if (chequeEntity is not null)
                     {
-                        chequeEntity.IdEstadoch = VariablesGlobales.ID_CH_CARTERA;
+                        chequeEntity.IdEstadoch = ID_CH_CARTERA;
                         chequeEntity.FechaDeposito = null;
                         chequeEntity.IdCuentaBancaria = null;
 
@@ -233,7 +226,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -244,13 +237,14 @@ namespace Centrex.Funciones
             {
                 using (var context = new CentrexDbContext())
                 {
-                    int count = context.ChequeEntity.Count(c => c.NCheque.ToString() == Strings.Trim(nCheque));
+                    string trimmedNCheque = nCheque.Trim();
+                    int count = context.ChequeEntity.Count(c => c.NCheque.ToString() == trimmedNCheque);
                     return count > 0;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -273,7 +267,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return 0;
             }
         }

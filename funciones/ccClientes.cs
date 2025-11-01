@@ -136,7 +136,7 @@ namespace Centrex.Funciones
                 // =======================
                 var movimientos = ctx.TransaccionEntity
                     .Include(t => t.IdTipoComprobanteNavigation)
-                    .Include(t => t.IdClienteNavigation)                    
+                    .Include(t => t.IdClienteNavigation)
                     .Where(t =>
                         t.IdCliente == id_cliente &&
                         t.IdCc == id_Cc &&
@@ -202,7 +202,7 @@ namespace Centrex.Funciones
                 // Calcular paginación
                 // =======================
                 nRegs = dataGrid.Rows.Count;
-                tPaginas = (int)Math.Ceiling(nRegs / (double)VariablesGlobales.itXPage);
+                tPaginas = (int)Math.Ceiling(nRegs / (double)itXPage);
                 txtnPage.Text = $"{pagina} / {tPaginas}";
             }
             catch (Exception ex)

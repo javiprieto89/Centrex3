@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -14,7 +11,7 @@ public partial class CondicionVentaEntity
     public int IdCondicionVenta { get; set; }
 
     [Column("condicion")]
-  [StringLength(100)]
+    [StringLength(100)]
     public string Condicion { get; set; } = null!;
 
     [Column("vencimiento")]

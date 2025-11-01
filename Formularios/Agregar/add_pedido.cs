@@ -1,25 +1,17 @@
 ﻿using System;
-using System.Drawing;
-using System.Globalization;
 using System.Linq;
-using System.Windows.Forms;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic;
-using Centrex.Models;
+using System.Windows.Forms;
 
 namespace Centrex
 {
     public partial class add_pedido : Form
     {
-        private bool emitir = false;
-        private decimal totalOriginal;
-        private decimal subTotalOriginal;
         private ComprobanteEntity comprobanteSeleccionado;
         private decimal markupOriginal = -1;
         private int idUsuario;
         private Guid idUnico;
         private bool historico;
-        private int numeroPedidoAnulado = -1;
 
         public add_pedido()
         {
@@ -37,7 +29,7 @@ namespace Centrex
             if (idUnico == Guid.Empty)
                 idUnico = Guid.NewGuid();
 
-            idUsuario = VariablesGlobales.usuario_logueado.IdUsuario;
+            idUsuario = usuario_logueado.IdUsuario;
             historico = activo;
             activo = true;
 
@@ -56,14 +48,14 @@ namespace Centrex
                 entidad: "ComprobanteEntity",
                 displaymember: "Comprobante",
                 valuemember: "IdComprobante",
-                predet: VariablesGlobales.id_comprobante_default,
+                predet: id_comprobante_default,
                 soloActivos: true
             );
 
             cmb_cliente.SelectedIndex = -1;
             cmb_cliente.Text = "Seleccione un cliente...";
-            cmb_comprobante.SelectedValue = VariablesGlobales.id_comprobante_default;
-            comprobanteSeleccionado = comprobantes.InfoComprobante(VariablesGlobales.id_comprobante_default);
+            cmb_comprobante.SelectedValue = id_comprobante_default;
+            comprobanteSeleccionado = comprobantes.InfoComprobante(id_comprobante_default);
 
             lbl_date.Text = DateTime.Now.ToString("dd/MM/yyyy");
             txt_total.Text = "0,00";
@@ -72,9 +64,8 @@ namespace Centrex
             txt_totalO.Text = txt_total.Text;
 
             // Inicializar grilla vacía
-            LoadGridItems();
+            LoadGridItems().GetAwaiter().GetResult();
 
-            cmd_emitir.Enabled = false;
             cmd_ok.Enabled = false;
         }
 
@@ -153,7 +144,6 @@ namespace Centrex
             Enabled = true;
 
             Pedidos.UpdatePrecios(dg_items, chk_presupuesto, txt_subTotal, txt_impuestos, txt_total, txt_totalO, txt_markup, txt_totalDescuentos, comprobanteSeleccionado, idUsuario, idUnico);
-            subTotalOriginal = decimal.Parse(txt_subTotal.Text);
             txt_markup_LostFocus(null, null);
         }
 
@@ -209,9 +199,7 @@ namespace Centrex
 
         private void cmd_emitir_Click(object sender, EventArgs e)
         {
-            emitir = true;
-            cmd_ok_Click(null, null);
-            emitir = false;
+            cmd_ok_Click(sender, e);
         }
 
         // ============================================================================================
@@ -241,7 +229,6 @@ namespace Centrex
             }
 
             Pedidos.UpdatePrecios(dg_items, chk_presupuesto, txt_subTotal, txt_impuestos, txt_total, txt_totalO, txt_markup, txt_totalDescuentos, comprobanteSeleccionado, idUsuario, idUnico);
-            subTotalOriginal = decimal.Parse(txt_subTotal.Text);
             txt_markup_LostFocus(null, null);
         }
 
@@ -258,7 +245,6 @@ namespace Centrex
             Pedidos.BorrarItemCargado(idTmp);
 
             Pedidos.UpdatePrecios(dg_items, chk_presupuesto, txt_subTotal, txt_impuestos, txt_total, txt_totalO, txt_markup, txt_totalDescuentos, comprobanteSeleccionado, idUsuario, idUnico);
-            subTotalOriginal = decimal.Parse(txt_subTotal.Text);
             txt_markup_LostFocus(null, null);
         }
 
@@ -275,7 +261,6 @@ namespace Centrex
             }
 
             Pedidos.UpdatePrecios(dg_items, chk_presupuesto, txt_subTotal, txt_impuestos, txt_total, txt_totalO, txt_markup, txt_totalDescuentos, comprobanteSeleccionado, idUsuario, idUnico);
-            subTotalOriginal = decimal.Parse(txt_subTotal.Text);
             txt_markup_LostFocus(null, null);
         }
 
@@ -304,7 +289,6 @@ namespace Centrex
             cmd_add_descuento.Enabled = txt_markup.Text == "0";
 
             Pedidos.UpdatePrecios(dg_items, chk_presupuesto, txt_subTotal, txt_impuestos, txt_total, txt_totalO, txt_markup, txt_totalDescuentos, comprobanteSeleccionado, idUsuario, idUnico);
-            subTotalOriginal = decimal.Parse(txt_subTotal.Text);
 
             decimal markup = decimal.Parse(txt_markup.Text);
             markupOriginal = markup;
@@ -328,7 +312,7 @@ namespace Centrex
                 txt_impuestos.Text = "0";
                 Pedidos.UpdatePrecios(dg_items, chk_presupuesto, txt_subTotal, txt_impuestos, txt_total, txt_totalO, txt_markup, txt_totalDescuentos, comprobanteSeleccionado, idUsuario, idUnico);
                 txt_impuestos.Enabled = false;
-                cmb_comprobante.SelectedValue = VariablesGlobales.comprobantePresupuesto_default;
+                cmb_comprobante.SelectedValue = comprobantePresupuesto_default;
             }
             txt_markup_LostFocus(null, null);
         }
@@ -336,11 +320,10 @@ namespace Centrex
         private void updateAndCheck()
         {
             txt_markup_LostFocus(null, null);
-            subTotalOriginal = decimal.Parse(txt_subTotal.Text);
 
             bool hasItems = dg_items.Rows.Count > 0;
-            cmd_emitir.Enabled = hasItems;
             cmd_ok.Enabled = hasItems;
         }
     }
 }
+

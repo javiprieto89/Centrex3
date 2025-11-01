@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -29,7 +27,7 @@ public partial class CcProveedorEntity
     [Column("activo")]
     public bool Activo { get; set; }
 
-    [InverseProperty("IdCcNavigation")]
+    [InverseProperty("IdCcProveedorNavigation")]
     public virtual ICollection<ComprobanteCompraEntity> ComprobanteCompraEntity { get; set; } = new List<ComprobanteCompraEntity>();
 
     [ForeignKey("IdMoneda")]
@@ -40,6 +38,6 @@ public partial class CcProveedorEntity
     [InverseProperty("CcProveedorEntity")]
     public virtual ProveedorEntity IdProveedorNavigation { get; set; } = null!;
 
-    [InverseProperty("IdCcNavigation")]
+    [InverseProperty("IdCcProveedorNavigation")]
     public virtual ICollection<PagoEntity> PagoEntity { get; set; } = new List<PagoEntity>();
 }

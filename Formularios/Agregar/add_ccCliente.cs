@@ -22,13 +22,13 @@ namespace Centrex
             CargarClientes();
             CargarMonedas();
 
-            if (VariablesGlobales.edicion | VariablesGlobales.borrado)
+            if (edicion | borrado)
             {
-                cmb_cliente.SelectedValue = VariablesGlobales.edita_ccCliente.IdCliente;
-                cmb_moneda.SelectedValue = VariablesGlobales.edita_ccCliente.IdMoneda;
-                txt_nombre.Text = VariablesGlobales.edita_ccCliente.Nombre;
-                txt_saldo.Text = VariablesGlobales.edita_ccCliente.Saldo.ToString("0.###", CultureInfo.CurrentCulture);
-                chk_activo.Checked = VariablesGlobales.edita_ccCliente.Activo;
+                cmb_cliente.SelectedValue = edita_ccCliente.IdCliente;
+                cmb_moneda.SelectedValue = edita_ccCliente.IdMoneda;
+                txt_nombre.Text = edita_ccCliente.Nombre;
+                txt_saldo.Text = edita_ccCliente.Saldo.ToString("0.###", CultureInfo.CurrentCulture);
+                chk_activo.Checked = edita_ccCliente.Activo;
                 cmb_cliente.Enabled = false; // No se puede cambiar el cliente de una cuenta corriente dada de alta
                 cmb_moneda.Enabled = false; // No se puede cambiar la moneda de una cuenta corriente dada de alta
                                             // No se puede cambiar el saldo de una cuenta corriente ya dada de alta
@@ -45,7 +45,7 @@ namespace Centrex
                 cmb_moneda.Text = "Seleccione una moneda...";
             }
 
-            if (VariablesGlobales.borrado)
+            if (borrado)
             {
                 txt_nombre.Enabled = false;
                 chk_activo.Enabled = false;
@@ -56,12 +56,12 @@ namespace Centrex
 
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta cuenta corriente?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (ccClientes.borrarccCliente(VariablesGlobales.edita_ccCliente) == false)
+                    if (ccClientes.borrarccCliente(edita_ccCliente) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la cuenta corriente, ¿desea intetar desactivarla para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (ccClientes.updateCCCliente(VariablesGlobales.edita_ccCliente, true) == true)
+                            if (ccClientes.updateCCCliente(edita_ccCliente, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la cuenta corriente no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que la cuenta corriente, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }
@@ -71,7 +71,7 @@ namespace Centrex
                             }
                         }
                     }
-                    else if (ccClientes.info_ccCliente(VariablesGlobales.edita_ccCliente.IdCc).Nombre != "error")
+                    else if (ccClientes.info_ccCliente(edita_ccCliente.IdCc).Nombre != "error")
                     {
                         Interaction.MsgBox("Cada cliente debe tener por lo menos una cuenta corriente, y este cliente tiene solo una, por lo cual no puede ser borrada", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                     }
@@ -106,10 +106,10 @@ namespace Centrex
             tmp.Saldo = Convert.ToDecimal(txt_saldo.Text);
             tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                tmp.IdCliente = VariablesGlobales.edita_ccCliente.IdCliente;
-                tmp.IdCc = VariablesGlobales.edita_ccCliente.IdCc;
+                tmp.IdCliente = edita_ccCliente.IdCliente;
+                tmp.IdCc = edita_ccCliente.IdCc;
                 if (ccClientes.updateCCCliente(tmp) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar la cuenta corriente, consulte con su programdor", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
@@ -147,17 +147,17 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "clientes";
+            tmp = tabla;
+            tabla = "clientes";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_cliente;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_cliente = argcmb;
         }
 

@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex.Funciones
 {
@@ -13,7 +9,7 @@ namespace Centrex.Funciones
     {
         // ************************************ FUNCIONES DE STOCK ***************************
 
-        public static RegistroStockEntity InfoRegistroStock(int id_rs)
+        public static RegistroStockEntity info_registro_stock(int id_rs)
         {
             var tmp = new RegistroStockEntity();
             try

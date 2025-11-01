@@ -2,9 +2,6 @@
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -28,12 +25,12 @@ namespace Centrex
             cmb_proveedor.DisplayMember = "RazonSocial";
             cmb_proveedor.ValueMember = "IdProveedor";
 
-            if (VariablesGlobales.edicion)
+            if (edicion)
             {
-                txt_fecha.Text = DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_registro_stock.Fecha.Value)).ToString("dd/MM/yyyy");
-                lbl_fecha_ingreso.Text = VariablesGlobales.edita_registro_stock.FechaIngreso.ToString("dd/MM/yyyy");
-                txt_factura.Text = VariablesGlobales.edita_registro_stock.Factura;
-                cmb_proveedor.SelectedValue = (byte)VariablesGlobales.edita_registro_stock.IdProveedor;
+                txt_fecha.Text = DateTime.Parse(Conversions.ToString(edita_registro_stock.Fecha.Value)).ToString("dd/MM/yyyy");
+                lbl_fecha_ingreso.Text = edita_registro_stock.FechaIngreso.ToString("dd/MM/yyyy");
+                txt_factura.Text = edita_registro_stock.Factura;
+                cmb_proveedor.SelectedValue = (byte)edita_registro_stock.IdProveedor;
 
                 if (!editaStock)
                 {
@@ -75,7 +72,7 @@ namespace Centrex
         {
             if (ingreso_guardado)
                 return;
-            if (!VariablesGlobales.edicion)
+            if (!edicion)
             {
                 if (Interaction.MsgBox("Eliminará el ingreso, por lo cual no se contabilizará. ¿Deseá continuar?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == Constants.vbNo)
                 {
@@ -91,9 +88,9 @@ namespace Centrex
         {
             object data;
 
-            if (VariablesGlobales.edicion && editaStock)
+            if (edicion && editaStock)
             {
-                data = ctx.RegistroStockEntity.Include("Item").Where(rs => rs.IdIngreso == VariablesGlobales.edita_registro_stock.IdIngreso).Select(rs => new
+                data = ctx.RegistroStockEntity.Include("Item").Where(rs => rs.IdIngreso == edita_registro_stock.IdIngreso).Select(rs => new
                 {
                     ID = rs.IdRegistro,
                     Código = rs.IdItemNavigation.Item,
@@ -133,7 +130,7 @@ namespace Centrex
         // ==========================================================
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            if (!VariablesGlobales.edicion)
+            if (!edicion)
             {
                 if (Interaction.MsgBox("Se modificarán todos los items anteriormente cargados. ¿Está seguro de que desea continuar?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion), "Centrex") == Constants.vbYes)
                 {
@@ -166,7 +163,7 @@ namespace Centrex
             My.MyProject.Forms.search.ShowDialog();
             Enabled = true;
 
-            if (VariablesGlobales.id == 0)
+            if (id == 0)
                 return;
 
             var frm = new infoagregarstock(Conversions.ToInteger(cmb_proveedor.SelectedValue));
@@ -179,7 +176,7 @@ namespace Centrex
         // ==========================================================
         private void cmd_cancel_Click(object sender, EventArgs e)
         {
-            if (!VariablesGlobales.edicion)
+            if (!edicion)
             {
                 if (Interaction.MsgBox("Eliminará el ingreso, por lo cual no se contabilizará. ¿Deseá continuar?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == Constants.vbYes)
                 {
@@ -198,19 +195,19 @@ namespace Centrex
         // ==========================================================
         private void psearch_proveedor_Click(object sender, EventArgs e)
         {
-            string tmpTabla = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "proveedores";
+            string tmpTabla = tabla;
+            tabla = "proveedores";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
             Enabled = true;
-            VariablesGlobales.tabla = tmpTabla;
+            tabla = tmpTabla;
 
-            var proveedor = ctx.ProveedorEntity.FirstOrDefault(p => p.IdProveedor == VariablesGlobales.id);
+            var proveedor = ctx.ProveedorEntity.FirstOrDefault(p => p.IdProveedor == id);
             if (proveedor is not null)
             {
                 cmb_proveedor.SelectedIndex = cmb_proveedor.FindString(proveedor.RazonSocial);
             }
-            VariablesGlobales.id = 0;
+            id = 0;
         }
 
         // ==========================================================
@@ -218,7 +215,7 @@ namespace Centrex
         // ==========================================================
         private void dg_view_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (VariablesGlobales.edicion && !editaStock)
+            if (edicion && !editaStock)
                 return;
             if (dg_view.Rows.Count == 0)
                 return;
@@ -226,8 +223,8 @@ namespace Centrex
             int seleccionado = Conversions.ToInteger(dg_view.CurrentRow.Cells[0].Value);
 
             edicion_item_registro_stock = true;
-            VariablesGlobales.edita_item_registro_stock = ctx.RegistroStockEntity.FirstOrDefault(r => r.IdRegistro == seleccionado);
-            if (VariablesGlobales.edita_item_registro_stock is not null)
+            edita_item_registro_stock = ctx.RegistroStockEntity.FirstOrDefault(r => r.IdRegistro == seleccionado);
+            if (edita_item_registro_stock is not null)
             {
                 My.MyProject.Forms.infoagregarstock.ShowDialog();
                 updateform();
@@ -272,7 +269,7 @@ namespace Centrex
         {
             if (e.Button == MouseButtons.Right)
             {
-                if (VariablesGlobales.edicion)
+                if (edicion)
                     ContextMenuStrip1.Enabled = false;
             }
         }

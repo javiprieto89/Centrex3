@@ -49,10 +49,10 @@ namespace Centrex
                 Interaction.MsgBox("Debe seleccionar un item.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
-            else if(string.IsNullOrEmpty(txt_cantidad.Text))
+            else if (string.IsNullOrEmpty(txt_cantidad.Text))
             {
                 Interaction.MsgBox("Debe escribir una cantidad a ajustar.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
-                return;                
+                return;
             }
 
             _as.Fecha = DateOnly.FromDateTime(DateTime.Now);

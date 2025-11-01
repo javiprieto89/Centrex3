@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -21,13 +20,13 @@ namespace Centrex
             string minuto = DateTime.Now.Minute.ToString();
             string segundo = DateTime.Now.Second.ToString();
             string timeStamp = anio + mes + dia + "_" + hora + minuto + segundo;
-            string archivoBackup_local; 
+            string archivoBackup_local;
             Timer1.Enabled = true;
             ProgressBar1.Visible = true;
 
 
-            archivoBackup_local = VariablesGlobales.archivoBackup + "_" + timeStamp + ".bak";
-            resultado = dbBackup(VariablesGlobales.rutaBackup, archivoBackup_local);
+            archivoBackup_local = archivoBackup + "_" + timeStamp + ".bak";
+            resultado = dbBackup(rutaBackup, archivoBackup_local);
             // If pc = "BRUNO" Then
             // resultado = dbBackup(Application.StartupPath + "\SQL\BKP", archivoBackup_local)
             // End If

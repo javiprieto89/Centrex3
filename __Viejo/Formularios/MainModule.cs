@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Centrex3.__Viejo.Formularios
+﻿namespace Centrex3.__Viejo.Formularios
 {
     internal class MainModule
     {

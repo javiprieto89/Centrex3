@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -127,7 +126,7 @@ public partial class ClienteEntity
     [InverseProperty("ClienteEntityIdPaisEntregaNavigation")]
     public virtual PaisEntity? IdPaisEntregaNavigation { get; set; }
 
-    [ForeignKey("IdCliente")]
-    [InverseProperty("TransaccionEntity")]
-    public virtual ClienteEntity? IdClienteNavigation { get; set; }
+    [InverseProperty("IdClienteNavigation")]
+    public virtual ICollection<TransaccionEntity> TransaccionEntity { get; set; } = new List<TransaccionEntity>();
+
 }

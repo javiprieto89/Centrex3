@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -23,13 +22,13 @@ namespace Centrex
             CargarProveedores();
             CargarMonedas();
 
-            if (VariablesGlobales.edicion | VariablesGlobales.borrado)
+            if (edicion | borrado)
             {
-                cmb_proveedor.SelectedValue = VariablesGlobales.edita_ccProveedor.IdProveedor;
-                cmb_moneda.SelectedValue = VariablesGlobales.edita_ccProveedor.IdMoneda;
-                txt_nombre.Text = VariablesGlobales.edita_ccProveedor.Nombre;
-                txt_saldo.Text = VariablesGlobales.edita_ccProveedor.Saldo.ToString("0.###", CultureInfo.CurrentCulture);
-                chk_activo.Checked = VariablesGlobales.edita_ccProveedor.Activo;
+                cmb_proveedor.SelectedValue = edita_ccProveedor.IdProveedor;
+                cmb_moneda.SelectedValue = edita_ccProveedor.IdMoneda;
+                txt_nombre.Text = edita_ccProveedor.Nombre;
+                txt_saldo.Text = edita_ccProveedor.Saldo.ToString("0.###", CultureInfo.CurrentCulture);
+                chk_activo.Checked = edita_ccProveedor.Activo;
                 cmb_proveedor.Enabled = false; // No se puede cambiar el proveedor de una cuenta corriente dada de alta
                 cmb_moneda.Enabled = false; // No se puede cambiar la moneda de una cuenta corriente ya dada de alta
                                             // No se puede cambiar el saldo de una cuenta corriente ya dada de alta
@@ -46,7 +45,7 @@ namespace Centrex
                 cmb_moneda.Text = "Seleccione una moneda...";
             }
 
-            if (VariablesGlobales.borrado)
+            if (borrado)
             {
                 txt_nombre.Enabled = false;
                 chk_activo.Enabled = false;
@@ -57,12 +56,12 @@ namespace Centrex
 
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta cuenta corriente?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (ccProveedores.borrarccProveedor(VariablesGlobales.edita_ccProveedor) == false)
+                    if (ccProveedores.borrarccProveedor(edita_ccProveedor) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la cuenta corriente, ¿desea intetar desactivarla para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (ccProveedores.updateCCProveedor(VariablesGlobales.edita_ccProveedor, true) == true)
+                            if (ccProveedores.updateCCProveedor(edita_ccProveedor, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la cuenta corriente no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que la cuenta corriente, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }
@@ -72,7 +71,7 @@ namespace Centrex
                             }
                         }
                     }
-                    else if (ccProveedores.info_ccProveedor(VariablesGlobales.edita_ccProveedor.IdCc).Nombre != "error")
+                    else if (ccProveedores.info_ccProveedor(edita_ccProveedor.IdCc).Nombre != "error")
                     {
                         Interaction.MsgBox("Cada proveedor debe tener por lo menos una cuenta corriente, y este proveedor tiene solo una, por lo cual no puede ser borrada", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                     }
@@ -107,10 +106,10 @@ namespace Centrex
             tmp.Saldo = Convert.ToDecimal(txt_saldo.Text);
             tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                tmp.IdProveedor = VariablesGlobales.edita_ccProveedor.IdProveedor;
-                tmp.IdCc = VariablesGlobales.edita_ccProveedor.IdCc;
+                tmp.IdProveedor = edita_ccProveedor.IdProveedor;
+                tmp.IdCc = edita_ccProveedor.IdCc;
                 if (ccProveedores.updateCCProveedor(tmp) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar la cuenta corriente, consulte con su programdor", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
@@ -148,17 +147,17 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "proveedores";
+            tmp = tabla;
+            tabla = "proveedores";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el proveedor default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_proveedor_default;
+            if (id == 0)
+                id = id_proveedor_default;
             var argcmb = cmb_proveedor;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_proveedor = argcmb;
         }
 

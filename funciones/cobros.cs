@@ -53,7 +53,7 @@ namespace Centrex.Funciones
                         Notas = c.Notas ?? "",
                         Firmante = c.Firmante ?? ""
                     };
-                    
+
                     context.CobroEntity.Add(cobroEntity);
                     context.SaveChanges();
 
@@ -133,7 +133,7 @@ namespace Centrex.Funciones
                         var ch = context.ChequeEntity.FirstOrDefault(c => c.IdCheque == idCheque);
                         if (ch is not null)
                         {
-                            ch.IdEstadoch = VariablesGlobales.ID_CH_ENTREGADO;   // Constante definida en mconfig
+                            ch.IdEstadoch = ID_CH_ENTREGADO;   // Constante definida en mconfig
                             ch.FechaSalida = DateOnly.FromDateTime(DateTime.Now);
                             context.Entry(ch).State = EntityState.Modified;
                         }
@@ -201,7 +201,7 @@ namespace Centrex.Funciones
                         var cheque = context.ChequeEntity.FirstOrDefault(ch => ch.IdCheque == idCheque);
                         if (cheque is not null)
                         {
-                            cheque.IdEstadoch = VariablesGlobales.ID_CH_CARTERA;
+                            cheque.IdEstadoch = ID_CH_CARTERA;
                         }
                     }
 

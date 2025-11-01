@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -22,9 +21,9 @@ namespace Centrex
             tmp.Tipo = txt_tipoitem.Text;
             tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                tmp.IdTipo = VariablesGlobales.edita_tipoitem.IdTipo;
+                tmp.IdTipo = edita_tipoitem.IdTipo;
                 if (tipositems.updatetipoitem(tmp) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar la categoría, consulte con su programdor", Constants.vbExclamation);
@@ -60,14 +59,14 @@ namespace Centrex
         private void add_tipoitem_Load(object sender, EventArgs e)
         {
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_tipoitem.Text = VariablesGlobales.edita_tipoitem.Tipo;
-                chk_activo.Checked = VariablesGlobales.edita_tipoitem.Activo;
+                txt_tipoitem.Text = edita_tipoitem.Tipo;
+                chk_activo.Checked = edita_tipoitem.Activo;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_tipoitem.Enabled = false;
                 chk_activo.Enabled = false;
@@ -76,12 +75,12 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta categoría?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (tipositems.BorrarTipoItem(VariablesGlobales.edita_tipoitem) == false)
+                    if (tipositems.BorrarTipoItem(edita_tipoitem) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la categoría, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (tipositems.updatetipoitem(VariablesGlobales.edita_tipoitem, true) == true)
+                            if (tipositems.updatetipoitem(edita_tipoitem, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la categoría no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que la categoría, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }

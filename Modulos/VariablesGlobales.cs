@@ -1,6 +1,4 @@
-﻿using Centrex.Models;
-using Microsoft.VisualBasic;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace Centrex
@@ -68,7 +66,7 @@ namespace Centrex
         // ======================================================
         // VARIABLES DE BACKUP
         // ======================================================
-        public static string archivoBackup = "";        
+        public static string archivoBackup = "";
         public static string rutaBackup = "";
 
         // ======================================================
@@ -104,7 +102,6 @@ namespace Centrex
         public static ConceptoCompraEntity edita_concepto_compra;
         public static CuentaBancariaEntity edita_cuentaBancaria;
         public static OrdenCompraEntity edita_ordenCompra;
-        //public static TransferenciaEntity edita_transferencia;
         public static BancoEntity edita_banco;
         public static CajaEntity edita_caja;
         public static CcClienteEntity edita_ccCliente;
@@ -112,9 +109,9 @@ namespace Centrex
         public static ChequeEntity edita_cheque;
         public static ClienteEntity edita_cliente;
         public static ComprobanteEntity edita_comprobante;
-        public static CondicionCompraEntity edita_condicion_compra;   
+        public static CondicionCompraEntity edita_condicion_compra;
         public static CondicionVentaEntity edita_condicion_venta;
-public static ConsultaPersonalizadaEntity edita_Consulta;
+        public static ConsultaPersonalizadaEntity edita_consulta;
         public static ImpuestoEntity edita_impuesto;
         public static RegistroStockEntity edita_item_registro_stock;
         public static ItemImpuestoEntity edita_itemImpuesto;
@@ -140,7 +137,7 @@ public static ConsultaPersonalizadaEntity edita_Consulta;
         public static string consultaUltimoComprobante = "";
         public static double precio = 0d;
         public static bool editaStock = false;
-        public static bool edicion_item_registro_stock = false;        
+        public static bool edicion_item_registro_stock = false;
 
         // ======================================================
         // VARIABLES AFIP Y OTROS OBJETOS EXTERNOS
@@ -150,11 +147,18 @@ public static ConsultaPersonalizadaEntity edita_Consulta;
 
 
         // ======================================================
-        // FUNCIONES PLACEHOLDER (COMPATIBILIDAD LEGACY)
+        // FUNCIONES PLACEHOLDER (COMPATIBILIDAD LEGACY) - ELIMINADAS
         // ======================================================
         public static string obtieneValorConfigGlobal(string str)
         {
-            return Strings.Trim(Strings.Right(str, str.Length - (Strings.InStr(str, "=") + 1)));
+            // Eliminar espacios y obtener valor después del '='
+            string trimmed = str.Trim();
+            int equalIndex = trimmed.IndexOf('=');
+            if (equalIndex >= 0 && equalIndex < trimmed.Length - 1)
+            {
+                return trimmed.Substring(equalIndex + 1).Trim();
+            }
+            return string.Empty;
         }
 
 
@@ -163,57 +167,57 @@ public static ConsultaPersonalizadaEntity edita_Consulta;
         // ======================================================
         public static ItemEntity ConvertToItem(ItemEntity itemEntity)
         {
-    var result = new ItemEntity();
-       result.IdItem = itemEntity.IdItem;
-  result.Item = itemEntity.Item;
-    result.Descript = itemEntity.Descript;
-      result.Cantidad = itemEntity.Cantidad;
+            var result = new ItemEntity();
+            result.IdItem = itemEntity.IdItem;
+            result.Item = itemEntity.Item;
+            result.Descript = itemEntity.Descript;
+            result.Cantidad = itemEntity.Cantidad;
             result.PrecioLista = itemEntity.PrecioLista;
             result.EsDescuento = itemEntity.EsDescuento;
-    result.Activo = itemEntity.Activo;
-          return result;
+            result.Activo = itemEntity.Activo;
+            return result;
         }
 
         public static TmpTransferenciaEntity ConvertToTmpTransferencia(TransferenciaEntity transferenciaEntity)
         {
-  return new TmpTransferenciaEntity()
+            return new TmpTransferenciaEntity()
             {
-IdCuentaBancaria = transferenciaEntity.IdCuentaBancaria,
-            Fecha = transferenciaEntity.Fecha,
- Total = transferenciaEntity.Total,
-    NComprobante = transferenciaEntity.NComprobante,
-       Notas = transferenciaEntity.Notas
+                IdCuentaBancaria = transferenciaEntity.IdCuentaBancaria,
+                Fecha = transferenciaEntity.Fecha,
+                Total = transferenciaEntity.Total,
+                NComprobante = transferenciaEntity.NComprobante,
+                Notas = transferenciaEntity.Notas
             };
         }
 
         public static PedidoEntity ConvertToPedido(PedidoEntity pedidoEntity)
-{
-  var result = new PedidoEntity();
-         result.IdPedido = pedidoEntity.IdPedido;
+        {
+            var result = new PedidoEntity();
+            result.IdPedido = pedidoEntity.IdPedido;
             result.Fecha = pedidoEntity.Fecha;
-result.IdCliente = pedidoEntity.IdCliente;
-result.Subtotal = pedidoEntity.Subtotal;
+            result.IdCliente = pedidoEntity.IdCliente;
+            result.Subtotal = pedidoEntity.Subtotal;
             result.Iva = pedidoEntity.Iva;
- result.Total = pedidoEntity.Total;
-    result.Activo = pedidoEntity.Activo;
-        result.Cerrado = pedidoEntity.Cerrado;
-         result.EsPresupuesto = pedidoEntity.EsPresupuesto;
+            result.Total = pedidoEntity.Total;
+            result.Activo = pedidoEntity.Activo;
+            result.Cerrado = pedidoEntity.Cerrado;
+            result.EsPresupuesto = pedidoEntity.EsPresupuesto;
             return result;
-      }
+        }
 
-   public static PedidoEntity ConvertToPedidoEntity(PedidoEntity pedido)
-    {
-  return new PedidoEntity()
-   {
-   IdPedido = pedido.IdPedido,
- Fecha = pedido.Fecha,
-      IdCliente = pedido.IdCliente,
-Subtotal = pedido.Subtotal,
-    Iva = pedido.Iva,
-     Total = pedido.Total,
+        public static PedidoEntity ConvertToPedidoEntity(PedidoEntity pedido)
+        {
+            return new PedidoEntity()
+            {
+                IdPedido = pedido.IdPedido,
+                Fecha = pedido.Fecha,
+                IdCliente = pedido.IdCliente,
+                Subtotal = pedido.Subtotal,
+                Iva = pedido.Iva,
+                Total = pedido.Total,
                 Activo = pedido.Activo,
-    Cerrado = pedido.Cerrado,
- EsPresupuesto = pedido.EsPresupuesto
+                Cerrado = pedido.Cerrado,
+                EsPresupuesto = pedido.EsPresupuesto
             };
         }
 
@@ -223,17 +227,17 @@ Subtotal = pedido.Subtotal,
             result.IdComprobante = comprobanteEntity.IdComprobante;
             result.Comprobante = comprobanteEntity.Comprobante;
             result.Activo = comprobanteEntity.Activo;
-   return result;
+            return result;
         }
 
         public static ItemImpuestoEntity ConvertToItemImpuesto(ItemImpuestoEntity itemImpuestoEntity)
         {
-  var result = new ItemImpuestoEntity();
+            var result = new ItemImpuestoEntity();
             result.IdItem = itemImpuestoEntity.IdItem;
-    result.IdImpuesto = itemImpuestoEntity.IdImpuesto;
-       result.Activo = itemImpuestoEntity.Activo;
-        return result;
-     }
+            result.IdImpuesto = itemImpuestoEntity.IdImpuesto;
+            result.Activo = itemImpuestoEntity.Activo;
+            return result;
+        }
 
     }
 }

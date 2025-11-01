@@ -4,8 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -15,7 +13,6 @@ namespace Centrex
         private int pagina_cartera;
         private int nRegs_cartera;
         private int tPaginas_cartera;
-        private ColumnClickEventArgs orderCol_cartera = null;
         // Dim fecha_desde_cartera As Date
         // Dim fecha_hasta_cartera As Date
 
@@ -23,7 +20,6 @@ namespace Centrex
         private int pagina_depositado;
         private int nRegs_depositado;
         private int tPaginas_depositado;
-        private ColumnClickEventArgs orderCol_depositado = null;
 
         public frm_depositarCH()
         {
@@ -97,7 +93,7 @@ namespace Centrex
                     .Include(ch => ch.IdBancoNavigation)
                     .Include(ch => ch.IdCuentaBancariaNavigation)
                     .Include(ch => ch.IdEstadochNavigation)
-                    .Where(ch => ch.Activo && ch.IdEstadoch == VariablesGlobales.ID_CH_CARTERA);
+                    .Where(ch => ch.Activo && ch.IdEstadoch == ID_CH_CARTERA);
 
                 if (chk_desdeSiempre_cartera.Checked)
                 {
@@ -123,7 +119,7 @@ namespace Centrex
 
                 nRegs_cartera = await query.CountAsync();
 
-                var pageSize = VariablesGlobales.itXPage > 0 ? VariablesGlobales.itXPage : 50;
+                var pageSize = itXPage > 0 ? itXPage : 50;
                 tPaginas_cartera = nRegs_cartera == 0 ? 1 : (int)Math.Ceiling(nRegs_cartera / (double)pageSize);
 
                 if (pagina_cartera < 1)
@@ -222,7 +218,7 @@ namespace Centrex
                     .Include(ch => ch.IdBancoNavigation)
                     .Include(ch => ch.IdCuentaBancariaNavigation)
                     .Include(ch => ch.IdEstadochNavigation)
-                    .Where(ch => ch.Activo && ch.IdEstadoch == VariablesGlobales.ID_CH_DEPOSITADO);
+                    .Where(ch => ch.Activo && ch.IdEstadoch == ID_CH_DEPOSITADO);
 
                 if (chk_desdeSiempre_depositado.Checked)
                 {
@@ -253,7 +249,7 @@ namespace Centrex
 
                 nRegs_depositado = await query.CountAsync();
 
-                var pageSize = VariablesGlobales.itXPage > 0 ? VariablesGlobales.itXPage : 50;
+                var pageSize = itXPage > 0 ? itXPage : 50;
                 tPaginas_depositado = nRegs_depositado == 0 ? 1 : (int)Math.Ceiling(nRegs_depositado / (double)pageSize);
 
                 if (pagina_depositado < 1)
@@ -529,7 +525,7 @@ namespace Centrex
                     continue;
 
                 ch.IdCheque = Convert.ToInt32(idValor);
-                ch.FechaDeposito = ConversorFechas.GetFecha(generales.Hoy(), ch.FechaDeposito) ;
+                ch.FechaDeposito = ConversorFechas.GetFecha(generales.Hoy(), ch.FechaDeposito);
                 ch.IdCuentaBancaria = Convert.ToInt32(cmb_cuentaBancaria.SelectedValue);
                 var nChequeValor = dg_view_chCartera.Rows[c].Cells["NumeroCheque"].Value;
                 if (nChequeValor != null && int.TryParse(nChequeValor.ToString(), out var numCheque))
@@ -540,7 +536,7 @@ namespace Centrex
 
                 if (!cheques.Depositar_cheque(ch))
                 {
-                Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.NCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                    Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.NCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                     hay_error = true;
                 }
             }
@@ -747,7 +743,7 @@ namespace Centrex
 
                 if (!cheques.Anular_Deposito_Cheque(ch.IdCheque))
                 {
-                Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.NCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                    Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.NCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                     hay_error = true;
                 }
             }

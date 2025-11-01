@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
-{    public static class ajustes_stock
+{
+    public static class ajustes_stock
     {
         // ************************************ FUNCIONES DE RELACION ITEMS E IMPUESTOS ********************
         public static AjusteStockEntity info_ajuste_stock(int _as)
@@ -13,7 +15,6 @@ namespace Centrex.Funciones
             {
                 using (var context = new CentrexDbContext())
                 {
-                    
                     if (_as != 0 && _as != -1)
                     {
                         var AjusteStockEntity = context.AjusteStockEntity.FirstOrDefault(i => i.IdAjusteStock == _as);
@@ -29,7 +30,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return tmp;
             }
         }
@@ -55,7 +56,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

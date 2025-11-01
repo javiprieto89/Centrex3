@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -22,7 +21,7 @@ namespace Centrex
             {
                 var orden = OrdenAsc("Nombre");
 
-                // 🔹 Cargar combo usando la nueva función EF de "generales"
+                // Cargar combo usando la nueva función EF de "generales"
                 generales.Cargar_Combo(
                     ref cmb_consultas,
                     entidad: "ConsultaPersonalizadaEntity",
@@ -38,7 +37,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox($"Error al cargar consultas: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+                MessageBox.Show($"Error al cargar consultas: {ex.Message}", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -48,8 +47,7 @@ namespace Centrex
             {
                 if (cmb_consultas.SelectedValue is null)
                 {
-                    Interaction.MsgBox("Debe elegir una consulta para ejecutar",
-                        (MsgBoxStyle)((int)MsgBoxStyle.Exclamation | (int)MsgBoxStyle.OkOnly), "Centrex");
+                    MessageBox.Show("Debe elegir una consulta para ejecutar", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
 
@@ -60,25 +58,23 @@ namespace Centrex
 
                 if (consulta is null)
                 {
-                    Interaction.MsgBox("No se encontró la consulta seleccionada.",
-                        MsgBoxStyle.Exclamation, "Centrex");
+                    MessageBox.Show("No se encontró la consulta seleccionada.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
 
-                // 🔹 Obtener la "entidad" o alias de consulta
+                // Obtener la "entidad" o alias de consulta
                 string entidad = consulta.Consulta?.Trim() ?? "";
                 if (string.IsNullOrEmpty(entidad))
                 {
-                    Interaction.MsgBox("La consulta seleccionada no tiene una entidad asociada.",
-                        MsgBoxStyle.Exclamation, "Centrex");
+                    MessageBox.Show("La consulta seleccionada no tiene una entidad asociada.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
 
-                // 🔹 Construir el DataGridQueryResult con EF dinámico
+                // Construir el DataGridQueryResult con EF dinámico
                 var result = DataGridQueryFactory.GetQueryForTable(ctx, entidad, historicoActivo: true);
                 result.GridName = "grilla_resultados";
 
-                // 🔹 Cargar la grilla usando la nueva función centralizada
+                // Cargar la grilla usando la nueva función centralizada
                 await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_view_resultados, result);
 
                 // Mostrar total de registros
@@ -86,8 +82,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al ejecutar la consulta: " + ex.Message,
-                    MsgBoxStyle.Critical, "Centrex");
+                MessageBox.Show("Error al ejecutar la consulta: " + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

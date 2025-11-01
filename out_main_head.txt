@@ -1,4 +1,4 @@
-Imports Centrex.clsgenerales
+﻿Imports Centrex.clsgenerales
 Imports System.Data
 Imports System.Data.SqlClient
 'Imports System.Data.Entity
@@ -36,54 +36,54 @@ Public Class main
     Private Sub main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Visible = False
 
-        VariablesGlobales.pc = SystemInformation.ComputerName.ToUpper
+        pc = SystemInformation.ComputerName.ToUpper
 
         ' ******* Configuraciones inciales *******
         Dim c As New configInit
         c.leerConfig()
 
-        VariablesGlobales.comprobantePresupuesto_default = 3
-        VariablesGlobales.id_comprobante_default = 3 '4
-        VariablesGlobales.id_tipoDocumento_default = 80
-        VariablesGlobales.id_tipoComprobante_default = 1
-        VariablesGlobales.id_cliente_pedido_default = 2 '8
-        VariablesGlobales.id_pais_default = 1
-        VariablesGlobales.id_provincia_default = 1
-        VariablesGlobales.id_marca_default = 1
-        VariablesGlobales.id_proveedor_default = 1
-        'VariablesGlobales.cuit_emisor_default = "20100906512"
-        VariablesGlobales.cuit_emisor_default = "20233695255"
-        VariablesGlobales.id_condicion_compra_default = 1
-        VariablesGlobales.STR_COMPROBANTES_CONTABLES = "1, 6, 11, 51, 201, 206, 211, 1006, 2, 7, 12, 52, 202, 207, 212, 1007, 1002, 1003, 1004, 1005, 1010, 1015, 3, 8, 13, 53, 203, 208, 213, 1008, 4, 1009"
+        comprobantePresupuesto_default = 3
+        id_comprobante_default = 3 '4
+        id_tipoDocumento_default = 80
+        id_tipoComprobante_default = 1
+        id_cliente_pedido_default = 2 '8
+        id_pais_default = 1
+        id_provincia_default = 1
+        id_marca_default = 1
+        id_proveedor_default = 1
+        'cuit_emisor_default = "20100906512"
+        cuit_emisor_default = "20233695255"
+        id_condicion_compra_default = 1
+        STR_COMPROBANTES_CONTABLES = "1, 6, 11, 51, 201, 206, 211, 1006, 2, 7, 12, 52, 202, 207, 212, 1007, 1002, 1003, 1004, 1005, 1010, 1015, 3, 8, 13, 53, 203, 208, 213, 1008, 4, 1009"
         'modificacionesDB = 0
         'Carga versión de la base de datos
-        VariablesGlobales.versiondb = "1.0.0"
+        versiondb = "1.0.0"
         'cs = "Data Source=127.0.0.1;Initial Catalog=dbCentrex;Persist Security Info=True;User ID=sa;Password=Ladeda78"
-        If VariablesGlobales.pc <> "JARVIS" And VariablesGlobales.pc <> "SERVTEC-06" And VariablesGlobales.pc <> "CORTANA" And VariablesGlobales.pc <> "SKYNET" Then
-            VariablesGlobales.depuracion = False
+        If pc <> "JARVIS" And pc <> "SERVTEC-06" And pc <> "CORTANA" And pc <> "SKYNET" Then
+            depuracion = False
             Timer1.Enabled = True
         Else
-            VariablesGlobales.depuracion = True
+            depuracion = True
             chk_test.Visible = True
             Timer1.Enabled = False
-            VariablesGlobales.serversql = "127.0.0.1"
+            serversql = "127.0.0.1"
         End If
 
         'SI QUERES FORZAR EL DEPURADO
-        'VariablesGlobales.depuracion = True
+        'depuracion = True
         If Debugger.IsAttached Then
-            VariablesGlobales.depuracion = True
+            depuracion = True
             Timer1.Enabled = False
         End If
 
-        If VariablesGlobales.pc = "SKYNET" Then
-            '  VariablesGlobales.serversql = "computron.selfip.com"
-        ElseIf VariablesGlobales.pc = "SILVIA" Then
-            VariablesGlobales.serversql = "192.168.1.100"
+        If pc = "SKYNET" Then
+            '  serversql = "computron.selfip.com"
+        ElseIf pc = "SILVIA" Then
+            serversql = "192.168.1.100"
         End If
 
         ' ******* Testeos inciales *******
-        If abrirdb(VariablesGlobales.serversql, VariablesGlobales.basedb, VariablesGlobales.usuariodb, VariablesGlobales.passdb) = False Then
+        If abrirdb(serversql, basedb, usuariodb, passdb) = False Then
             MsgBox("Error al abrir la Base de datos.")
             End
         End If
@@ -92,13 +92,13 @@ Public Class main
         configuracion_regional.cambiarIdioma()
         ' ******* Sentencias SQL específicas que se quieran ejecutar antes de iniciar la aplicación *******
         'ejecutarSQL("SQL")
-        If modificacionesDB And Not VariablesGlobales.pc = "JARVIS" Then
+        If modificacionesDB And Not pc = "JARVIS" Then
             MsgBox("Se deben hacer modificaciones mayores a la base de datos para que se ajuste a la última versión del programa." & Chr(13) _
                            + "Avisele al programador, ya que puede ser que el programa no corra correctamente sin estas modificaciones", vbInformation + vbOKOnly, "Centrex")
         End If
 
 
-        If VariablesGlobales.pc <> "JARVIS" Or VariablesGlobales.depuracion = False Then
+        If pc <> "JARVIS" Or depuracion = False Then
             Try
                 Dim di As DirectoryInfo = New DirectoryInfo("..\..\ScriptsDB")
                 Dim fileReader As String
@@ -124,7 +124,7 @@ Public Class main
 
 
         Dim cantUsuarios As Integer
-        cantUsuarios = cantReg(VariablesGlobales.basedb, "SELECT * FROM usuarios")
+        cantUsuarios = cantReg(basedb, "SELECT * FROM usuarios")
         If cantUsuarios = 0 Then
             Do Until cantUsuarios > 0
                 If MsgBox("No tiene creado ningún usuario para loguearse en el sistema, debera crear uno." & vbCr &
@@ -132,7 +132,7 @@ Public Class main
                     End
                 End If
                 add_usuario.ShowDialog()
-                cantUsuarios = cantReg(VariablesGlobales.basedb, "SELECT * FROM usuarios")
+                cantUsuarios = cantReg(basedb, "SELECT * FROM usuarios")
                 If cantUsuarios = 0 Then
                     MsgBox("No ha creado ningún usuario, no podrá iniciar el sistema hasta que cree uno.", vbExclamation + vbOKOnly, "Centrex")
                 Else
@@ -142,17 +142,17 @@ Public Class main
             Loop
         Else
             'Loguearse en el sistema
-            If VariablesGlobales.pc <> "JARVIS" And VariablesGlobales.pc <> "SERVTEC-06" And VariablesGlobales.depuracion = False Then
+            If pc <> "JARVIS" And pc <> "SERVTEC-06" And depuracion = False Then
                 login.ShowDialog()
             Else
-                VariablesGlobales.usuario_logueado = info_usuario("javierp", True)
+                usuario_logueado = info_usuario("javierp", True)
             End If
-            borrar_tabla_pedidos_temporales(VariablesGlobales.usuario_logueado.id_usuario)
-            'Borrar_tabla_segun_usuario("tmpcobros_retenciones", VariablesGlobales.usuario_logueado.id_usuario)
-            'Borrar_tabla_segun_usuario("tmptransferencias", VariablesGlobales.usuario_logueado.id_usuario)
+            borrar_tabla_pedidos_temporales(usuario_logueado.id_usuario)
+            'Borrar_tabla_segun_usuario("tmpcobros_retenciones", usuario_logueado.id_usuario)
+            'Borrar_tabla_segun_usuario("tmptransferencias", usuario_logueado.id_usuario)
             'borrartbl("tmppedidos_items")
-            borrarTmpProduccion(VariablesGlobales.usuario_logueado.id_usuario)
-            Borrar_tabla_segun_usuario("tmpOC_items", VariablesGlobales.usuario_logueado.id_usuario)
+            borrarTmpProduccion(usuario_logueado.id_usuario)
+            Borrar_tabla_segun_usuario("tmpOC_items", usuario_logueado.id_usuario)
             ArchivarIngresoStock()
             Me.Visible = True
         End If
@@ -172,7 +172,7 @@ Public Class main
         'borrartbl("tmpOC_items")
 
         If haycambios() Then
-            VariablesGlobales.frmCambios.ShowDialog()
+            frmCambios.ShowDialog()
         End If
 
         cmd_add.Enabled = False
@@ -183,8 +183,8 @@ Public Class main
 
         With My.Application.Info.Version
             tss_version.Text = "Versión: " & .Major & "." & .Minor & "." & .Revision
-            tss_dbInfo.Text = "VariablesGlobales.serversql: " & VariablesGlobales.serversql & " - DB: " & VariablesGlobales.basedb & " - Ver.DB: " & VariablesGlobales.versiondb
-            tss_usuario_logueado.Text = "Usuario logueado: " & VariablesGlobales.usuario_logueado.nombre
+            tss_dbInfo.Text = "serversql: " & serversql & " - DB: " & basedb & " - Ver.DB: " & versiondb
+            tss_usuario_logueado.Text = "Usuario logueado: " & usuario_logueado.nombre
         End With
         tss_hora.Text = "Hora: " & DateAndTime.TimeOfDay
 
@@ -222,8 +222,8 @@ Public Class main
                 pic.Visible = False
             End If
 
-            VariablesGlobales.tabla_vieja = VariablesGlobales.tabla
-            VariablesGlobales.tabla = e.Node.Name
+            tabla_vieja = tabla
+            tabla = e.Node.Name
             txt_search.Text = ""
             chk_historicos.Checked = False
 
@@ -248,7 +248,7 @@ Public Class main
             Dim txtsearch As String = Microsoft.VisualBasic.Replace(txt_search.Text, " ", "%")
             sqlstr = sqlstrbuscar(txtsearch)
         Else
-            Select Case VariablesGlobales.tabla
+            Select Case tabla
                 Case Is = "root"
                     cmd_add.Enabled = False
                     dg_view.Visible = False
@@ -279,17 +279,17 @@ Public Class main
                 Case Is = "mercadopagoQR"
                     frm_mercadopago_qr.ShowDialog()
                 Case Else
-                    sqlstr = updateDataGrid(VariablesGlobales.activo)
+                    sqlstr = updateDataGrid(activo)
             End Select
         End If
 
         'If sqlstr = "error" Then
         'MsgBox("Ha ocurrido un error, consulte con el programdor", vbOKOnly + vbAbort, "Computron")
         If sqlstr <> "" And sqlstr <> "error" Then
-            cargar_datagrid(dg_view, sqlstr, VariablesGlobales.basedb, desde, nRegs, tPaginas, pagina, txt_nPage, VariablesGlobales.tabla, VariablesGlobales.tabla_vieja) 'Carga el datagrid con los nuevos datos
-            If VariablesGlobales.tabla = "archivoConsultas" Then
+            cargar_datagrid(dg_view, sqlstr, basedb, desde, nRegs, tPaginas, pagina, txt_nPage, tabla, tabla_vieja) 'Carga el datagrid con los nuevos datos
+            If tabla = "archivoConsultas" Then
                 dg_view.Columns(0).Width = 50
-            ElseIf VariablesGlobales.tabla = "cobros" Then
+            ElseIf tabla = "cobros" Then
                 Dim i As Integer
                 For i = 0 To dg_view.Rows.Count - 1
                     If InStr(dg_view.Rows(i).Cells(5).Value, "-") > 0 Then
@@ -298,15 +298,15 @@ Public Class main
                 Next
             End If
 
-            'If VariablesGlobales.tabla = "items" Then
+            'If tabla = "items" Then
             '    'resaltarColumna(dg_view, 4, Color.Red)
-            'ElseIf VariablesGlobales.tabla = "registros_stock" Then
+            'ElseIf tabla = "registros_stock" Then
             '    'resaltarColumna(dg_view, 7, Color.Red)
-            'ElseIf VariablesGlobales.tabla = "pedidos" Then
+            'ElseIf tabla = "pedidos" Then
             '    'resaltarColumna(dg_view, 3, Color.Red)
             'End If
         End If
-        'cargar_datagrid(dg_view, "SELECT id_cliente, VariablesGlobales.activo FROM clientes", VariablesGlobales.basedb)
+        'cargar_datagrid(dg_view, "SELECT id_cliente, activo FROM clientes", basedb)
 
     End Sub
 
@@ -317,14 +317,14 @@ Public Class main
 
             desde = 0
             pagina = 1
-            'cargar_datagrid(dg_view, sqlstr, VariablesGlobales.basedb)
-            cargar_datagrid(dg_view, sqlstr, VariablesGlobales.basedb, desde, nRegs, tPaginas, pagina, txt_nPage, VariablesGlobales.tabla, VariablesGlobales.tabla_vieja) 'Carga el datagrid con los nuevos datos
-            'If VariablesGlobales.tabla = "items" Then resaltarcolumna(dg_view, 4, Color.Red)
+            'cargar_datagrid(dg_view, sqlstr, basedb)
+            cargar_datagrid(dg_view, sqlstr, basedb, desde, nRegs, tPaginas, pagina, txt_nPage, tabla, tabla_vieja) 'Carga el datagrid con los nuevos datos
+            'If tabla = "items" Then resaltarcolumna(dg_view, 4, Color.Red)
         End If
     End Sub
 
     Private Sub cmd_add_Click(sender As Object, e As EventArgs) Handles cmd_add.Click
-        Select Case VariablesGlobales.tabla
+        Select Case tabla
             Case Is = "clientes"
                 add_cliente.ShowDialog()
             Case Is = "archivoCCClientes"
@@ -378,12 +378,12 @@ Public Class main
             Case Is = "pagos"
                 add_pago.ShowDialog()
             Case Is = "ajustes_stock"
-                VariablesGlobales.tabla = "ajustes_stock"
+                tabla = "ajustes_stock"
                 add_ajuste_stock.ShowDialog()
             Case Is = "registros_stock"
-                VariablesGlobales.tabla = "items_registros_stock"
+                tabla = "items_registros_stock"
                 add_stock.ShowDialog()
-                VariablesGlobales.tabla = "registros_stock"
+                tabla = "registros_stock"
             Case Is = "produccion"
                 add_produccion.ShowDialog()
             Case Is = "pedidos"
@@ -411,9 +411,9 @@ Public Class main
 
     Private Sub BorrarToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BorrarToolStripMenuItem.Click
         'borrar el item
-        VariablesGlobales.borrado = True
+        borrado = True
         dg_view_CellMouseDoubleClick(Nothing, Nothing)
-        VariablesGlobales.borrado = False
+        borrado = False
         ActualizarDatagrid()
     End Sub
 
@@ -433,14 +433,14 @@ Public Class main
             cmsGeneral.Items(7).Visible = False
 
             If chk_historicos.Checked Then
-                If VariablesGlobales.tabla = "pedidos" Then
+                If tabla = "pedidos" Then
                     cmsGeneral.Items(0).Text = "Ver pedido"
                     cmsGeneral.Items(4).Visible = True
                     cmsGeneral.Items(5).Visible = True
                     '        cmsGeneral.Items(7).Visible = True
-                ElseIf VariablesGlobales.tabla = "registros_stock" Then
+                ElseIf tabla = "registros_stock" Then
                     cmsGeneral.Items(0).Text = "Ver ingreso"
-                ElseIf VariablesGlobales.tabla = "items" Then
+                ElseIf tabla = "items" Then
                     cmsGeneral.Items(3).Text = "Activar item"
                     cmsGeneral.Items(3).Visible = True
                     Exit Sub
@@ -450,14 +450,14 @@ Public Class main
                 End If
                 cmsGeneral.Items(1).Visible = False
             Else
-                If VariablesGlobales.tabla = "registros_stock" Then
+                If tabla = "registros_stock" Then
                     cmsGeneral.Items(0).Text = "Ver ingreso"
                     cmsGeneral.Items(1).Visible = False
                     cmsGeneral.Items(7).Visible = True
                 Else
                     cmsGeneral.Items(0).Text = "Editar"
                     cmsGeneral.Items(1).Visible = True
-                    If VariablesGlobales.tabla = "items" Then
+                    If tabla = "items" Then
                         cmsGeneral.Items(3).Text = "Desactivar item"
                         cmsGeneral.Items(3).Visible = True
                     Else
@@ -466,14 +466,14 @@ Public Class main
                 End If
             End If
 
-            If VariablesGlobales.tabla = "pedidos" Then
+            If tabla = "pedidos" Then
                 cmsGeneral.Items(2).Visible = True
             End If
 
-            If VariablesGlobales.tabla = "pagos" Or VariablesGlobales.tabla = "cobros" Then 'Or VariablesGlobales.tabla = "comprobantes_compras" Then
+            If tabla = "pagos" Or tabla = "cobros" Then 'Or tabla = "comprobantes_compras" Then
                 cmsGeneral.Items(1).Visible = False 'Borrar
                 cmsGeneral.Items(7).Visible = True 'Anular
-            ElseIf VariablesGlobales.tabla = "comprobantes_compras" Then
+            ElseIf tabla = "comprobantes_compras" Then
                 cmsGeneral.Items(1).Visible = False 'Borrar
             Else
                 cmsGeneral.Items(1).Text = "Borrar"
@@ -486,12 +486,12 @@ Public Class main
     End Sub
 
     Private Sub chk_historicos_CheckedChanged(sender As Object, e As EventArgs) Handles chk_historicos.CheckedChanged
-        If VariablesGlobales.activo Then
-            VariablesGlobales.activo = False
+        If activo Then
+            activo = False
         Else
-            VariablesGlobales.activo = True
+            activo = True
         End If
-        cmd_add.Enabled = VariablesGlobales.activo
+        cmd_add.Enabled = activo
         ActualizarDatagrid()
     End Sub
 
@@ -514,7 +514,7 @@ Public Class main
     Private Sub cmd_pedido_Click(sender As Object, e As EventArgs) Handles cmd_pedido.Click
         add_pedido.ShowDialog()
         'Treev.SelectedNode = Treev.Nodes("root").Nodes("ventas").Nodes("pedidos")
-        'VariablesGlobales.tabla = "pedidos"
+        'tabla = "pedidos"
         ActualizarDatagrid()
     End Sub
 
@@ -530,9 +530,9 @@ Public Class main
         i = info_item(seleccionado)
 
         If chk_historicos.Checked Then
-            i.VariablesGlobales.activo = True   'VariablesGlobales.activo
+            i.activo = True   'activo
         Else
-            i.VariablesGlobales.activo = False 'Desactivo
+            i.activo = False 'Desactivo
         End If
 
         updateitem(i)
@@ -540,7 +540,7 @@ Public Class main
     End Sub
 
     Private Sub chk_rpt_CheckedChanged(sender As Object, e As EventArgs) Handles chk_rpt.CheckedChanged
-        VariablesGlobales.showrpt = chk_rpt.Checked
+        showrpt = chk_rpt.Checked
     End Sub
 
     Private Sub MostrarFacturaToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MostrarFacturaToolStripMenuItem.Click
@@ -554,13 +554,13 @@ Public Class main
 
         seleccionado = dg_view.CurrentRow.Cells(0).Value.ToString
         idUnico = Generar_ID_Unico()
-        VariablesGlobales.edicion = True
+        edicion = True
         edita_pedido = InfoPedido(seleccionado)
-        PedidoAPedidoTmp(seleccionado, VariablesGlobales.usuario_logueado.id_usuario, idUnico)
+        PedidoAPedidoTmp(seleccionado, usuario_logueado.id_usuario, idUnico)
         Dim addPedido As New add_pedido(idUnico)
         addPedido.ShowDialog()
         'add_pedido.ShowDialog()
-        VariablesGlobales.edicion = False
+        edicion = False
     End Sub
 
     Private Sub DuplicarPedidoToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DuplicarPedidoToolStripMenuItem.Click
@@ -587,7 +587,7 @@ Public Class main
     End Sub
 
     Private Sub main_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
-        If VariablesGlobales.pc <> "JARVIS" And VariablesGlobales.pc <> "SERVTEC-06" And VariablesGlobales.pc <> "CORTANA" And Not VariablesGlobales.depuracion Then
+        If pc <> "JARVIS" And pc <> "SERVTEC-06" And pc <> "CORTANA" And Not depuracion Then
             'If MsgBox("¿Desea realizar un backup de la base de datos?", vbYesNo + vbQuestion, "Centrex") = MsgBoxResult.Yes Then
             BackupDB.ShowDialog()
             'Else
@@ -607,12 +607,12 @@ Public Class main
     End Sub
 
     Private Sub dg_view_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dg_view.CellMouseDoubleClick
-        If VariablesGlobales.borrado = False Then VariablesGlobales.edicion = True
+        If borrado = False Then edicion = True
 
         If dg_view.Rows.Count = 0 Then Exit Sub
 
         Dim seleccionado As String = dg_view.CurrentRow.Cells(0).Value.ToString
-        Select Case VariablesGlobales.tabla
+        Select Case tabla
             Case "clientes"
                 edita_cliente = info_cliente(seleccionado)
                 add_cliente.ShowDialog()
@@ -717,7 +717,7 @@ Public Class main
                 add_stock.ShowDialog()
             Case "produccion"
                 'borrartbl("tmpproduccion_items", True)
-                borrarTmpProduccion(VariablesGlobales.usuario_logueado.id_usuario)
+                borrarTmpProduccion(usuario_logueado.id_usuario)
                 edita_produccion = info_produccion(seleccionado)
                 produccion_a_produccionTmp(seleccionado)
                 add_produccion.ShowDialog()
@@ -734,10 +734,10 @@ Public Class main
                     frmPrn.ShowDialog()
                 Else
                     edita_pedido = InfoPedido(seleccionado)
-                    edita_pedido.id_usuario = VariablesGlobales.usuario_logueado.id_usuario
+                    edita_pedido.id_usuario = usuario_logueado.id_usuario
                     Dim idUnico As String
                     idUnico = Generar_ID_Unico()
-                    PedidoAPedidoTmp(seleccionado, VariablesGlobales.usuario_logueado.id_usuario, idUnico)
+                    PedidoAPedidoTmp(seleccionado, usuario_logueado.id_usuario, idUnico)
                     Dim addPedido As New add_pedido(idUnico)
                     addPedido.ShowDialog()
                     'add_pedido.ShowDialog()
@@ -765,22 +765,22 @@ Public Class main
             Case "perfiles_a_usuarios"
                 MsgBox("La relación entre un usuario y un perfil no puede editarse", vbExclamation + vbOKOnly, "Centrex")
         End Select
-        If VariablesGlobales.borrado = False Then VariablesGlobales.edicion = False
+        If borrado = False Then edicion = False
 
-        If VariablesGlobales.tabla <> "pedidos" Then
+        If tabla <> "pedidos" Then
             ActualizarDatagrid()
-        ElseIf VariablesGlobales.tabla = "pedidos" And VariablesGlobales.activo Then
+        ElseIf tabla = "pedidos" And activo Then
             ActualizarDatagrid()
         End If
     End Sub
 
     Private Sub chk_test_CheckedChanged(sender As Object, e As EventArgs) Handles chk_test.CheckedChanged
         If chk_test.Checked Then
-            VariablesGlobales.depuracion = True
-            '    VariablesGlobales.basedb = "dbCentrexTest"
+            depuracion = True
+            '    basedb = "dbCentrexTest"
         Else
-            VariablesGlobales.depuracion = False
-            '   VariablesGlobales.basedb = "dbCentrex"
+            depuracion = False
+            '   basedb = "dbCentrex"
         End If
         ActualizarDatagrid()
     End Sub
@@ -804,7 +804,7 @@ Public Class main
         Dim dtUltimoComprobante As New DataTable
         Try
             Using context As CentrexDbContext = GetDbContext()
-                Dim comprobantes = context.Comprobantes.Where(Function(c) c.VariablesGlobales.activo = True AndAlso
+                Dim comprobantes = context.Comprobantes.Where(Function(c) c.activo = True AndAlso
                     Not {0, 99, 199}.Contains(c.IdTipoComprobante) AndAlso c.EsElectronica = True).
                     OrderBy(Function(c) c.Testing).ThenBy(Function(c) c.Comprobante).ToList()
 
@@ -889,7 +889,7 @@ Public Class main
         'c = info_comprobante(edita_pedido.id_comprobante)
 
         'modo = WSAFIPFE.Factura.modoFiscal.Test
-        'cuit_emisor = VariablesGlobales.cuit_emisor_default
+        'cuit_emisor = cuit_emisor_default
         'archivo_certificado = "Q:\J@V!\Docs\Dropbox\_Development\Centrex 2.0\Certificados\JARVIS20171211.pfx"
         'archivo_licencia = "Q:\J@V!\Docs\Dropbox\_Development\Centrex 2.0\Certificados\WSAFIPFE.lic"
         'password_certificado = "Ladeda78"
@@ -912,15 +912,15 @@ Public Class main
     End Sub
 
     Private Sub cmd_next_Click(sender As Object, e As EventArgs) Handles cmd_next.Click
-        If pagina = Math.Ceiling(nRegs / VariablesGlobales.itXPage) Then Exit Sub
-        desde += VariablesGlobales.itXPage
+        If pagina = Math.Ceiling(nRegs / itXPage) Then Exit Sub
+        desde += itXPage
         pagina += 1
         ActualizarDatagrid()
     End Sub
 
     Private Sub cmd_prev_Click(sender As Object, e As EventArgs) Handles cmd_prev.Click
         If pagina = 1 Then Exit Sub
-        desde -= VariablesGlobales.itXPage
+        desde -= itXPage
         pagina -= 1
         ActualizarDatagrid()
     End Sub
@@ -933,14 +933,14 @@ Public Class main
 
     Private Sub cmd_last_Click(sender As Object, e As EventArgs) Handles cmd_last.Click
         pagina = tPaginas
-        desde = nRegs - VariablesGlobales.itXPage
+        desde = nRegs - itXPage
         ActualizarDatagrid()
     End Sub
 
     Private Sub cmd_go_Click(sender As Object, e As EventArgs) Handles cmd_go.Click
         pagina = txt_nPage.Text
         If pagina > tPaginas Then pagina = tPaginas
-        desde = (pagina - 1) * VariablesGlobales.itXPage
+        desde = (pagina - 1) * itXPage
         ActualizarDatagrid()
     End Sub
 
@@ -962,7 +962,7 @@ Public Class main
         'Dim fe As New WSAFIPFE.Factura
         'Dim n As Integer
         'Dim resultadoticket As Boolean
-        'fe.iniciar(WSAFIPFE.Factura.modoFiscal.Fiscal, VariablesGlobales.cuit_emisor_default, Application.StartupPath + "\Certificados\Bruno.pfx", Application.StartupPath + "\Certificados\WSAFIPFE.lic")
+        'fe.iniciar(WSAFIPFE.Factura.modoFiscal.Fiscal, cuit_emisor_default, Application.StartupPath + "\Certificados\Bruno.pfx", Application.StartupPath + "\Certificados\WSAFIPFE.lic")
         'resultadoticket = fe.f1ObtenerTicketAcceso()
         'MsgBox(resultadoticket)
         'n = fe.F1CompConsultar(2, 1, 1400)
@@ -1008,12 +1008,12 @@ Public Class main
         chk_historicos.Checked = False
         ActualizarDatagrid()
         edita_pedido = InfoPedido()
-        PedidoAPedidoTmp(edita_pedido.id_pedido, VariablesGlobales.usuario_logueado.id_usuario, idUnico)
-        VariablesGlobales.edicion = True
+        PedidoAPedidoTmp(edita_pedido.id_pedido, usuario_logueado.id_usuario, idUnico)
+        edicion = True
         Dim addPedido As New add_pedido(idUnico)
         addPedido.ShowDialog()
         'add_pedido.ShowDialog()
-        VariablesGlobales.edicion = False
+        edicion = False
     End Sub
 
     Private Sub AnularToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AnularToolStripMenuItem.Click
@@ -1026,7 +1026,7 @@ Public Class main
         Dim ccc As New ccCliente
 
 
-        Select Case VariablesGlobales.tabla
+        Select Case tabla
             Case Is = "pagos"
                 'HACER FUNCION Y PASAR TODO ESTO
                 p = info_pago(seleccionado)

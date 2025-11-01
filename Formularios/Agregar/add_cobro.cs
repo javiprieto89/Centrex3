@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex
 {
@@ -16,8 +14,7 @@ namespace Centrex
         // ==============================
         // === VARIABLES INTERNAS =======
         // ==============================
-        private CobroEntity c;
-        private CcClienteEntity cc;
+        private CcClienteEntity? cc;
         private string selColName = "Seleccionado";
         private double Total = 0d;
         private double Efectivo = 0d;
@@ -25,7 +22,6 @@ namespace Centrex
         private double totalRetenciones = 0d;
         private double TotalCh = 0d;
         private int[] chSel;
-        private bool noCambiar = false;
 
         public add_cobro()
         {
@@ -41,9 +37,9 @@ namespace Centrex
             try
             {
                 // Limpieza de temporales usando las funciones existentes
-                generales.Borrar_tabla_segun_usuario("tmpCobrosRetenciones", usuario_logueado.IdUsuario);
-                generales.Borrar_tabla_segun_usuario("tmpTransferencias", usuario_logueado.IdUsuario);
-                generales.Borrar_tabla_segun_usuario("tmpCheques", usuario_logueado.IdUsuario);
+                Borrar_tabla_segun_usuario("tmpCobrosRetenciones", usuario_logueado.IdUsuario);
+                Borrar_tabla_segun_usuario("tmpTransferencias", usuario_logueado.IdUsuario);
+                Borrar_tabla_segun_usuario("tmpCheques", usuario_logueado.IdUsuario);
 
                 // Cargar combo clientes usando la función existente
                 generales.Cargar_Combo(
@@ -80,7 +76,7 @@ namespace Centrex
             try
             {
                 int clienteId = Conversions.ToInteger(cmb_cliente.SelectedValue);
-                
+
                 // Cargar cuentas corrientes usando la función existente con filtros
                 var filtros = new Dictionary<string, object>
                 {
@@ -126,6 +122,12 @@ namespace Centrex
                 {
                     cc = ctx.CcClienteEntity.FirstOrDefault(x => x.IdCc == Conversions.ToInteger(cmb_cc.SelectedValue));
                 }
+                if (cc is null)
+                {
+                    Interaction.MsgBox("No se encontró la cuenta corriente seleccionada.", Constants.vbExclamation, "Centrex");
+                    return;
+                }
+
                 lbl_saldo.Text = "$ " + cc.Saldo.ToString();
                 lbl_importePago.Text = Strings.FormatCurrency(Total);
                 lbl_saldo.ForeColor = cc.Saldo < 0m ? Color.Red : Color.Green;
@@ -224,7 +226,7 @@ namespace Centrex
             try
             {
                 var cb = new CobroEntity();
-                
+
                 if (cmb_cliente.Text == "Seleccione un cliente")
                 {
                     Interaction.MsgBox("Debe seleccionar un cliente válido", Constants.vbExclamation, "Centrex");
@@ -292,7 +294,6 @@ namespace Centrex
 
         private void selCheques()
         {
-            noCambiar = true;
 
             foreach (DataGridViewRow row in dg_viewCH.Rows)
             {
@@ -302,13 +303,12 @@ namespace Centrex
                 }
             }
 
-            noCambiar = false;
         }
 
         private bool searchArray(int[] array, int value)
         {
             if (array == null) return false;
-          return array.Contains(value);
+            return array.Contains(value);
         }
 
         private string precio(string str)
@@ -390,7 +390,7 @@ namespace Centrex
                     };
                     ctx.TransferenciaEntity.Add(transferencia);
                 }
-                
+
                 // Borrar temporales
                 ctx.TmpTransferenciaEntity.RemoveRange(transferencias);
                 ctx.SaveChanges();
@@ -402,24 +402,24 @@ namespace Centrex
             using (var ctx = new CentrexDbContext())
             {
                 var retenciones = ctx.TmpCobroRetencionEntity.ToList();
- 
+
                 foreach (var r in retenciones)
                 {
                     var retencion = new CobroRetencionEntity
-                  {
-                 IdCobro = cb.IdCobro,
-                IdImpuesto = r.IdImpuesto,
-              Total = r.Total,
-                   Notas = r.Notas
-                };
+                    {
+                        IdCobro = cb.IdCobro,
+                        IdImpuesto = r.IdImpuesto,
+                        Total = r.Total,
+                        Notas = r.Notas
+                    };
                     ctx.CobroRetencionEntity.Add(retencion);
                 }
-                
+
                 // Borrar temporales
-              ctx.TmpCobroRetencionEntity.RemoveRange(retenciones);
-                  ctx.SaveChanges();
-             }
-          }
+                ctx.TmpCobroRetencionEntity.RemoveRange(retenciones);
+                ctx.SaveChanges();
+            }
+        }
 
         private void updateCCCliente_EF(CcClienteEntity cc)
         {
@@ -439,40 +439,40 @@ namespace Centrex
             // Usar las funciones temporales existentes para transferencias
             using (var ctx = new CentrexDbContext())
             {
-      var transferencias = ctx.TmpTransferenciaEntity
-        .Include(t => t.IdCuentaBancariaNavigation)
-          .ThenInclude(cb => cb.IdBancoNavigation)
-         .Select(t => new
-    {
-             ID = t.IdTmpTransferencia,
-     Banco = t.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre,
-        CuentaBancaria = t.IdCuentaBancariaNavigation.IdCuentaBancaria,
-        t.Fecha,
-    t.Total,
-          t.Notas
-  }).ToList();
-         
-           dg_viewTransferencia.DataSource = transferencias;
-         }
+                var transferencias = ctx.TmpTransferenciaEntity
+                  .Include(t => t.IdCuentaBancariaNavigation)
+                    .ThenInclude(cb => cb.IdBancoNavigation)
+                   .Select(t => new
+                   {
+                       ID = t.IdTmpTransferencia,
+                       Banco = t.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre,
+                       CuentaBancaria = t.IdCuentaBancariaNavigation.IdCuentaBancaria,
+                       t.Fecha,
+                       t.Total,
+                       t.Notas
+                   }).ToList();
+
+                dg_viewTransferencia.DataSource = transferencias;
+            }
         }
 
         private void cargarDGRetenciones()
         {
             // Usar las funciones temporales existentes para retenciones
-       using (var ctx = new CentrexDbContext())
-     {
-   var retenciones = ctx.TmpCobroRetencionEntity
-     .Include(r => r.IdImpuestoNavigation)
-  .Select(r => new
-   {
-     ID = r.IdTmpRetencion,
-     Retencion = r.IdImpuestoNavigation.Nombre,
-    r.Total,
-   r.Notas
-      }).ToList();
+            using (var ctx = new CentrexDbContext())
+            {
+                var retenciones = ctx.TmpCobroRetencionEntity
+                  .Include(r => r.IdImpuestoNavigation)
+               .Select(r => new
+               {
+                   ID = r.IdTmpRetencion,
+                   Retencion = r.IdImpuestoNavigation.Nombre,
+                   r.Total,
+                   r.Notas
+               }).ToList();
 
- dg_viewRetencion.DataSource = retenciones;
-  }
+                dg_viewRetencion.DataSource = retenciones;
+            }
         }
 
         private void actualizarDataGrid(int idCliente)
@@ -486,58 +486,58 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     string txtsearch = txt_searchCH.Text.Trim();
- var query = context.ChequeEntity
-  .Include(ch => ch.IdClienteNavigation)
-        .Include(ch => ch.IdBancoNavigation)
-  .Include(ch => ch.IdCuentaBancariaNavigation)
-     .ThenInclude(cb => cb.IdBancoNavigation)
-   .Include(ch => ch.IdEstadochNavigation)
-    .Where(ch => ch.Activo == true && ch.IdCliente == idCliente);
+                    var query = context.ChequeEntity
+                     .Include(ch => ch.IdClienteNavigation)
+                           .Include(ch => ch.IdBancoNavigation)
+                     .Include(ch => ch.IdCuentaBancariaNavigation)
+                        .ThenInclude(cb => cb.IdBancoNavigation)
+                      .Include(ch => ch.IdEstadochNavigation)
+                       .Where(ch => ch.Activo == true && ch.IdCliente == idCliente);
 
-     // Filtro de búsqueda
-      if (!string.IsNullOrEmpty(txtsearch))
-     {
-  string s = txtsearch.ToLower();
-       query = query.Where(ch => ch.IdCheque.ToString().Contains(s) ||
-   ch.IdBancoNavigation.Nombre.ToLower().Contains(s) ||
-     ch.NCheque.ToString().Contains(s) ||
-     ch.Importe.ToString().Contains(s) ||
-   ch.IdEstadochNavigation.Estado.ToLower().Contains(s));
-    }
+                    // Filtro de búsqueda
+                    if (!string.IsNullOrEmpty(txtsearch))
+                    {
+                        string s = txtsearch.ToLower();
+                        query = query.Where(ch => ch.IdCheque.ToString().Contains(s) ||
+                    ch.IdBancoNavigation.Nombre.ToLower().Contains(s) ||
+                      ch.NCheque.ToString().Contains(s) ||
+                      ch.Importe.ToString().Contains(s) ||
+                    ch.IdEstadochNavigation.Estado.ToLower().Contains(s));
+                    }
 
-       // Proyección y resultado
-   var resultado = query.OrderBy(ch => ch.NCheque)
-       .Select(ch => new
-    {
-     ID = ch.IdCheque,
-     Cliente = ch.IdClienteNavigation.RazonSocial,
-  Banco = ch.IdBancoNavigation.Nombre,
-   Numero = ch.NCheque,
-       ch.Importe,
-          Estado = ch.IdEstadochNavigation.Estado,
-      Depositado = ch.IdCuentaBancaria == null ? "No" :
-       $"Si, en: {ch.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre} - {ch.IdCuentaBancariaNavigation.Nombre}",
-     Activo = ch.Activo ? "Si" : "No"
-         }).ToList();
+                    // Proyección y resultado
+                    var resultado = query.OrderBy(ch => ch.NCheque)
+                        .Select(ch => new
+                        {
+                            ID = ch.IdCheque,
+                            Cliente = ch.IdClienteNavigation.RazonSocial,
+                            Banco = ch.IdBancoNavigation.Nombre,
+                            Numero = ch.NCheque,
+                            ch.Importe,
+                            Estado = ch.IdEstadochNavigation.Estado,
+                            Depositado = ch.IdCuentaBancaria == null ? "No" :
+                        $"Si, en: {ch.IdCuentaBancariaNavigation.IdBancoNavigation.Nombre} - {ch.IdCuentaBancariaNavigation.Nombre}",
+                            Activo = ch.Activo ? "Si" : "No"
+                        }).ToList();
 
-     dg_viewCH.DataSource = resultado;
-    dg_viewCH.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-     dg_viewCH.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                    dg_viewCH.DataSource = resultado;
+                    dg_viewCH.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                    dg_viewCH.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
-   // Calcular total
- decimal total = 0m;
-     foreach (var row in resultado)
-     total += ((dynamic)row).Importe;
+                    // Calcular total
+                    decimal total = 0m;
+                    foreach (var row in resultado)
+                        total += ((dynamic)row).Importe;
 
- lbl_importePago.Text = precio(total.ToString());
-     selCheques();
-   }
-     }
-       catch (Exception ex)
- {
- Interaction.MsgBox("Error al actualizar la grilla de cheques: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
-    }
-  }
+                    lbl_importePago.Text = precio(total.ToString());
+                    selCheques();
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox("Error al actualizar la grilla de cheques: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
+            }
+        }
 
         private void resetForm()
         {
@@ -547,7 +547,6 @@ namespace Centrex
             TotalCh = 0d;
             totalRetenciones = 0d;
             chSel = null;
-            noCambiar = false;
 
             chk_cobro_no_oficial.Checked = false;
             chk_efectivo.Checked = false;
@@ -557,13 +556,13 @@ namespace Centrex
 
             txt_efectivo.Text = Efectivo.ToString();
             lbl_totalRetencion.Text = precio(totalRetenciones.ToString());
-       lbl_totalTransferencia.Text = precio(transferenciaBancaria.ToString());
-   lbl_totalCh.Text = precio(TotalCh.ToString());
-      lbl_importePago.Text = precio(Total.ToString());
+            lbl_totalTransferencia.Text = precio(transferenciaBancaria.ToString());
+            lbl_totalCh.Text = precio(TotalCh.ToString());
+            lbl_importePago.Text = precio(Total.ToString());
             txt_notas.Text = "";
             cargarDGTransferencias();
-      cargarDGRetenciones();
-    }
+            cargarDGRetenciones();
+        }
 
     }
 }

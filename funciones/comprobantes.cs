@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
 {
@@ -31,7 +32,7 @@ namespace Centrex.Funciones
                 {
                     var comprobanteEntity = context.ComprobanteEntity
      .Include(c => c.IdTipoComprobanteNavigation)
-      .FirstOrDefault(c => c.IdComprobante == Conversions.ToInteger(id_comprobante));
+      .FirstOrDefault(c => c.IdComprobante == id_comprobante);
 
                     if (comprobanteEntity is not null)
                     {
@@ -65,7 +66,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 tmp.Comprobante = "error";
             }
 
@@ -108,7 +109,7 @@ namespace Centrex.Funciones
                             AnulaMiPyMe = comprobanteEntity.AnulaMiPyMe,
                             Contabilizar = comprobanteEntity.Contabilizar,
                             MueveStock = comprobanteEntity.MueveStock,
-                            IdModoMiPyme = comprobanteEntity.IdModoMiPyme                            
+                            IdModoMiPyme = comprobanteEntity.IdModoMiPyme
                         };
                         return tmp;
                     }
@@ -116,13 +117,13 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox($"Error en info_comprobante_porPtoYTipo: {ex.Message}");
+                MessageBox.Show($"Error en info_comprobante_porPtoYTipo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return null;
         }
 
-         // =============================================
+        // =============================================
         // AGREGAR COMPROBANTE
         // =============================================
         public static bool addcomprobante(ComprobanteEntity c)
@@ -161,7 +162,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -213,7 +214,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -240,7 +241,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -254,8 +255,9 @@ namespace Centrex.Funciones
             {
                 using (var context = new CentrexDbContext())
                 {
+                    int idTipo = int.Parse(id_tipoComprobante);
                     var tipoComprobante = context.TipoComprobanteEntity
-                 .FirstOrDefault(tc => tc.IdTipoComprobante == Conversions.ToInteger(id_tipoComprobante));
+                    .FirstOrDefault(tc => tc.IdTipoComprobante == idTipo);
 
                     if (tipoComprobante is not null && tipoComprobante.IdAnulaTipoComprobante.HasValue)
                     {
@@ -266,21 +268,20 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
             }
         }
-    
 
-            // ===============================================
+        // ===============================================
         // 🔹 Obtener información de comprobante
         // ===============================================
         public static ComprobanteEntity InfoComprobante(int comprobanteId)
         {
             using var ctx = new CentrexDbContext();
             return ctx.ComprobanteEntity
-                .Include(c => c.IdTipoComprobanteNavigation)
-                .FirstOrDefault(c => c.IdComprobante == comprobanteId);
+                        .Include(c => c.IdTipoComprobanteNavigation)
+                           .FirstOrDefault(c => c.IdComprobante == comprobanteId);
         }
 
         // =============================================
@@ -304,7 +305,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
 {
@@ -8,34 +9,28 @@ namespace Centrex.Funciones
     {
 
         // ************************************ FUNCIONES DE CONCEPTOS DE COMPRA **********************
-        public static ConceptoCompraEntity info_concepto_compra(string id_concepto)
+        public static ConceptoCompraEntity info_concepto_compra(int id_concepto)
         {
-            var tmp = new ConceptoCompraEntity();
-
-            try
+                        try
             {
                 using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var conceptoEntity = context.ConceptoCompraEntity.FirstOrDefault(c => c.IdConceptoCompra == Conversions.ToInteger(id_concepto));
+                    var conceptoCompraEntity = context.ConceptoCompraEntity.FirstOrDefault(c => c.IdConceptoCompra == id_concepto);                    
 
-                    if (conceptoEntity is not null)
-                    {
-                        tmp.IdConceptoCompra = conceptoEntity.IdConceptoCompra;
-                        tmp.Concepto = conceptoEntity.Concepto;
-                        tmp.Activo = conceptoEntity.Activo;
+                    if (conceptoCompraEntity is not null)
+                    {                        
+                        return conceptoCompraEntity;
                     }
                     else
                     {
-                        tmp.Concepto = "error";
+                        return null;
                     }
                 }
-
-                return tmp;
             }
             catch (Exception ex)
             {
-                tmp.Concepto = "error";
-                return tmp;
+                MessageBox.Show("Error al obtener concepto de compra:" + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
         }
 
@@ -103,7 +98,7 @@ namespace Centrex.Funciones
         {
             try
             {
-                using (CentrexDbContext context = new ())
+                using (CentrexDbContext context = new())
                 {
                     var conceptoEntity = context.ConceptoCompraEntity.FirstOrDefault(c => c.IdConceptoCompra == Concepto.IdConceptoCompra);
 

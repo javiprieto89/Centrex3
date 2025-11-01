@@ -180,7 +180,7 @@ namespace Centrex.Afip
             }
         }
 
-           
+
         public object FEParamGetPtosVenta()
         {
             try

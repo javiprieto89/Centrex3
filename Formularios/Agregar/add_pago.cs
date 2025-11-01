@@ -4,9 +4,6 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -250,7 +247,7 @@ namespace Centrex
                     .Include(ch => ch.IdCuentaBancariaNavigation)
                         .ThenInclude(cb => cb.IdBancoNavigation)
                     .Include(ch => ch.IdEstadochNavigation)
-                    .Where(ch => ch.Activo == true && ch.IdEstadoch == VariablesGlobales.ID_CH_CARTERA);
+                    .Where(ch => ch.Activo == true && ch.IdEstadoch == ID_CH_CARTERA);
 
                 // ==========================================================
                 // 2️⃣ Filtro textual si hay búsqueda
@@ -381,14 +378,14 @@ namespace Centrex
             string seleccionado = dg_viewCH.CurrentRow.Cells["ID"].Value?.ToString();
             if (string.IsNullOrEmpty(seleccionado)) return;
 
-            VariablesGlobales.edita_cheque = cccheque.info_cheque(seleccionado);
-            if (!VariablesGlobales.borrado) VariablesGlobales.edicion = true;
+            edita_cheque = cccheque.info_cheque(seleccionado);
+            if (!borrado) edicion = true;
 
             var frm = new add_cheque();
             frm.ShowDialog();
 
             ActualizarGridCheques();
-            VariablesGlobales.edicion = false;
+            edicion = false;
         }
 
         // ====== Helpers selección cheques ======
@@ -502,9 +499,9 @@ namespace Centrex
                     return;
 
                 // 🔹 Buscar transferencia temporal por ID
-                //VariablesGlobales.edita_transferencia = cctransferencia.InfoTmpTransferencia(seleccionado);
+                //edita_transferencia = cctransferencia.InfoTmpTransferencia(seleccionado);
 
-                if (VariablesGlobales.edita_transferencia == null || VariablesGlobales.edita_transferencia.IdTransferencia == -1)
+                if (edita_transferencia == null || edita_transferencia.IdTransferencia == -1)
                 {
                     MessageBox.Show("Ocurrió un problema al editar la transferencia.", "Centrex",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -512,8 +509,8 @@ namespace Centrex
                 }
 
                 // 🔹 Marcar modo edición
-                if (!VariablesGlobales.borrado)
-                    VariablesGlobales.edicion = true;
+                if (!borrado)
+                    edicion = true;
 
                 // 🔹 Abrir formulario de edición
                 using (var frm = new add_transferencia())
@@ -525,7 +522,7 @@ namespace Centrex
                 ActualizaTransferencias();
 
                 // 🔹 Restaurar estado global
-                VariablesGlobales.edicion = false;
+                edicion = false;
             }
             catch (Exception ex)
             {
@@ -547,40 +544,40 @@ namespace Centrex
         // ==========================================================
         private void pic_searchProveedor_Click(object sender, EventArgs e)
         {
-            string tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "proveedores";
+            string tmp = tabla;
+            tabla = "proveedores";
 
             Enabled = false;
             var s = new search();
             s.ShowDialog();
             Enabled = true;
 
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
-            if (VariablesGlobales.id == 0) VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
-            generales.updateform(VariablesGlobales.id.ToString(), ref cmb_proveedor);
+            if (id == 0) id = id_cliente_pedido_default;
+            generales.updateform(id.ToString(), ref cmb_proveedor);
         }
 
         private void pic_searchCCProveedor_Click(object sender, EventArgs e)
         {
             if (cmb_proveedor.SelectedValue is null || cmb_proveedor.SelectedIndex == -1) return;
 
-            string tmp = VariablesGlobales.tabla;
-            var tmpProv = VariablesGlobales.edita_proveedor;
+            string tmp = tabla;
+            var tmpProv = edita_proveedor;
 
-            VariablesGlobales.edita_proveedor = info_proveedor(Conversions.ToInteger(cmb_proveedor.SelectedValue));
-            VariablesGlobales.tabla = "cc_proveedores";
+            edita_proveedor = info_proveedor(Conversions.ToInteger(cmb_proveedor.SelectedValue));
+            tabla = "cc_proveedores";
 
             Enabled = false;
             var s = new search();
             s.ShowDialog();
             Enabled = true;
 
-            VariablesGlobales.tabla = tmp;
-            VariablesGlobales.edita_proveedor = tmpProv;
+            tabla = tmp;
+            edita_proveedor = tmpProv;
 
-            if (VariablesGlobales.id == 0) VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
-            generales.updateform(VariablesGlobales.id.ToString(), ref cmb_cc);
+            if (id == 0) id = id_cliente_pedido_default;
+            generales.updateform(id.ToString(), ref cmb_cc);
         }
 
         private void cmd_verCheques_Click(object sender, EventArgs e)

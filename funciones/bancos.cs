@@ -7,22 +7,26 @@ namespace Centrex.Funciones
     {
         // ************************************ FUNCIONES DE BANCOS ***************************
 
-        public static BancoEntity InfoBanco(string id_banco)
+        public static BancoEntity info_banco(int id_banco)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    if (string.IsNullOrEmpty(id_banco))
-                        return context.BancoEntity.FirstOrDefault();
-
-                    int id = Conversions.ToInteger(id_banco);
-                    return context.BancoEntity.FirstOrDefault(b => b.IdBanco == id);
+                    var bancoEntity = context.BancoEntity.FirstOrDefault(b => b.IdBanco == id_banco);
+                    if (bancoEntity is not null)
+                    {
+                        return bancoEntity;
+                    }
+                    else
+                    {
+                        return null;
+                    }                   
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                Interaction.MsgBox(ex.Message);                
                 return null;
             }
         }

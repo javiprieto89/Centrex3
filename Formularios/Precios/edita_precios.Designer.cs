@@ -27,7 +27,7 @@ namespace Centrex
         }
 
         // Requerido por el Diseñador de Windows Forms
-        private System.ComponentModel.IContainer components;
+        private System.ComponentModel.IContainer components = null!;
 
         // NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
         // Se puede modificar usando el Diseñador de Windows Forms.  
@@ -77,7 +77,7 @@ namespace Centrex
             dg_view.Size = new Size(891, 669);
             dg_view.TabIndex = 58;
             // 
-            // VariablesGlobales.edita_precios
+            // edita_precios
             // 
             AutoScaleDimensions = new SizeF(6.0f, 13.0f);
             AutoScaleMode = AutoScaleMode.Font;
@@ -85,7 +85,7 @@ namespace Centrex
             Controls.Add(cmd_exit);
             Controls.Add(cmd_ok);
             Controls.Add(dg_view);
-            Name = "VariablesGlobales.edita_precios";
+            Name = "edita_precios";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Edición masiva de precios";
             ((System.ComponentModel.ISupportInitialize)dg_view).EndInit();

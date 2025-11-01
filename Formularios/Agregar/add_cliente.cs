@@ -13,20 +13,21 @@ namespace Centrex
         {
             InitializeComponent();
         }
+
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            if (VariablesGlobales.busquedaavanzada)
+            if (busquedaavanzada)
             {
                 {
-                    var withBlock = VariablesGlobales.edita_cliente;
-                    withBlock.RazonSocial = Strings.Trim(txt_razonSocial.Text);
-                    withBlock.NombreFantasia = Strings.Trim(txt_nombreFantasia.Text);
+                    var withBlock = edita_cliente;
+                    withBlock.RazonSocial = txt_razonSocial.Text.Trim();
+                    withBlock.NombreFantasia = txt_nombreFantasia.Text.Trim();
                     withBlock.IdClaseFiscal = ToNullableInt(cmb_claseFiscal.SelectedValue);
                     if (cmb_tipoDocumento.SelectedValue is not null)
                     {
-                        withBlock.IdTipoDocumento = Conversions.ToInteger(cmb_tipoDocumento.SelectedValue);
+                        withBlock.IdTipoDocumento = Convert.ToInt32(cmb_tipoDocumento.SelectedValue);
                     }
-                    withBlock.Contacto = Strings.Trim(txt_contacto.Text);
+                    withBlock.Contacto = txt_contacto.Text.Trim();
                     withBlock.TaxNumber = txt_taxNumber.Text;
                     withBlock.Telefono = txt_telefono.Text;
                     withBlock.Celular = txt_celular.Text;
@@ -51,17 +52,17 @@ namespace Centrex
 
             if (string.IsNullOrEmpty(txt_razonSocial.Text))
             {
-                Interaction.MsgBox("El campo 'Razon social' es obligatorio y está vacio");
+                MessageBox.Show("El campo 'Razon social' es obligatorio y está vacio", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
             var cl = new ClienteEntity();
 
-            cl.RazonSocial = Strings.Trim(txt_razonSocial.Text);
-            cl.NombreFantasia = Strings.Trim(txt_nombreFantasia.Text);
+            cl.RazonSocial = txt_razonSocial.Text.Trim();
+            cl.NombreFantasia = txt_nombreFantasia.Text.Trim();
             cl.IdClaseFiscal = ToNullableInt(cmb_claseFiscal.SelectedValue);
-            cl.IdTipoDocumento = Conversions.ToInteger(cmb_tipoDocumento.SelectedValue);
-            cl.Contacto = Strings.Trim(txt_contacto.Text);
+            cl.IdTipoDocumento = Convert.ToInt32(cmb_tipoDocumento.SelectedValue);
+            cl.Contacto = txt_contacto.Text.Trim();
             cl.TaxNumber = txt_taxNumber.Text;
             cl.Telefono = txt_telefono.Text;
             cl.Celular = txt_celular.Text;
@@ -73,8 +74,7 @@ namespace Centrex
             cl.DireccionFiscal = txt_direccionFiscal.Text;
             cl.LocalidadFiscal = txt_localidadFiscal.Text;
             cl.CpFiscal = txt_cpFiscal.Text;
-            // If cmb_paisEntrega.Text = "" Then .id_pais_entrega = cmb_paisFiscal.SelectedValue Else .id_pais_entrega = cmb_paisEntrega.SelectedValue
-            // If cmb_provinciaEntrega.Text = "" Then .id_provincia_entrega = cmb_provinciaFiscal.SelectedValue Else .id_provincia_entrega = cmb_provinciaEntrega.SelectedValue
+
             if (string.IsNullOrEmpty(txt_direccionEntrega.Text))
             {
                 cl.IdPaisEntrega = cl.IdPaisFiscal;
@@ -91,18 +91,17 @@ namespace Centrex
                 cl.LocalidadEntrega = txt_localidadEntrega.Text;
                 cl.CpEntrega = txt_cpEntrega.Text;
             }
-            // If txt_localidadEntrega.Text = "" Then .localidad_entrega = txt_localidadFiscal.Text Else .localidad_entrega = txt_localidadEntrega.Text
-            // If txt_cpEntrega.Text = "" Then .cp_entrega = txt_cpFiscal.Text Else .cp_entrega = txt_cpEntrega.Text
+
             cl.EsInscripto = chk_esInscripto.Checked;
             cl.Activo = chk_activo.Checked;
             cl.Notas = txt_notas.Text;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                cl.IdCliente = VariablesGlobales.edita_cliente.IdCliente;
+                cl.IdCliente = edita_cliente.IdCliente;
                 if (clientes.updatecliente(cl) == false)
                 {
-                    Interaction.MsgBox("Hubo un problema al actualizar el cliente, consulte con su programdor", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                    MessageBox.Show("Hubo un problema al actualizar el cliente, consulte con su programador", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     closeandupdate(this);
                 }
             }
@@ -116,17 +115,17 @@ namespace Centrex
                 txt_razonSocial.Text = "";
                 txt_nombreFantasia.Text = "";
                 cmb_claseFiscal.Text = "Seleccione una clase fiscal....";
-                cmb_tipoDocumento.SelectedValue = VariablesGlobales.id_tipoDocumento_default;
+                cmb_tipoDocumento.SelectedValue = id_tipoDocumento_default;
                 txt_taxNumber.Text = "";
                 txt_contacto.Text = "";
                 txt_telefono.Text = "";
                 txt_celular.Text = "";
                 txt_email.Text = "";
-                cmb_paisFiscal.SelectedValue = VariablesGlobales.id_pais_default;
+                cmb_paisFiscal.SelectedValue = id_pais_default;
                 CargarProvinciasPorPais(ref cmb_provinciaFiscal, cmb_paisFiscal.SelectedValue);
-                if (VariablesGlobales.id_provincia_default > 0 && cmb_provinciaFiscal.Items.Count > 0)
+                if (id_provincia_default > 0 && cmb_provinciaFiscal.Items.Count > 0)
                 {
-                    cmb_provinciaFiscal.SelectedValue = VariablesGlobales.id_provincia_default;
+                    cmb_provinciaFiscal.SelectedValue = id_provincia_default;
                 }
                 else
                 {
@@ -135,11 +134,11 @@ namespace Centrex
                 txt_direccionFiscal.Text = "";
                 txt_localidadFiscal.Text = "";
                 txt_cpFiscal.Text = "";
-                cmb_paisEntrega.SelectedValue = VariablesGlobales.id_pais_default;
+                cmb_paisEntrega.SelectedValue = id_pais_default;
                 CargarProvinciasPorPais(ref cmb_provinciaEntrega, cmb_paisEntrega.SelectedValue);
-                if (VariablesGlobales.id_provincia_default > 0 && cmb_provinciaEntrega.Items.Count > 0)
+                if (id_provincia_default > 0 && cmb_provinciaEntrega.Items.Count > 0)
                 {
-                    cmb_provinciaEntrega.SelectedValue = VariablesGlobales.id_provincia_default;
+                    cmb_provinciaEntrega.SelectedValue = id_provincia_default;
                 }
                 else
                 {
@@ -159,10 +158,6 @@ namespace Centrex
             closeandupdate(this);
         }
 
-        // Private Sub txt_taxNumber_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_taxNumber
-        // 'e.Handled = valida(e.KeyChar, 2)
-        // End Sub
-
         private void add_cliente_FormClosed(object sender, FormClosedEventArgs e)
         {
             closeandupdate(this);
@@ -176,37 +171,37 @@ namespace Centrex
             var ordenDocumento = OrdenAscendente("Documento");
 
             generales.Cargar_Combo(
-             ref cmb_paisFiscal,
-               entidad: "PaisEntity",
-               displaymember: "Pais",
-               valuemember: "IdPais",
-              predet: -1,
-                         soloActivos: false,
-                  orden: ordenPais);
+           ref cmb_paisFiscal,
+      entidad: "PaisEntity",
+          displaymember: "Pais",
+         valuemember: "IdPais",
+           predet: -1,
+         soloActivos: false,
+               orden: ordenPais);
 
-            if (VariablesGlobales.id_pais_default > 0 && cmb_paisFiscal.Items.Count > 0)
+            if (id_pais_default > 0 && cmb_paisFiscal.Items.Count > 0)
             {
-                cmb_paisFiscal.SelectedValue = VariablesGlobales.id_pais_default;
+                cmb_paisFiscal.SelectedValue = id_pais_default;
             }
 
             CargarProvinciasPorPais(ref cmb_provinciaFiscal, cmb_paisFiscal.SelectedValue, ordenProvincia);
-            if (VariablesGlobales.id_provincia_default > 0 && cmb_provinciaFiscal.Items.Count > 0)
+            if (id_provincia_default > 0 && cmb_provinciaFiscal.Items.Count > 0)
             {
-                cmb_provinciaFiscal.SelectedValue = VariablesGlobales.id_provincia_default;
+                cmb_provinciaFiscal.SelectedValue = id_provincia_default;
             }
 
             generales.Cargar_Combo(
                ref cmb_paisEntrega,
-            entidad: "PaisEntity",
-          displaymember: "Pais",
-                    valuemember: "IdPais",
-              predet: -1,
-                  soloActivos: false,
-              orden: ordenPais);
+             entidad: "PaisEntity",
+              displaymember: "Pais",
+                     valuemember: "IdPais",
+                        predet: -1,
+                     soloActivos: false,
+           orden: ordenPais);
 
-            if (VariablesGlobales.id_pais_default > 0 && cmb_paisEntrega.Items.Count > 0)
+            if (id_pais_default > 0 && cmb_paisEntrega.Items.Count > 0)
             {
-                cmb_paisEntrega.SelectedValue = VariablesGlobales.id_pais_default;
+                cmb_paisEntrega.SelectedValue = id_pais_default;
             }
             else
             {
@@ -220,40 +215,39 @@ namespace Centrex
                 cmb_provinciaEntrega.Items.Clear();
                 cmb_provinciaEntrega.SelectedIndex = -1;
             }
-            else if (VariablesGlobales.id_provincia_default > 0 && cmb_provinciaEntrega.Items.Count > 0)
+            else if (id_provincia_default > 0 && cmb_provinciaEntrega.Items.Count > 0)
             {
-                cmb_provinciaEntrega.SelectedValue = VariablesGlobales.id_provincia_default;
+                cmb_provinciaEntrega.SelectedValue = id_provincia_default;
             }
 
             generales.Cargar_Combo(
-             ref cmb_claseFiscal,
-         entidad: "SysClaseFiscalEntity",
-                   displaymember: "Descript",
-          valuemember: "IdClaseFiscal",
-        predet: -1,
-               soloActivos: false,
-           orden: ordenClaseFiscal);
+       ref cmb_claseFiscal,
+                entidad: "SysClaseFiscalEntity",
+   displaymember: "Descript",
+    valuemember: "IdClaseFiscal",
+                predet: -1,
+    soloActivos: false,
+  orden: ordenClaseFiscal);
             cmb_claseFiscal.Text = "Seleccione una clase fiscal...";
 
             generales.Cargar_Combo(
-          ref cmb_tipoDocumento,
-         entidad: "TipoDocumentoEntity",
-         displaymember: "Documento",
-  valuemember: "IdTipoDocumento",
-   predet: -1,
-   soloActivos: true,
-      orden: ordenDocumento);
-            if (VariablesGlobales.id_tipoDocumento_default > 0)
+             ref cmb_tipoDocumento,
+          entidad: "TipoDocumentoEntity",
+             displaymember: "Documento",
+               valuemember: "IdTipoDocumento",
+             predet: -1,
+              soloActivos: true,
+            orden: ordenDocumento);
+            if (id_tipoDocumento_default > 0)
             {
-                cmb_tipoDocumento.SelectedValue = VariablesGlobales.id_tipoDocumento_default;
+                cmb_tipoDocumento.SelectedValue = id_tipoDocumento_default;
             }
 
             cmb_tipoDocumento_SelectionChangeCommitted(null, null);
 
-            // Me.ActiveControl = Me.txt_razonSocial
             ActiveControl = txt_taxNumber;
 
-            if (VariablesGlobales.busquedaavanzada)
+            if (busquedaavanzada)
             {
                 Text = "Buscar clientes";
                 cmd_ok.Text = "Buscar";
@@ -263,12 +257,12 @@ namespace Centrex
             }
 
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true || borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_razonSocial.Text = VariablesGlobales.edita_cliente.RazonSocial;
-                txt_nombreFantasia.Text = VariablesGlobales.edita_cliente.NombreFantasia;
-                if (VariablesGlobales.edita_cliente.IdClaseFiscal is int claseFiscalId)
+                txt_razonSocial.Text = edita_cliente.RazonSocial;
+                txt_nombreFantasia.Text = edita_cliente.NombreFantasia;
+                if (edita_cliente.IdClaseFiscal is int claseFiscalId)
                 {
                     cmb_claseFiscal.SelectedValue = claseFiscalId;
                 }
@@ -277,29 +271,29 @@ namespace Centrex
                     cmb_claseFiscal.SelectedIndex = -1;
                 }
 
-                cmb_tipoDocumento.SelectedValue = VariablesGlobales.edita_cliente.IdTipoDocumento;
-                txt_taxNumber.Text = VariablesGlobales.edita_cliente.TaxNumber;
-                txt_contacto.Text = VariablesGlobales.edita_cliente.Contacto;
-                txt_telefono.Text = VariablesGlobales.edita_cliente.Telefono;
-                txt_celular.Text = VariablesGlobales.edita_cliente.Celular;
-                txt_email.Text = VariablesGlobales.edita_cliente.Email;
+                cmb_tipoDocumento.SelectedValue = edita_cliente.IdTipoDocumento;
+                txt_taxNumber.Text = edita_cliente.TaxNumber;
+                txt_contacto.Text = edita_cliente.Contacto;
+                txt_telefono.Text = edita_cliente.Telefono;
+                txt_celular.Text = edita_cliente.Celular;
+                txt_email.Text = edita_cliente.Email;
 
-                SeleccionarPaisYProvincia(cmb_paisFiscal, ref cmb_provinciaFiscal, VariablesGlobales.edita_cliente.IdProvinciaFiscal);
-                txt_direccionFiscal.Text = VariablesGlobales.edita_cliente.DireccionFiscal;
-                txt_localidadFiscal.Text = VariablesGlobales.edita_cliente.LocalidadFiscal;
-                txt_cpFiscal.Text = VariablesGlobales.edita_cliente.CpFiscal;
+                SeleccionarPaisYProvincia(cmb_paisFiscal, ref cmb_provinciaFiscal, edita_cliente.IdProvinciaFiscal);
+                txt_direccionFiscal.Text = edita_cliente.DireccionFiscal;
+                txt_localidadFiscal.Text = edita_cliente.LocalidadFiscal;
+                txt_cpFiscal.Text = edita_cliente.CpFiscal;
 
-                SeleccionarPaisYProvincia(cmb_paisEntrega, ref cmb_provinciaEntrega, VariablesGlobales.edita_cliente.IdProvinciaEntrega);
-                txt_direccionEntrega.Text = VariablesGlobales.edita_cliente.DireccionEntrega;
-                txt_localidadEntrega.Text = VariablesGlobales.edita_cliente.LocalidadEntrega;
-                txt_cpEntrega.Text = VariablesGlobales.edita_cliente.CpEntrega;
+                SeleccionarPaisYProvincia(cmb_paisEntrega, ref cmb_provinciaEntrega, edita_cliente.IdProvinciaEntrega);
+                txt_direccionEntrega.Text = edita_cliente.DireccionEntrega;
+                txt_localidadEntrega.Text = edita_cliente.LocalidadEntrega;
+                txt_cpEntrega.Text = edita_cliente.CpEntrega;
 
-                chk_esInscripto.Checked = VariablesGlobales.edita_cliente.EsInscripto;
-                chk_activo.Checked = VariablesGlobales.edita_cliente.Activo;
-                txt_notas.Text = VariablesGlobales.edita_cliente.Notas;
+                chk_esInscripto.Checked = edita_cliente.EsInscripto;
+                chk_activo.Checked = edita_cliente.Activo;
+                txt_notas.Text = edita_cliente.Notas;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_razonSocial.Enabled = false;
                 txt_nombreFantasia.Enabled = false;
@@ -324,20 +318,20 @@ namespace Centrex
                 cmd_ok.Visible = false;
                 cmd_exit.Visible = false;
                 Show();
-                if (Interaction.MsgBox("¿Está seguro que desea borrar este cliente?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
+                if (MessageBox.Show("¿Está seguro que desea borrar este cliente?", "Centrex", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    if (clientes.borrarcliente(VariablesGlobales.edita_cliente) == false)
+                    if (clientes.borrarcliente(edita_cliente) == false)
                     {
-                        if (Interaction.MsgBox("Ocurrió un error al realizar el borrado del cliente, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
+                        if (MessageBox.Show("Ocurrió un error al realizar el borrado del cliente, ¿desea intentar desactivarlo para que no aparezca en la búsqueda?", "Centrex", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         {
                             // Realizo un borrado lógico
-                            if (clientes.updatecliente(VariablesGlobales.edita_cliente, true) == true)
+                            if (clientes.updatecliente(edita_cliente, true) == true)
                             {
-                                Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero el cliente no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el cliente, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
+                                MessageBox.Show("Se ha podido realizar un borrado lógico, pero el cliente no se borró definitivamente.\r\nEsto posiblemente se deba a que el cliente tiene operaciones realizadas y por lo tanto no podrá borrarse", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
-                                Interaction.MsgBox("No se ha podido borrar el cliente, consulte con el programador");
+                                MessageBox.Show("No se ha podido borrar el cliente, consulte con el programador", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                         }
                     }
@@ -360,11 +354,7 @@ namespace Centrex
 
         private void txt_taxNumber_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (char.IsDigit(e.KeyChar))
-            {
-                e.Handled = false;
-            }
-            else if (char.IsControl(e.KeyChar))
+            if (char.IsDigit(e.KeyChar) || char.IsControl(e.KeyChar))
             {
                 e.Handled = false;
             }
@@ -376,7 +366,7 @@ namespace Centrex
 
         private void cmb_tipoDocumento_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(cmb_tipoDocumento.SelectedValue, 80, false)))
+            if (cmb_tipoDocumento.SelectedValue != null && Convert.ToInt32(cmb_tipoDocumento.SelectedValue) == 80)
             {
                 chk_esInscripto.Checked = true;
             }
@@ -388,32 +378,26 @@ namespace Centrex
 
         private void txt_notas_TextChanged(object sender, EventArgs e)
         {
-
         }
 
         private void cmb_tipoDocumento_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // e.KeyChar = ""
         }
 
         private void cmb_paisFiscal_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // e.KeyChar = ""
         }
 
         private void cmb_provinciaFiscal_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // e.KeyChar = ""
         }
 
         private void cmb_paisEntrega_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // e.KeyChar = ""
         }
 
         private void cmb_provinciaEntrega_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // e.KeyChar = ""
         }
 
         private void txt_taxNumber_LostFocus(object sender, EventArgs e)
@@ -463,8 +447,8 @@ namespace Centrex
 
                 txt_notas.Text = cl.Notas;
                 cmb_tipoDocumento_SelectionChangeCommitted(null, null);
-                VariablesGlobales.edita_cliente = cl;
-                VariablesGlobales.edicion = true;
+                edita_cliente = cl;
+                edicion = true;
             }
         }
 
@@ -477,7 +461,7 @@ namespace Centrex
 
             try
             {
-                return Conversions.ToInteger(value);
+                return Convert.ToInt32(value);
             }
             catch
             {
@@ -508,14 +492,14 @@ namespace Centrex
             };
 
             generales.Cargar_Combo(
-                      ref comboProvincia,
-             entidad: "ProvinciaEntity",
-              displaymember: "Provincia",
-              valuemember: "IdProvincia",
-             predet: -1,
-                      soloActivos: false,
-          filtros: filtros,
-                      orden: orden);
+     ref comboProvincia,
+                entidad: "ProvinciaEntity",
+         displaymember: "Provincia",
+         valuemember: "IdProvincia",
+        predet: -1,
+                soloActivos: false,
+                filtros: filtros,
+             orden: orden);
         }
 
         private void SeleccionarPaisYProvincia(ComboBox cmbPais, ref ComboBox cmbProvincia, int? idProvincia)

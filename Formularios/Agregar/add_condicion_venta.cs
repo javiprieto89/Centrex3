@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex
 {
@@ -38,9 +35,9 @@ namespace Centrex
             tmp.Recargo = Conversions.ToDecimal(txt_recargo.Text);
             tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                tmp.IdCondicionVenta = VariablesGlobales.edita_condicion_venta.IdCondicionVenta;
+                tmp.IdCondicionVenta = edita_condicion_venta.IdCondicionVenta;
                 if (condiciones_venta.updateCondicion_venta(tmp) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar la condición, consulte con su programador", Constants.vbExclamation);
@@ -78,16 +75,16 @@ namespace Centrex
         private void Add_condicion_Load(object sender, EventArgs e)
         {
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_condicion.Text = VariablesGlobales.edita_condicion_venta.Condicion;
-                txt_vencimiento.Text = VariablesGlobales.edita_condicion_venta.Vencimiento.ToString();
-                txt_recargo.Text = VariablesGlobales.edita_condicion_venta.Recargo.ToString();
-                chk_activo.Checked = VariablesGlobales.edita_condicion_venta.Activo;
+                txt_condicion.Text = edita_condicion_venta.Condicion;
+                txt_vencimiento.Text = edita_condicion_venta.Vencimiento.ToString();
+                txt_recargo.Text = edita_condicion_venta.Recargo.ToString();
+                chk_activo.Checked = edita_condicion_venta.Activo;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_condicion.Enabled = false;
                 txt_vencimiento.Enabled = false;
@@ -100,12 +97,12 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta condición?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (condiciones_venta.borrarCondicion_venta(VariablesGlobales.edita_condicion_venta) == false)
+                    if (condiciones_venta.borrarCondicion_venta(edita_condicion_venta) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la condición, ¿desea intentar desactivarla para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (condiciones_venta.updateCondicion_venta(VariablesGlobales.edita_condicion_venta, true) == true)
+                            if (condiciones_venta.updateCondicion_venta(edita_condicion_venta, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la condición no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que la condición tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }

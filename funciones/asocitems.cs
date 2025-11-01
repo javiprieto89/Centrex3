@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex.Funciones
 {
@@ -28,9 +24,9 @@ namespace Centrex.Funciones
                     {
                         return ent;
                     }
-                    else 
+                    else
                     {
-                        tmp.IdItem = -1;   
+                        tmp.IdItem = -1;
                         return tmp;
                     }
                 }

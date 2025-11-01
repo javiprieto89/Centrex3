@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Centrex.Afip;
+using Centrex.Afip.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using Centrex.Afip;
-using Centrex.Afip.Models;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -27,7 +25,7 @@ namespace Centrex
         private void CargarConfiguracion()
         {
             // Cargar valores por defecto
-            txt_cuit.Text = VariablesGlobales.cuit_emisor_default;
+            txt_cuit.Text = cuit_emisor_default;
 
             // Cargar opciones de modo
             cmb_mode.Items.Clear();

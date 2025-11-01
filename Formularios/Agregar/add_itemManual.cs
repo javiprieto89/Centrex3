@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -64,6 +62,8 @@ namespace Centrex
             }
             catch (Exception ex)
             {
+                Interaction.MsgBox("Valores no válidos: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
+                return;
             }
 
 

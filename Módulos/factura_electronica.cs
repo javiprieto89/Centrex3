@@ -25,19 +25,19 @@ namespace Centrex
         public static string cuit_emisor { get; private set; }
         public static PedidoEntity pAnulado;
         public static ComprobanteEntity cAnulado;
-        
+
 
         // Propiedades privadas para configuración
-        private static string archivo_certificado;
-        private static string archivo_licencia;
-        private static string password_certificado;
-        private static AfipMode afipMode;
+        private static string archivo_certificado = string.Empty;
+        private static string archivo_licencia = string.Empty;
+        private static string password_certificado = string.Empty;
+        private static AfipMode afipMode = AfipMode.HOMO;
 
         private const string WSAA_HOMO = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms";
         private const string WSAA_PROD = "https://wsaa.afip.gov.ar/ws/services/LoginCms";
         private const string WSFE_HOMO = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx";
         private const string WSFE_PROD = "https://servicios1.afip.gov.ar/wsfev1/service.asmx";
-        
+
 
         /// <summary>
         /// Función principal de facturación - MANTIENE LA FIRMA ORIGINAL
@@ -220,7 +220,7 @@ namespace Centrex
                     // Documentos asociados para NC/ND MiPyME
                     if (EsNotaCreditoODebito(c.IdTipoComprobante) && (p.NumeroPedidoAnulado ?? 0) > 0)
                     {
-                        pAnulado = Pedidos.Info_pedido(p.NumeroPedidoAnulado ?? 0);
+                        pAnulado = info_pedido(p.NumeroPedidoAnulado ?? 0);
                         if (pAnulado != null)
                         {
                             cAnulado = comprobantes.info_comprobante(pAnulado.IdComprobante);
@@ -248,7 +248,7 @@ namespace Centrex
                     // ============================================
                     if (EsNotaCreditoODebito(c.IdTipoComprobante) && (p.NumeroPedidoAnulado ?? 0) > 0)
                     {
-                        pAnulado = Info_pedido(p.NumeroPedidoAnulado ?? 0);
+                        pAnulado = info_pedido(p.NumeroPedidoAnulado ?? 0);
                         if (pAnulado != null)
                         {
                             cAnulado = comprobantes.info_comprobante(pAnulado.IdComprobante);
@@ -931,7 +931,7 @@ namespace Centrex
             {
                 Console.WriteLine($"ConsultarComprobante Error: {ex.Message}");
                 throw;
-            }     
+            }
         }
     }
 }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -73,7 +71,7 @@ public partial class ComprobanteEntity
 
     [Column("id_modoMiPyme")]
     public int IdModoMiPyme { get; set; }
-        
+
     [ForeignKey("IdModoMiPyme")]
     [InverseProperty("ComprobanteEntity")]
     public virtual SysModoMiPymeEntity IdModoMiPymeNavigation { get; set; } = null!;

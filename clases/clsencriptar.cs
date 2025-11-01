@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -39,8 +39,29 @@ namespace Centrex
                 var output = Transformar(input, decryptor);
                 return m_utf8.GetString(output);
             }
-            catch
+            catch (FormatException ex)
             {
+                var prefix = text is null ? "" : text[..Math.Min(16, text.Length)];
+                Centrex.Funciones.ErrorLogger.Log(
+                    ex,
+                    $"EncriptarType.Desencriptar - Invalid Base64. Len={text?.Length ?? 0}, Prefix='{prefix}'"
+                );
+                return "error";
+            }
+            catch (CryptographicException ex)
+            {
+                Centrex.Funciones.ErrorLogger.Log(
+                    ex,
+                    "EncriptarType.Desencriptar - CryptographicException (clave/IV o datos inválidos)"
+                );
+                return "error";
+            }
+            catch (Exception ex)
+            {
+                Centrex.Funciones.ErrorLogger.Log(
+                    ex,
+                    "EncriptarType.Desencriptar - Unexpected exception"
+                );
                 return "error";
             }
         }

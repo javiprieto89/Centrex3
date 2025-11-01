@@ -188,7 +188,7 @@ namespace Centrex
                     if (ch.FechaCobro != default)
                     {
                         chk_fCobro.Checked = true;
-                        dtp_fCobro.Value = DateTime.Parse(ch.FechaCobro.ToString());                        
+                        dtp_fCobro.Value = DateTime.Parse(ch.FechaCobro.ToString());
                     }
 
                     if (ch.FechaSalida != default)

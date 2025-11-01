@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex.Funciones
 {
@@ -40,7 +36,7 @@ namespace Centrex.Funciones
             {
                 using (CentrexDbContext context = new CentrexDbContext())
                 {
-                   
+
                     context.PermisoEntity.Add(p);
                     context.SaveChanges();
                     return true;
@@ -74,7 +70,7 @@ namespace Centrex.Funciones
                         }
                         else
                         {
-                            permisoEntity.Nombre = p.Nombre;                            
+                            permisoEntity.Nombre = p.Nombre;
                         }
 
                         context.SaveChanges();

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
 {
@@ -11,29 +8,28 @@ namespace Centrex.Funciones
     static class itemsImpuestos
     {
         // ************************************ FUNCIONES DE RELACION ITEMS E IMPUESTOS ********************
-        public static ItemImpuestoEntity info_itemImpuesto(string IdItem, string IdImpuesto)
+        public static ItemImpuestoEntity info_itemImpuesto(int IdItem, int IdImpuesto)
         {
-            var tmp = new ItemImpuestoEntity();
-            try
+                     try
             {
                 using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var itemImpuestoEntity = context.ItemImpuestoEntity.FirstOrDefault(ii => ii.IdItem == Conversions.ToInteger(IdItem) && ii.IdImpuesto == Conversions.ToInteger(IdImpuesto));
-
+                    var itemImpuestoEntity = context.ItemImpuestoEntity.FirstOrDefault(ii => ii.IdItem == IdItem && ii.IdImpuesto == IdImpuesto);
+                    
                     if (itemImpuestoEntity is not null)
                     {
-                        tmp.IdItem = itemImpuestoEntity.IdItem;
-                        tmp.IdImpuesto = itemImpuestoEntity.IdImpuesto;
-                        tmp.Activo = itemImpuestoEntity.Activo;
+                        return itemImpuestoEntity;
                     }
-                }
+                    else
+                    {
+                        return null;
+                    }
 
-                return tmp;
-            }
+                }            }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                return tmp;
+                MessageBox.Show("Error al obtener los impuestos del item:" + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
         }
 

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -99,7 +97,7 @@ public partial class ItemEntity
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<TmpProduccionItemEntity> TmpProduccionItemEntity { get; set; } = new List<TmpProduccionItemEntity>();
 
-    [InverseProperty("IdItemRecibido")]
+    [InverseProperty("IdItemRecibidoNavigation")]
     public virtual ICollection<TmpProduccionItemEntity> TmpProduccionItemRecibidoEntity { get; set; } = new List<TmpProduccionItemEntity>();
 
     [InverseProperty("IdItemNavigation")]

@@ -1,11 +1,7 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
 namespace Centrex.Funciones
 {
@@ -15,8 +11,8 @@ namespace Centrex.Funciones
         // ************************************ FUNCIONES DE ORDENES DE COMPRA MIGRADAS A ENTITY FRAMEWORK ***************************
 
         /// <summary>
-    /// Obtiene información de una orden de compra usando Entity Framework
-    /// </summary>
+        /// Obtiene información de una orden de compra usando Entity Framework
+        /// </summary>
         public static OrdenCompraEntity info_ordenCompra(string IdOrdenCompra = "")
         {
             var tmp = new OrdenCompraEntity();
@@ -78,8 +74,8 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Agrega una nueva orden de compra usando Entity Framework
-    /// </summary>
+        /// Agrega una nueva orden de compra usando Entity Framework
+        /// </summary>
         public static bool addOrdenCompra(OrdenCompraEntity oc)
         {
             try
@@ -128,8 +124,8 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Actualiza o borra (lógicamente) una orden de compra usando Entity Framework
-    /// </summary>
+        /// Actualiza o borra (lógicamente) una orden de compra usando Entity Framework
+        /// </summary>
         public static bool updateOrdenCompra(OrdenCompraEntity oc, bool borra = false)
         {
             try
@@ -158,9 +154,9 @@ namespace Centrex.Funciones
                             ordenEntity.IdProveedor = oc.IdProveedor;
                         }
 
-                        
-                            ordenEntity.FechaComprobante = oc.FechaComprobante;
-                        
+
+                        ordenEntity.FechaComprobante = oc.FechaComprobante;
+
 
                         ordenEntity.Notas = oc.Notas ?? "";
 
@@ -182,8 +178,8 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Borra físicamente una orden de compra y sus items usando Entity Framework
-    /// </summary>
+        /// Borra físicamente una orden de compra y sus items usando Entity Framework
+        /// </summary>
         public static bool borrarOrdenCompra(OrdenCompraEntity oc)
         {
             try
@@ -223,8 +219,8 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Agrega o actualiza un item en la tabla temporal usando Entity Framework
-    /// </summary>
+        /// Agrega o actualiza un item en la tabla temporal usando Entity Framework
+        /// </summary>
         public static bool addItemOCtmp(ItemEntity i, int Cantidad, decimal Precio, int id_tmpOCItem = -1)
         {
             try
@@ -485,8 +481,8 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Obtiene la Cantidad cargada de un item en la tabla temporal usando Entity Framework
-    /// </summary>
+        /// Obtiene la Cantidad cargada de un item en la tabla temporal usando Entity Framework
+        /// </summary>
         public static double askCantidadCargadaOC(int IdItem, int id = -1, int id_tmpOCItem = -1)
         {
             try
@@ -522,13 +518,14 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
+                Interaction.MsgBox("Error al consultar orden de compra: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
                 return -1;
             }
         }
 
         /// <summary>
-    /// Obtiene el Precio cargado de un item en la tabla temporal usando Entity Framework
-    /// </summary>
+        /// Obtiene el Precio cargado de un item en la tabla temporal usando Entity Framework
+        /// </summary>
         public static double askPrecioCargadoOC(int IdItem, int id = -1, int id_tmpOCItem = -1)
         {
             try
@@ -564,13 +561,14 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
+                Interaction.MsgBox("Error al consultar orden de compra: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
                 return -1;
             }
         }
 
         /// <summary>
-    /// Función de compatibilidad para imprimir producción
-    /// </summary>
+        /// Función de compatibilidad para imprimir producción
+        /// </summary>
         public static void imprimirProduccion(int id_produccion)
         {
             // If showrpt Then
@@ -580,8 +578,8 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Actualiza precios y totales de la orden de compra en el DataGrid usando Entity Framework
-    /// </summary>
+        /// Actualiza precios y totales de la orden de compra en el DataGrid usando Entity Framework
+        /// </summary>
         public static bool updatePreciosOC(DataGridView datagrid, TextBox txt_subTotal, TextBox txt_impuestos, TextBox txt_total, TextBox txt_totalOriginal)
         {
             try
@@ -669,8 +667,8 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Calcula los impuestos totales de un item usando Entity Framework
-    /// </summary>
+        /// Calcula los impuestos totales de un item usando Entity Framework
+        /// </summary>
         public static double calculaImpuestoEntityItem(string id_tmpOCItem, string IdItem)
         {
             try
@@ -715,8 +713,8 @@ namespace Centrex.Funciones
         }
 
         /// <summary>
-    /// Borra o marca como inactivo un item cargado en la orden de compra temporal usando Entity Framework
-    /// </summary>
+        /// Borra o marca como inactivo un item cargado en la orden de compra temporal usando Entity Framework
+        /// </summary>
         public static void borraritemCargadoOC(int id_tmpOCItem_seleccionado = -1)
         {
             try
@@ -755,3 +753,4 @@ namespace Centrex.Funciones
         // ************************************ FUNCIONES DE ORDENES DE COMPRA ***************************
     }
 }
+

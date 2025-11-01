@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
 {
@@ -9,31 +10,29 @@ namespace Centrex.Funciones
         // ************************************ FUNCIONES DE CLIENTES ***************************
         public static ClienteEntity info_cliente(int id_cliente)
         {
-            var tmp = new ClienteEntity();
-
             try
             {
                 using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var clienteEntity = context.ClienteEntity.AsNoTracking().Include(c => c.IdProvinciaFiscalNavigation).Include(c => c.IdProvinciaEntregaNavigation).FirstOrDefault(c => c.IdCliente == Conversions.ToInteger(id_cliente));
+                    var clienteEntity = context.ClienteEntity.AsNoTracking().Include(c => c.IdProvinciaFiscalNavigation).Include(c => c.IdProvinciaEntregaNavigation).FirstOrDefault(c => c.IdCliente == id_cliente);
 
                     if (clienteEntity is not null)
                     {
-                       return clienteEntity;
+                        return clienteEntity;
                     }
                     else
                     {
-                        tmp.RazonSocial = "error";
+                        return null;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                tmp.RazonSocial = "error";
+                MessageBox.Show("Error al obtener el cliente:" + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
 
-            return tmp;
+
         }
 
         public static bool addcliente(ClienteEntity cl)
@@ -74,7 +73,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -130,7 +129,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -157,7 +156,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -175,7 +174,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -186,7 +185,8 @@ namespace Centrex.Funciones
             {
                 using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var clienteEntity = context.ClienteEntity.FirstOrDefault(c => c.TaxNumber == Strings.Trim(taxNumber.ToString()));
+                    string trimmedTaxNumber = taxNumber.Trim();
+                    var clienteEntity = context.ClienteEntity.FirstOrDefault(c => c.TaxNumber == trimmedTaxNumber);
 
                     if (clienteEntity is not null)
                     {
@@ -200,7 +200,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
             }
         }

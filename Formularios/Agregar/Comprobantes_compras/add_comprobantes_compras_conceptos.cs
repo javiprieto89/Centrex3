@@ -30,7 +30,7 @@ namespace Centrex
         }
         private void add_comprobantes_compras_conceptos_Load(object sender, EventArgs e)
         {
-            c = info_concepto_compra(id_concepto.ToString());
+            c = info_concepto_compra(id_concepto);
 
             lbl_concepto.Text = c.Concepto;
         }

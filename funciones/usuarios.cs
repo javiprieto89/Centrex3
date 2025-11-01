@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Centrex.Models;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
 {
@@ -12,8 +10,7 @@ namespace Centrex.Funciones
         // ************************************ FUNCIONES DE USUARIOS **********************
         public static UsuarioEntity info_usuario(int id_usuario)
         {
-            var tmp = new UsuarioEntity();
-
+            
             try
             {
                 using (CentrexDbContext context = new CentrexDbContext())
@@ -22,31 +19,24 @@ namespace Centrex.Funciones
 
                     if (usuarioEntity is not null)
                     {
-                        tmp.IdUsuario = usuarioEntity.IdUsuario;
-                        tmp.Usuario = usuarioEntity.Usuario;
-                        tmp.Password = usuarioEntity.Password;
-                        tmp.Nombre = usuarioEntity.Nombre;
-                        tmp.Activo = usuarioEntity.Activo;
+                        return usuarioEntity;
                     }
                     else
                     {
-                        tmp.Usuario = "error";
+                        return null;
                     }
                 }
             }
             catch (Exception ex)
             {
-                tmp.Usuario = "error";
+                MessageBox.Show("Error al obtener el usuario:" + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
-
-            return tmp;
         }
 
         public static UsuarioEntity info_usuario(string Usuario, bool exacto)
         {
-            var tmp = new UsuarioEntity();
-
-            try
+                        try
             {
                 using (CentrexDbContext context = new CentrexDbContext())
                 {
@@ -63,24 +53,20 @@ namespace Centrex.Funciones
 
                     if (usuarioEntity is not null)
                     {
-                        tmp.IdUsuario = usuarioEntity.IdUsuario;
-                        tmp.Usuario = usuarioEntity.Usuario;
-                        tmp.Password = usuarioEntity.Password;
-                        tmp.Nombre = usuarioEntity.Nombre;
-                        tmp.Activo = usuarioEntity.Activo;
+                        return usuarioEntity;
                     }
                     else
                     {
-                        tmp.Usuario = "error";
+                        return null;
                     }
                 }
             }
             catch (Exception ex)
             {
-                tmp.Usuario = "error";
+                MessageBox.Show("Error al obtener el usuario:" + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
 
-            return tmp;
         }
 
         public static bool addUsuario(UsuarioEntity u)
@@ -251,17 +237,18 @@ namespace Centrex.Funciones
             catch (Exception ex)
             {
                 tmp.Usuario = "error";
+                Interaction.MsgBox("Error en login de usuario: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
             }
 
             return tmp;
         }
 
         /// <summary>
-    /// Obtiene información de un Usuario por nombre de Usuario y estado activo
-    /// </summary>
+        /// Obtiene información de un Usuario por nombre de Usuario y estado activo
+        /// </summary>
         /// <summary>
-    /// Obtiene información de un Usuario por nombre de Usuario
-    /// </summary>
+        /// Obtiene información de un Usuario por nombre de Usuario
+        /// </summary>
         public static UsuarioEntity info_usuario(string nombreUsuario)
         {
             try
@@ -273,9 +260,11 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
+                Interaction.MsgBox("Error al obtener usuario: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
                 return null;
             }
         }
         // ************************************ FUNCIONES DE USUARIOS **********************
     }
 }
+

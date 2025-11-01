@@ -1,10 +1,11 @@
-﻿using System;
+﻿#pragma warning disable IDE0037 // 'Member name can be simplified'
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
     /// <summary>
     /// Resultado de una consulta para cargar en DataGridView
@@ -13,12 +14,12 @@ namespace Centrex
     {
         public IQueryable Query { get; set; }
         public bool MostrarSoloActivos { get; set; } = true;
-        public List<string> ColumnasOcultar { get; set; } = new List<string>();
-        public Dictionary<string, Color> ColoresColumnas { get; set; } = new Dictionary<string, Color>();
+        public List<string> ColumnasOcultar { get; set; } = [];
+        public Dictionary<string, Color> ColoresColumnas { get; set; } = [];
         public bool TieneCheckbox { get; set; } = false;
         public string NombreColumnCheckbox { get; set; } = "Seleccionar";
         public int PosicionColumnCheckbox { get; set; } = 0;
-        public List<string> OrdenarPor { get; set; } = new List<string>();
+        public List<string> OrdenarPor { get; set; } = [];
         public bool OrdenAscendente { get; set; } = true;
         public bool EsMaterializada { get; set; } = false; // Para queries que necesitan ToList() antes
         public object DataMaterializada { get; set; } // Para queries ya materializadas
@@ -40,6 +41,72 @@ namespace Centrex
         private static string DepositadoEn(string? cuentaNombre, string? bancoNombre)
             => string.IsNullOrEmpty(cuentaNombre) ? "No" : $"Si, en: {cuentaNombre} - {bancoNombre}";
 
+        /// <summary>
+        /// Fuerza a EF Core a compilar el modelo y la consulta base
+        /// de la entidad asociada a la tabla solicitada (warm-up selectivo).
+        /// </summary>
+        private static void PrecalentarEntidad(CentrexDbContext ctx, string tabla)
+        {
+            try
+            {
+                switch (tabla.ToLower())
+                {
+                    case "clientes":
+                        ctx.ClienteEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "proveedores":
+                        ctx.ProveedorEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "items":
+                    case "items_sindescuento":
+                    case "itemsdescuentos":
+                    case "itemsimpuestos":
+                    case "asocitems":
+                        ctx.ItemEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "condiciones_venta":
+                        ctx.CondicionVentaEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "condiciones_compra":
+                        ctx.CondicionCompraEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "conceptos_compra":
+                        ctx.ConceptoCompraEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "impuestos":
+                    case "retenciones":
+                    case "itemiva":
+                        ctx.ImpuestoEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "bancos":
+                        ctx.BancoEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "cuentas_bancarias":
+                        ctx.CuentaBancariaEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "ordenescompras":
+                    case "comprobantes_compras":
+                        ctx.ComprobanteCompraEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "pagos":
+                        ctx.PagoEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "pedidos":
+                        ctx.PedidoEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    case "cobros":
+                        ctx.CobroEntity.AsNoTracking().FirstOrDefault();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch
+            {
+                // Ignorar errores: esto es solo una precarga
+            }
+        }
+
         public static DataGridQueryResult GetQueryForTable(
             CentrexDbContext ctx,
             string tabla,
@@ -49,6 +116,7 @@ namespace Centrex
         {
             var result = new DataGridQueryResult();
             tabla = tabla?.Trim().ToLower();
+            //PrecalentarEntidad(ctx, tabla);
 
             switch (tabla)
             {
@@ -64,6 +132,7 @@ namespace Centrex
                 // =======================
                 case "condiciones_compra":
                     result.Query = ctx.CondicionCompraEntity
+                        .AsNoTracking()
                         .Where(c => c.Activo == historicoActivo)
                         .OrderBy(c => c.Condicion)
                         .Select(c => new
@@ -82,6 +151,7 @@ namespace Centrex
                 // =======================
                 case "conceptos_compra":
                     result.Query = ctx.ConceptoCompraEntity
+                        .AsNoTracking()
                         .Where(c => c.Activo == historicoActivo)
                         .OrderBy(c => c.Concepto)
                         .Select(c => new
@@ -89,6 +159,25 @@ namespace Centrex
                             ID = c.IdConceptoCompra,
                             Concepto = c.Concepto,
                             Activo = c.Activo
+                        });
+                    result.ColumnasOcultar.Add("ID");
+                    break;
+
+                // =======================
+                // CONDICIONES VENTA
+                // =======================
+                case "condiciones_venta":
+                    result.Query = ctx.CondicionVentaEntity
+                        .AsNoTracking()
+                        .Where(c => c.Activo == historicoActivo)
+                        .OrderBy(c => c.Condicion)
+                        .Select(c => new
+                        {
+                            ID = c.IdCondicionVenta,
+                            Condición = c.Condicion,
+                            Vencimiento = c.Vencimiento,
+                            Recargo = c.Recargo,
+                            Activo = c.Activo ? "Si" : "No"
                         });
                     result.ColumnasOcultar.Add("ID");
                     break;
@@ -103,6 +192,7 @@ namespace Centrex
                 // =======================
                 case "clientes":
                     result.Query = ctx.ClienteEntity
+                        .AsNoTracking()
                         .Include(c => c.IdTipoDocumentoNavigation)
                         .Include(c => c.IdProvinciaEntregaNavigation).ThenInclude(pe => pe.IdPaisNavigation)
                         .Include(c => c.IdProvinciaFiscalNavigation).ThenInclude(pf => pf.IdPaisNavigation)
@@ -127,8 +217,8 @@ namespace Centrex
                             LocalidadFiscal = c.LocalidadFiscal,
                             CPFiscal = c.CpFiscal,
                             CPEntrega = c.CpEntrega,
-                            Inscripto = c.EsInscripto,
-                            Activo = c.Activo
+                            Inscripto = c.EsInscripto ? "Si": "No",
+                            Activo = c.Activo ? "Si" : "No"
                         });
                     result.ColumnasOcultar.Add("ID");
                     break;
@@ -140,6 +230,7 @@ namespace Centrex
                 // =======================
                 case "archivoccclientes":
                     result.Query = ctx.CcClienteEntity
+                        .AsNoTracking()
                         .Include(ccc => ccc.IdClienteNavigation)
                         .Include(ccc => ccc.IdMonedaNavigation)
                         .OrderBy(ccc => ccc.IdClienteNavigation.RazonSocial).ThenBy(ccc => ccc.Nombre)
@@ -161,6 +252,7 @@ namespace Centrex
                 // =======================
                 case "proveedores":
                     result.Query = ctx.ProveedorEntity
+                        .AsNoTracking()
                         .Include(p => p.IdTipoDocumentoNavigation)
                         .Include(p => p.IdProvinciaEntregaNavigation).ThenInclude(pe => pe.IdPaisNavigation)
                         .Include(p => p.IdProvinciaFiscalNavigation).ThenInclude(pf => pf.IdPaisNavigation)
@@ -196,6 +288,7 @@ namespace Centrex
                 // =======================
                 case "archivoccproveedores":
                     result.Query = ctx.CcProveedorEntity
+                        .AsNoTracking()
                         .Include(ccp => ccp.IdProveedorNavigation)
                         .Include(ccp => ccp.IdMonedaNavigation)
                         .OrderBy(ccp => ccp.IdProveedorNavigation.RazonSocial).ThenBy(ccp => ccp.Nombre)
@@ -216,6 +309,7 @@ namespace Centrex
                 // =======================
                 case "marcas_items":
                     result.Query = ctx.MarcaItemEntity
+                        .AsNoTracking()
                         .Where(m => m.Activo == historicoActivo)
                         .OrderBy(m => m.Marca)
                         .Select(m => new
@@ -232,6 +326,7 @@ namespace Centrex
                 // =======================
                 case "tipos_items":
                     result.Query = ctx.TipoItemEntity
+                        .AsNoTracking()
                         .Where(t => t.Activo == historicoActivo)
                         .OrderBy(t => t.Tipo)
                         .Select(t => new
@@ -250,6 +345,7 @@ namespace Centrex
                 case "items":
                 case "itemsimpuestositems":
                     result.Query = ctx.ItemEntity
+                        .AsNoTracking()
                         .Include(i => i.IdTipoNavigation)
                         .Include(i => i.IdMarcaNavigation)
                         .Include(i => i.IdProveedorNavigation)
@@ -280,6 +376,7 @@ namespace Centrex
                 // =======================
                 case "asocitems":
                     result.Query = ctx.AsocItemEntity
+                        .AsNoTracking()
                         .Include(ai => ai.IdItemNavigation)
                         .Include(ai => ai.IdItemAsocNavigation)
                         .Where(ai => ai.IdItemNavigation.Activo == historicoActivo)
@@ -301,6 +398,7 @@ namespace Centrex
                 // =======================
                 case "items_sindescuento":
                     result.Query = ctx.ItemEntity
+                        .AsNoTracking()
                         .Include(i => i.IdTipoNavigation)
                         .Include(i => i.IdMarcaNavigation)
                         .Include(i => i.IdProveedorNavigation)
@@ -331,6 +429,7 @@ namespace Centrex
                 // =======================
                 case "itemsdescuentos":
                     result.Query = ctx.ItemEntity
+                        .AsNoTracking()
                         .Include(i => i.IdTipoNavigation)
                         .Include(i => i.IdMarcaNavigation)
                         .Include(i => i.IdProveedorNavigation)
@@ -361,6 +460,7 @@ namespace Centrex
                 case "items_registros_stock":
                 case "items_recibidos":
                     result.Query = ctx.ItemEntity
+                        .AsNoTracking()
                         .Include(i => i.IdTipoNavigation)
                         .Include(i => i.IdMarcaNavigation)
                         .Include(i => i.IdProveedorNavigation)
@@ -387,6 +487,7 @@ namespace Centrex
                 // =======================
                 case "comprobantes":
                     result.Query = ctx.ComprobanteEntity
+                        .AsNoTracking()
                         .Include(c => c.IdTipoComprobanteNavigation)
                         .Where(c => c.Activo == historicoActivo)
                         .OrderBy(c => c.Comprobante)
@@ -412,6 +513,7 @@ namespace Centrex
                 // =======================
                 case "archivoconsultas":
                     result.Query = ctx.ConsultaPersonalizadaEntity
+                        .AsNoTracking()
                         .Where(c => c.Activo == historicoActivo)
                         .OrderBy(c => c.Nombre)
                         .Select(c => new
@@ -429,6 +531,7 @@ namespace Centrex
                 // =======================
                 case "caja":
                     result.Query = ctx.CajaEntity
+                        .AsNoTracking()
                         .Where(c => c.Activo == activo)
                         .OrderBy(c => c.Nombre)
                         .Select(c => new
@@ -447,6 +550,7 @@ namespace Centrex
                 // =======================
                 case "bancos":
                     result.Query = ctx.BancoEntity
+                        .AsNoTracking()
                         .Include(b => b.IdPaisNavigation)
                         .Where(b => b.Activo == historicoActivo)
                         .OrderBy(b => b.Nombre)
@@ -467,6 +571,7 @@ namespace Centrex
                 // =======================
                 case "cuentas_bancarias":
                     result.Query = ctx.CuentaBancariaEntity
+                        .AsNoTracking()
                         .Include(cb => cb.IdBancoNavigation)
                         .Include(cb => cb.IdMonedaNavigation)
                         .Where(cb => cb.Activo == historicoActivo && (idBanco == -1 || cb.IdBanco == idBanco))
@@ -492,6 +597,7 @@ namespace Centrex
                 case "chrecibidos":
                     {
                         var query = ctx.ChequeEntity
+                            .AsNoTracking()
                             .Include(ch => ch.IdClienteNavigation)
                             .Include(ch => ch.IdBancoNavigation)
                             .Include(ch => ch.IdCuentaBancariaNavigation).ThenInclude(cb => cb.IdBancoNavigation)
@@ -525,6 +631,7 @@ namespace Centrex
                 case "chemitidos":
                     {
                         var query = ctx.ChequeEntity
+                            .AsNoTracking()
                             .Include(ch => ch.IdProveedorNavigation)
                             .Include(ch => ch.IdBancoNavigation)
                             .Include(ch => ch.IdCuentaBancariaNavigation).ThenInclude(cb => cb.IdBancoNavigation)
@@ -558,6 +665,7 @@ namespace Centrex
                 // =======================
                 case "chcartera":
                     result.Query = ctx.ChequeEntity
+                   .AsNoTracking()
                    .Include(ch => ch.IdClienteNavigation)
                    .Include(ch => ch.IdProveedorNavigation)
                    .Include(ch => ch.IdBancoNavigation)
@@ -591,6 +699,7 @@ namespace Centrex
                 case "impuestos":
                 case "itemsimpuestosimpuestos":
                     result.Query = ctx.ImpuestoEntity
+                        .AsNoTracking()
                         .Where(i => i.Activo == historicoActivo)
                         .OrderBy(i => i.Nombre)
                         .Select(i => new
@@ -611,6 +720,7 @@ namespace Centrex
                 // =======================
                 case "retenciones":
                     result.Query = ctx.ImpuestoEntity
+                        .AsNoTracking()
                         .Where(i => (bool)i.EsRetencion && (bool)i.Activo == historicoActivo)
                         .OrderBy(i => i.Nombre)
                         .Select(i => new
@@ -631,6 +741,7 @@ namespace Centrex
                 // =======================
                 case "itemiva":
                     result.Query = ctx.ImpuestoEntity
+                        .AsNoTracking()
                         .Where(i => i.Activo == historicoActivo && i.Nombre.Contains("iva", StringComparison.CurrentCultureIgnoreCase))
                         .OrderBy(i => i.Nombre)
                         .Select(i => new
@@ -649,6 +760,7 @@ namespace Centrex
                 // =======================
                 case "itemsimpuestos":
                     result.Query = ctx.ItemImpuestoEntity
+                        .AsNoTracking()
                         .Include(ii => ii.IdItemNavigation)
                         .Include(ii => ii.IdImpuestoNavigation)
                         .Where(ii => ii.Activo == activo)
@@ -669,6 +781,7 @@ namespace Centrex
                 // =======================
                 case "ordenescompras":
                     result.Query = ctx.OrdenCompraEntity
+                        .AsNoTracking()
                         .Include(oc => oc.IdProveedorNavigation)
                         .Where(oc => oc.Activo == historicoActivo)
                         .OrderBy(oc => oc.IdOrdenCompra)
@@ -691,6 +804,7 @@ namespace Centrex
                 // =======================
                 case "comprobantes_compras":
                     result.Query = ctx.ComprobanteCompraEntity
+                        .AsNoTracking()
                         .Include(cc => cc.IdTipoComprobanteNavigation)
                         .Include(cc => cc.IdProveedorNavigation)
                         .Include(cc => cc.IdCcProveedorNavigation)
@@ -725,6 +839,7 @@ namespace Centrex
                 // =======================
                 case "pagos":
                     result.Query = ctx.PagoEntity
+                        .AsNoTracking()
                         .Include(pg => pg.IdProveedorNavigation)
                         .Include(pg => pg.IdCcProveedorNavigation)
                         .OrderBy(pg => pg.FechaPago)
@@ -754,6 +869,7 @@ namespace Centrex
                     {
                         var today = DateOnly.FromDateTime(DateTime.Today);
                         result.Query = ctx.RegistroStockEntity
+                            .AsNoTracking()
                             .Include(rs => rs.IdItemNavigation)
                             .Include(rs => rs.IdProveedorNavigation)
                             .Where(rs => rs.Activo && rs.FechaIngreso == today)
@@ -782,6 +898,7 @@ namespace Centrex
                     else
                     {
                         result.Query = ctx.RegistroStockEntity
+                            .AsNoTracking()
                             .Include(rs => rs.IdItemNavigation)
                             .Include(rs => rs.IdProveedorNavigation)
                             .Where(rs => !rs.Activo)
@@ -820,6 +937,7 @@ namespace Centrex
                     {
                         var today = DateOnly.FromDateTime(DateTime.Today);
                         result.Query = ctx.AjusteStockEntity
+                            .AsNoTracking()
                             .Include(a => a.IdItemNavigation)
                             .Where(a => a.Fecha == today)
                             .OrderBy(a => a.IdAjusteStock)
@@ -836,6 +954,7 @@ namespace Centrex
                     else
                     {
                         result.Query = ctx.AjusteStockEntity
+                            .AsNoTracking()
                             .Include(a => a.IdItemNavigation)
                             .OrderBy(a => a.IdAjusteStock)
                             .Select(a => new
@@ -857,6 +976,7 @@ namespace Centrex
                 // =======================
                 case "produccion":
                     result.Query = ctx.ProduccionEntity
+                        .AsNoTracking()
                         .Include(p => p.IdProveedorNavigation)
                         .Where(p => p.Activo == historicoActivo)
                         .OrderBy(p => p.IdProduccion)
@@ -883,6 +1003,7 @@ namespace Centrex
                     if (activo)
                     {
                         result.Query = ctx.PedidoEntity
+                            .AsNoTracking()
                             .Include(p => p.IdClienteNavigation)
                             .Include(p => p.IdComprobanteNavigation)
                             .Where(p => !p.Cerrado && p.Activo)
@@ -900,6 +1021,7 @@ namespace Centrex
                     else
                     {
                         result.Query = ctx.PedidoEntity
+                            .AsNoTracking()
                             .Include(p => p.IdClienteNavigation)
                             .Include(p => p.IdComprobanteNavigation)
                             .Where(p => p.Cerrado && !p.Activo)
@@ -925,6 +1047,7 @@ namespace Centrex
                 // =======================
                 case "cobros":
                     result.Query = ctx.CobroEntity
+                        .AsNoTracking()
                         .Include(c => c.IdClienteNavigation)
                         .Where(c => c.Activo == historicoActivo)
                         .OrderBy(c => c.FechaCobro)
@@ -956,6 +1079,7 @@ namespace Centrex
                 // =======================
                 case "stock":
                     result.Query = ctx.ItemEntity
+                        .AsNoTracking()
                         .Where(i => !i.EsMarkup && !i.EsDescuento && i.Activo)
                         .OrderBy(i => i.Item).ThenBy(i => i.Descript)
                         .Select(i => new
@@ -975,6 +1099,7 @@ namespace Centrex
                 // =======================
                 case "tipos_comprobantes":
                     result.Query = ctx.TipoComprobanteEntity
+                        .AsNoTracking()
                         .OrderBy(tc => tc.ComprobanteAfip)
                         .Select(tc => new
                         {
@@ -989,6 +1114,7 @@ namespace Centrex
                 // =======================
                 case "permisos":
                     result.Query = ctx.PermisoEntity
+                        .AsNoTracking()
                         .OrderBy(p => p.Nombre)
                         .Select(p => new
                         {
@@ -1003,6 +1129,7 @@ namespace Centrex
                 // =======================
                 case "perfiles":
                     result.Query = ctx.PerfilEntity
+                        .AsNoTracking()
                         .OrderBy(p => p.Nombre)
                         .Select(p => new
                         {
@@ -1018,6 +1145,7 @@ namespace Centrex
                 // =======================
                 case "usuarios":
                     result.Query = ctx.UsuarioEntity
+                        .AsNoTracking()
                         .OrderBy(u => u.Nombre)
                         .Select(u => new
                         {
@@ -1116,7 +1244,7 @@ namespace Centrex
                 // =======================
                 default:
                     result.Query = null;
-                    MessageBox.Show($"La tabla '{tabla}' no está implementada.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    //MessageBox.Show($"La tabla '{tabla}' no está implementada.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
             }
 
@@ -1124,3 +1252,4 @@ namespace Centrex
         }
     }
 }
+#pragma warning restore IDE0037

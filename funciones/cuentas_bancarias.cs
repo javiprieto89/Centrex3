@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Centrex.Funciones
 {
@@ -17,7 +18,7 @@ namespace Centrex.Funciones
             try
             {
                 using (CentrexDbContext context = new CentrexDbContext())
-                {                    
+                {
                     var entidad = context.CuentaBancariaEntity.AsNoTracking().FirstOrDefault(c => c.IdCuentaBancaria == IdCuentaBancaria);
 
                     if (entidad is not null)
@@ -35,7 +36,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 tmp.Nombre = "error";
                 return tmp;
             }
@@ -65,7 +66,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -84,7 +85,10 @@ namespace Centrex.Funciones
 
                     if (entidad is null)
                     {
-                        Interaction.MsgBox("No se encontró la cuenta bancaria especificada.", Constants.vbExclamation);
+                        MessageBox.Show("No se encontró la cuenta bancaria especificada.",
+                            "Advertencia",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Exclamation);
                         return false;
                     }
 
@@ -109,7 +113,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -128,7 +132,10 @@ namespace Centrex.Funciones
 
                     if (entidad is null)
                     {
-                        Interaction.MsgBox("No se encontró la cuenta bancaria a eliminar.", Constants.vbExclamation);
+                        MessageBox.Show("No se encontró la cuenta bancaria a eliminar.",
+                            "Advertencia",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Exclamation);
                         return false;
                     }
 
@@ -140,7 +147,7 @@ namespace Centrex.Funciones
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

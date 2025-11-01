@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Centrex
 {
@@ -25,12 +25,12 @@ namespace Centrex
             {
                 case 0:
                     {
-                        VariablesGlobales.basedb = "Centrex";
+                        basedb = "Centrex";
                         break;
                     }
                 case 1:
                     {
-                        VariablesGlobales.basedb = "CentrexTest";
+                        basedb = "CentrexTest";
                         break;
                     }
             }
