@@ -73,6 +73,22 @@ namespace Centrex.Funciones
             return tmp;
         }
 
+        public static TipoComprobanteEntity? info_tipoComprobante(int idTipoComprobante)
+        {
+            try
+            {
+                using var context = new CentrexDbContext();
+                return context.TipoComprobanteEntity
+                    .AsNoTracking()
+                    .FirstOrDefault(tc => tc.IdTipoComprobante == idTipoComprobante);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al obtener el tipo de comprobante: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+        }
+
         // =============================================
         // OBTENER COMPROBANTE POR PUNTO DE VENTA Y TIPO
         // =============================================
