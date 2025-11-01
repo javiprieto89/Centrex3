@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class mitem
@@ -18,15 +15,16 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).FirstOrDefault(i => i.IdItem == Conversions.ToInteger(id_item));
-
-
-
+                    return context.ItemEntity
+    .Include(i => i.IdMarcaNavigation)
+.Include(i => i.IdTipoNavigation)
+        .Include(i => i.IdProveedorNavigation)
+  .FirstOrDefault(i => i.IdItem == id_item);
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
         }
@@ -37,15 +35,16 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).FirstOrDefault(i => i.Descript == descript);
-
-
-
+                    return context.ItemEntity
+   .Include(i => i.IdMarcaNavigation)
+     .Include(i => i.IdTipoNavigation)
+         .Include(i => i.IdProveedorNavigation)
+   .FirstOrDefault(i => i.Descript == descript);
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
         }
@@ -56,7 +55,7 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    int idItemInt = Conversions.ToInteger(_idItem);
+                    int idItemInt = int.Parse(_idItem);
 
                     bool exists = context.TmpPedidoItemEntity.Any(t => t.IdItem == idItemInt && t.IdUsuario == _idUsuario && t.IdUnico == _idUnico);
 
@@ -65,7 +64,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -83,7 +82,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -101,7 +100,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -112,13 +111,17 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.ItemEntity.Include(i => i.IdMarcaNavigation.Marca).Include(i => i.IdTipoNavigation.Tipo).Include(i => i.IdProveedorNavigation.RazonSocial).OrderByDescending(i => i.IdItem).FirstOrDefault();
-
+                    return context.ItemEntity
+.Include(i => i.IdMarcaNavigation)
+      .Include(i => i.IdTipoNavigation)
+      .Include(i => i.IdProveedorNavigation)
+         .OrderByDescending(i => i.IdItem)
+   .FirstOrDefault();
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
         }
@@ -155,7 +158,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -182,7 +185,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -207,8 +210,36 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
+            }
+        }
+
+        public static bool updatePrecios_items(string id_item, string precio)
+        {
+            try
+            {
+                using (CentrexDbContext context = new CentrexDbContext())
+                {
+                    int idItemInt = int.Parse(id_item);
+                    var itemEntity = context.ItemEntity.FirstOrDefault(i => i.IdItem == idItemInt);
+
+                    if (itemEntity is not null)
+                    {
+                        itemEntity.PrecioLista = decimal.Parse(precio);
+                        context.SaveChanges();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
         // ************************************ FUNCIONES DE ITEMS ***************************

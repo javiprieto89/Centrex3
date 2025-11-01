@@ -1,107 +1,80 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+using System.Windows.Forms;
 
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class producciones
     {
         // ************************************ FUNCIONES DE PRODUCCION MIGRADAS A ENTITY FRAMEWORK ***************************
 
-  
+
         /// <summary>
-    /// Obtiene información de una producción específica o la más reciente
-    /// </summary>
-        public static produccion info_produccion(string id_produccion = "")
+        /// Obtiene información de una producción específica o la más reciente
+        /// </summary>
+        public static ProduccionEntity info_produccion(int id_produccion = -1)
         {
-            var tmp = new produccion();
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    ProduccionEntity produccionEntity = null;
+                   var produccionEntity = new ProduccionEntity();
 
-                    if (string.IsNullOrWhiteSpace(id_produccion))
+                    if (id_produccion == -1)
                     {
                         // Última producción
-                        produccionEntity = context.Produccion.Include(p => p.Proveedor).Include(p => p.Usuario).OrderByDescending(p => p.IdProduccion).FirstOrDefault();
-
-
-
+                        produccionEntity = context.ProduccionEntity.Include(p => p.IdProveedorNavigation).Include(p => p.IdUsuarioNavigation).OrderByDescending(p => p.IdProduccion).FirstOrDefault();
                     }
                     else
                     {
-                        int idProd;
-                        if (int.TryParse(id_produccion, out idProd))
-                        {
-                            produccionEntity = context.Produccion.Include(p => p.Proveedor).Include(p => p.Usuario).FirstOrDefault(p => p.IdProduccion == idProd);
-
-
-                        }
+                         produccionEntity = context.ProduccionEntity.Include(p => p.IdProveedorNavigation).Include(p => p.IdUsuarioNavigation).FirstOrDefault(p => p.IdProduccion == id_produccion);
                     }
 
                     if (produccionEntity is not null)
                     {
-                        tmp.id_produccion = produccionEntity.IdProduccion.ToString();
-                        tmp.IdProveedor = produccionEntity.IdProveedor.ToString();
-                        tmp.fecha_carga = produccionEntity.FechaCarga.ToString("dd/MM/yyyy");
-                        tmp.fecha_envio = produccionEntity.FechaEnvio.HasValue ? produccionEntity.FechaEnvio.Value.ToString("dd/MM/yyyy") : "";
-                        tmp.fecha_recepcion = produccionEntity.FechaRecepcion.HasValue ? produccionEntity.FechaRecepcion.Value.ToString("dd/MM/yyyy") : "";
-
-                        // ✅ Cambiado: Boolean simple
-                        tmp.enviado = Conversions.ToBoolean(produccionEntity.enviado == true ? "1" : "0");
-                        tmp.recibido = Conversions.ToBoolean(produccionEntity.recibido == true ? "1" : "0");
-
-                        tmp.notas = produccionEntity.notas ?? "";
-                        tmp.activo = Conversions.ToBoolean(produccionEntity.activo ? "1" : "0");
-                        tmp.id_usuario = produccionEntity.IdUsuario.ToString();
+                        return produccionEntity;
                     }
                     else
                     {
-                        tmp.id_produccion = Conversions.ToInteger("-1");
+                        return null;
                     }
                 }
-
-                return tmp;
             }
 
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al obtener información de producción: " + ex.Message, MsgBoxStyle.Critical);
-                tmp.id_produccion = Conversions.ToInteger("-1");
-                return tmp;
+                MessageBox.Show("Error al obtener información de producción:" + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
         }
 
 
         /// <summary>
-    /// Agrega una nueva producción
-    /// </summary>
-        public static bool addProduccion(produccion p)
+        /// Agrega una nueva producción
+        /// </summary>
+        public static bool addProduccion(ProduccionEntity p)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var nuevaProduccion = new ProduccionEntity()
+                    var nuevaProduccionEntity = new ProduccionEntity()
                     {
-                        IdProveedor = !string.IsNullOrEmpty(p.IdProveedor.ToString()) ? p.IdProveedor : default(int?),
-                        FechaCarga = !string.IsNullOrEmpty(p.fecha_carga) ? DateTime.Parse(p.fecha_carga) : default(DateTime?),
-                        FechaEnvio = p.fecha_envio is not null && !string.IsNullOrEmpty(p.fecha_envio) ? DateTime.Parse(p.fecha_envio) : default(DateTime?),
-                        FechaRecepcion = p.fecha_recepcion is not null && !string.IsNullOrEmpty(p.fecha_recepcion) ? DateTime.Parse(p.fecha_recepcion) : default(DateTime?),
-                        enviado = p.enviado == Conversions.ToBoolean("1") ? true : false,
-                        recibido = p.recibido == Conversions.ToBoolean("1") ? true : false,
-                        notas = p.notas ?? "",
-                        activo = true,
-                        IdUsuario = !string.IsNullOrEmpty(p.id_usuario.ToString()) ? p.id_usuario : default(int?)
+                        IdProveedor = p.IdProveedor > 0 ? p.IdProveedor : 0,
+                        FechaCarga = p.FechaCarga != default(DateOnly) ? p.FechaCarga : DateOnly.FromDateTime(DateTime.Now),
+                        FechaEnvio = p.FechaEnvio,
+                        FechaRecepcion = p.FechaRecepcion,
+                        Enviado = p.Enviado == Conversions.ToBoolean("1") ? true : false,
+                        Recibido = p.Recibido == Conversions.ToBoolean("1") ? true : false,
+                        Notas = p.Notas ?? "",
+                        Activo = true,
+                        IdUsuario = !string.IsNullOrEmpty(p.IdUsuario.ToString()) ? p.IdUsuario : default(int)
                     };
 
-                    context.Produccion.Add(nuevaProduccion);
+                    context.ProduccionEntity.Add(nuevaProduccionEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -114,45 +87,51 @@ namespace Centrex
         }
 
         /// <summary>
-    /// Actualiza una producción existente
-    /// </summary>
-        public static bool updateProduccion(produccion p, bool borra = false)
+        /// Actualiza una producción existente
+        /// </summary>
+        public static bool updateProduccion(ProduccionEntity p, bool borra = false)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    int idProd = int.Parse(p.id_produccion.ToString());
-                    var produccionEntity = context.Produccion.FirstOrDefault(prod => prod.IdProduccion == idProd);
+                    int idProd = int.Parse(p.IdProduccion.ToString());
+                    var produccionEntity = context.ProduccionEntity.FirstOrDefault(prod => prod.IdProduccion == idProd);
 
                     if (produccionEntity is not null)
                     {
                         if (borra)
                         {
                             // Solo marcar como inactivo
-                            produccionEntity.activo = false;
+                            produccionEntity.Activo = false;
                         }
                         else
                         {
                             // Actualizar todos los campos
-                            produccionEntity.IdProveedor = !string.IsNullOrEmpty(p.IdProveedor.ToString()) ? p.IdProveedor : default(int?);
-                            produccionEntity.FechaCarga = !string.IsNullOrEmpty(p.fecha_carga) ? DateTime.Parse(p.fecha_carga) : default(DateTime?);
+                            produccionEntity.IdProveedor = p.IdProveedor;
+                            produccionEntity.FechaCarga = p.FechaCarga;
 
-                            if (p.fecha_envio is not null && !string.IsNullOrEmpty(p.fecha_envio))
+                            if (p.FechaEnvio != null)
                             {
-                                produccionEntity.FechaEnvio = DateTime.Parse(p.fecha_envio);
-                                produccionEntity.enviado = p.enviado == Conversions.ToBoolean("1") ? true : false;
+                                produccionEntity.FechaEnvio = p.FechaEnvio;
+                                produccionEntity.Enviado = p.Enviado;
                             }
 
-                            if (p.fecha_recepcion is not null && !string.IsNullOrEmpty(p.fecha_recepcion))
+                            // FechaRecepcion
+                            if (p.FechaRecepcion != null)
                             {
-                                produccionEntity.FechaRecepcion = DateTime.Parse(p.fecha_recepcion);
-                                produccionEntity.recibido = p.recibido == Conversions.ToBoolean("1") ? true : false;
+                                produccionEntity.FechaRecepcion = p.FechaRecepcion;
+                                produccionEntity.Recibido = p.Recibido;
                             }
 
-                            produccionEntity.notas = p.notas ?? "";
-                            produccionEntity.activo = p.activo == Conversions.ToBoolean("1") ? true : false;
-                            produccionEntity.IdUsuario = !string.IsNullOrEmpty(p.id_usuario.ToString()) ? p.id_usuario : default(int?);
+                            // Notas
+                            produccionEntity.Notas = p.Notas ?? string.Empty;
+
+                            // Activo
+                            produccionEntity.Activo = p.Activo;
+
+                            // IdUsuario
+                            produccionEntity.IdUsuario = p.IdUsuario > 0 ? p.IdUsuario : 0;
                         }
 
                         context.SaveChanges();
@@ -172,20 +151,20 @@ namespace Centrex
         }
 
         /// <summary>
-    /// Elimina físicamente una producción
-    /// </summary>
-        public static bool borrarProduccion(produccion p)
+        /// Elimina físicamente una producción
+        /// </summary>
+        public static bool borrarProduccion(ProduccionEntity p)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    int idProd = int.Parse(p.id_produccion.ToString());
-                    var produccionEntity = context.Produccion.FirstOrDefault(prod => prod.IdProduccion == idProd);
+                    int idProd = int.Parse(p.IdProduccion.ToString());
+                    var produccionEntity = context.ProduccionEntity.FirstOrDefault(prod => prod.IdProduccion == idProd);
 
                     if (produccionEntity is not null)
                     {
-                        context.Produccion.Remove(produccionEntity);
+                        context.ProduccionEntity.Remove(produccionEntity);
                         context.SaveChanges();
                         return true;
                     }
@@ -204,42 +183,42 @@ namespace Centrex
 
 
         /// <summary>
-    /// Agrega o actualiza un item en la tabla temporal de producción usando Entity Framework
-    /// </summary>
-        public static bool addItemProducciontmp(item i, int cantidad, int id_tmpProduccionItem = -1)
+        /// Agrega o actualiza un item en la tabla temporal de producción usando Entity Framework
+        /// </summary>
+        public static bool addItemProducciontmp(ItemEntity i, int cantidad, int id_tmpProduccionEntityItem = -1)
         {
             // Usa usuario_logueado global
-            return addItemProducciontmp(i, cantidad, VariablesGlobales.usuario_logueado.IdUsuario, id_tmpProduccionItem);
+            return addItemProducciontmp(i, cantidad, usuario_logueado.IdUsuario, id_tmpProduccionEntityItem);
         }
 
         /// <summary>
-    /// Sobrecarga con id_usuario explícito para compatibilidad interna
-    /// </summary>
-        public static bool addItemProducciontmp(item i, int cantidad, int id_usuario, int id_tmpProduccionItem = -1)
+        /// Sobrecarga con id_usuario explícito para compatibilidad interna
+        /// </summary>
+        public static bool addItemProducciontmp(ItemEntity i, int cantidad, int id_usuario, int id_tmpProduccionEntityItem = -1)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    if (id_tmpProduccionItem == -1 | id_tmpProduccionItem == 0)
+                    if (id_tmpProduccionEntityItem == -1 | id_tmpProduccionEntityItem == 0)
                     {
                         // INSERT - Crear nuevo item temporal
                         var nuevoTmpItem = new TmpProduccionItemEntity()
                         {
-                            IdItem = i.id_item,
-                            cantidad = cantidad,
+                            IdItem = i.IdItem,
+                            Cantidad = cantidad,
                             IdUsuario = id_usuario
                         };
-                        context.TmpProduccionItems.Add(nuevoTmpItem);
+                        context.TmpProduccionItemEntity.Add(nuevoTmpItem);
                     }
                     else
                     {
                         // UPDATE - Actualizar item temporal existente
-                        var tmpItem = context.TmpProduccionItems.FirstOrDefault(t => t.IdTmpProduccionItem == id_tmpProduccionItem);
+                        var tmpItem = context.TmpProduccionItemEntity.FirstOrDefault(t => t.IdTmpProduccionItem == id_tmpProduccionEntityItem);
 
                         if (tmpItem is not null)
                         {
-                            tmpItem.cantidad = cantidad;
+                            tmpItem.Cantidad = cantidad;
                         }
                         else
                         {
@@ -259,44 +238,44 @@ namespace Centrex
         }
 
         /// <summary>
-    /// Agrega o actualiza un item asociado en la tabla temporal de producción
-    /// Reemplaza SP_insertAsocItemsProduccionTMP y SP_updateAsocItemsProduccionTMP
-    /// </summary>
-        public static bool addItemAsocProducciontmp(int id_tmpProduccionItem, int id_item, int id_item_asoc, int cantidad_item_asoc_enviada, int id_tmpProduccion_asocItem = -1)
+        /// Agrega o actualiza un item asociado en la tabla temporal de producción
+        /// Reemplaza SP_insertAsocItemsProduccionEntityTMP y SP_updateAsocItemsProduccionEntityTMP
+        /// </summary>
+        public static bool addItemAsocProducciontmp(int id_tmpProduccionEntityItem, int id_item, int id_item_asoc, int cantidad_item_asoc_enviada, int id_tmpProduccionEntity_asocItem = -1)
         {
             // Usa usuario_logueado global
-            return addItemAsocProducciontmpInternal(id_tmpProduccionItem, id_item, id_item_asoc, cantidad_item_asoc_enviada, VariablesGlobales.usuario_logueado.IdUsuario, id_tmpProduccion_asocItem);
+            return addItemAsocProducciontmpInternal(id_tmpProduccionEntityItem, id_item, id_item_asoc, cantidad_item_asoc_enviada, usuario_logueado.IdUsuario, id_tmpProduccionEntity_asocItem);
         }
 
         /// <summary>
-    /// Sobrecarga con id_usuario explícito para compatibilidad interna
-    /// </summary>
-        private static bool addItemAsocProducciontmpInternal(int id_tmpProduccionItem, int id_item, int id_item_asoc, int cantidad_item_asoc_enviada, int id_usuario, int id_tmpProduccion_asocItem = -1)
+        /// Sobrecarga con id_usuario explícito para compatibilidad interna
+        /// </summary>
+        private static bool addItemAsocProducciontmpInternal(int id_tmpProduccionEntityItem, int id_item, int id_item_asoc, int cantidad_item_asoc_enviada, int id_usuario, int id_tmpProduccionEntity_asocItem = -1)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    if (id_tmpProduccion_asocItem == -1 | id_tmpProduccion_asocItem == 0)
+                    if (id_tmpProduccionEntity_asocItem == -1 | id_tmpProduccionEntity_asocItem == 0)
                     {
                         // INSERT - Crear nuevo item asociado temporal
                         var nuevoTmpAsocItem = new TmpProduccionAsocItemEntity()
                         {
                             IdItem = id_item,
                             IdItemAsoc = id_item_asoc,
-                            Cantidad = cantidad_item_asoc_enviada,
+                            CantidadItemAsocEnviada = cantidad_item_asoc_enviada,
                             IdUsuario = id_usuario
                         };
-                        context.TmpProduccionAsocItems.Add(nuevoTmpAsocItem);
+                        context.TmpProduccionAsocItemEntity.Add(nuevoTmpAsocItem);
                     }
                     else
                     {
                         // UPDATE - Actualizar item asociado temporal existente
-                        var tmpAsocItem = context.TmpProduccionAsocItems.FirstOrDefault(t => t.IdTmpProduccionAsocItem == id_tmpProduccion_asocItem);
+                        var tmpAsocItem = context.TmpProduccionAsocItemEntity.FirstOrDefault(t => t.IdTmpProduccionItem == id_tmpProduccionEntity_asocItem);
 
                         if (tmpAsocItem is not null)
                         {
-                            tmpAsocItem.Cantidad = cantidad_item_asoc_enviada;
+                            tmpAsocItem.CantidadItemAsocEnviada = cantidad_item_asoc_enviada;
                         }
                         else
                         {
@@ -316,26 +295,128 @@ namespace Centrex
         }
 
         /// <summary>
-    /// Guarda los items temporales en las tablas definitivas de producción
-    /// Maneja tanto produccion_items como produccion_asocItems
-    /// </summary>
+        /// Guarda los items temporales en las tablas definitivas de producción
+        /// Maneja tanto produccion_items como produccion_asocItems
+        /// </summary>
         public static bool guardarProduccion(int id_produccion = 0)
         {
             // Usa usuario_logueado global
-            return guardarProduccion(VariablesGlobales.usuario_logueado.IdUsuario, id_produccion);
+            return guardarProduccion(usuario_logueado.IdUsuario, id_produccion);
         }
 
         /// <summary>
-    /// Sobrecarga con id_usuario explícito para compatibilidad interna
-    /// </summary>
+        /// Sobrecarga con id_usuario explícito para compatibilidad interna
+        /// </summary>
+        //private static bool guardarProduccionEntity(int id_usuario, int id_produccion = 0)
+        //{
+        //    var p = new ProduccionEntity();
+
+        //    if (id_produccion == 0)
+        //    {
+        //        p = info_produccion();
+        //        id_produccion = p.IdProduccion;
+        //    }
+
+        //    try
+        //    {
+        //        using (var context = new CentrexDbContext())
+        //        {
+        //            // Obtener items temporales del usuario actual
+        //            var tmpItems = context.TmpProduccionItemEntity.Where(t => t.IdUsuario == id_usuario).ToList();
+
+        //            // 1. Actualizar items existentes
+        //            foreach (var tmpItem in tmpItems)
+        //            {
+        //                var existingItem = context.ProduccionItemEntity.FirstOrDefault(pi => pi.IdProduccionItem == id_produccion && Operators.ConditionalCompareObjectEqual(pi.IdItem, ((dynamic)tmpItem).IdItem, false));
+
+        //                if (existingItem is not null)
+        //                {
+        //                    existingItem.Cantidad = Conversions.ToInteger(((dynamic)tmpItem).Cantidad);
+        //                }
+        //            }
+
+        //            // 2. Insertar nuevos items
+        //            foreach (var tmpItem in tmpItems)
+        //            {
+        //                bool exists = context.ProduccionItemEntity.Any(pi => pi.IdProduccion == id_produccion && Operators.ConditionalCompareObjectEqual(pi.IdItem, ((dynamic)tmpItem).IdItem, false));
+
+        //                if (!exists)
+        //                {
+        //                    var nuevoItem = new ProduccionItemEntity()
+        //                    {
+        //                        IdProduccion = id_produccion,
+        //                        IdItem = Conversions.ToInteger(((dynamic)tmpItem).IdItem),
+        //                        Cantidad = Conversions.ToInteger(((dynamic)tmpItem).Cantidad)
+        //                    };
+        //                    context.ProduccionItemEntity.Add(nuevoItem);
+        //                }
+        //            }
+
+        //            context.SaveChanges();
+
+        //            // 3. Procesar items asociados
+        //            var tmpAsocItems = context.TmpProduccionAsocItemEntity.Where(t => t.IdUsuario == id_usuario).ToList();
+
+        //            // Actualizar items asociados existentes
+        //            foreach (var tmpAsocItem in tmpAsocItems)
+        //            {
+        //                var existingAsocItem = context.ProduccionAsocItemEntity.FirstOrDefault(pa => pa.IdProduccion == id_produccion && Operators.ConditionalCompareObjectEqual(pa.IdItem, ((dynamic)tmpAsocItem).IdItem, false) && Operators.ConditionalCompareObjectEqual(pa.IdItemAsoc, ((dynamic)tmpAsocItem).IdItemAsoc, false));
+
+        //                if (existingAsocItem is not null)
+        //                {
+        //                    existingAsocItem.CantidadItemAsocEnviada = ((dynamic)tmpAsocItem).Cantidad;
+        //                }
+        //            }
+
+        //            // Insertar nuevos items asociados
+        //            foreach (var tmpAsocItem in tmpAsocItems)
+        //            {
+        //                bool exists = context.ProduccionAsocItemEntity.Any(pa => pa.IdProduccion == id_produccion && Operators.ConditionalCompareObjectEqual(pa.IdItem, ((dynamic)tmpAsocItem).IdItem, false) && Operators.ConditionalCompareObjectEqual(pa.IdItemAsoc, ((dynamic)tmpAsocItem).IdItemAsoc, false));
+
+        //                if (!exists)
+        //                {
+        //                    var nuevoAsocItem = new ProduccionAsocItemEntity()
+        //                    {
+        //                        IdProduccion = id_produccion,
+        //                        IdItem = Conversions.ToInteger(((dynamic)tmpAsocItem).IdItem),
+        //                        IdItemAsoc = Conversions.ToInteger(((dynamic)tmpAsocItem).IdItemAsoc),
+        //                        CantidadItemAsocEnviada = ((dynamic)tmpAsocItem).Cantidad
+        //                    };
+        //                    context.ProduccionAsocItemEntity.Add(nuevoAsocItem);
+        //                }
+        //            }
+
+        //            context.SaveChanges();
+
+        //            // 4. Eliminar items que ya no están en temporal
+        //            // Obtener IDs de items en temporal
+        //            var tmpItemIds = tmpItems.Select(t => t.IdItem).ToList();
+
+        //            // Eliminar items de produccion_items que no están en temporal
+        //            var itemsToDelete = context.ProduccionItemEntity.Where(pi => pi.IdProduccion == id_produccion && !tmpItemIds.Contains(pi.IdItem)).ToList();
+
+        //            foreach (var itemToDelete in itemsToDelete)
+        //                context.ProduccionItemEntity.Remove(itemToDelete);
+
+        //            context.SaveChanges();
+        //            return true;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Interaction.MsgBox(ex.Message);
+        //        return false;
+        //    }
+        //}
+
         private static bool guardarProduccion(int id_usuario, int id_produccion = 0)
         {
-            var p = new produccion();
+            var p = new ProduccionEntity();
 
             if (id_produccion == 0)
             {
                 p = info_produccion();
-                id_produccion = p.id_produccion;
+                id_produccion = p.IdProduccion;
             }
 
             try
@@ -343,81 +424,93 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     // Obtener items temporales del usuario actual
-                    var tmpItems = context.TmpProduccionItems.Where(t => t.IdUsuario == id_usuario).ToList();
+                    var tmpItems = context.TmpProduccionItemEntity
+                        .Where(t => t.IdUsuario == id_usuario)
+                        .ToList();
 
-                    // 1. Actualizar items existentes
+                    // 1. Actualizar o insertar items
                     foreach (var tmpItem in tmpItems)
                     {
-                        var existingItem = context.ProduccionItems.FirstOrDefault(pi => pi.id_produccion == id_produccion && Operators.ConditionalCompareObjectEqual(pi.id_item, ((dynamic)tmpItem).IdItem, false));
+                        var existingItem = context.ProduccionItemEntity
+                            .FirstOrDefault(pi => pi.IdProduccion == id_produccion
+                                               && pi.IdItem == tmpItem.IdItem);
 
-                        if (existingItem is not null)
+                        if (existingItem != null)
                         {
-                            existingItem.cantidad = Conversions.ToInteger(((dynamic)tmpItem).Cantidad);
+                            // Actualizar item existente
+                            existingItem.Cantidad = tmpItem.Cantidad;
                         }
-                    }
-
-                    // 2. Insertar nuevos items
-                    foreach (var tmpItem in tmpItems)
-                    {
-                        bool exists = context.ProduccionItems.Any(pi => pi.id_produccion == id_produccion && Operators.ConditionalCompareObjectEqual(pi.id_item, ((dynamic)tmpItem).IdItem, false));
-
-                        if (!exists)
+                        else
                         {
-                            var nuevoItem = new ProduccionItemEntity()
+                            // Insertar nuevo item
+                            var nuevoItem = new ProduccionItemEntity
                             {
-                                id_produccion = id_produccion,
-                                id_item = Conversions.ToInteger(((dynamic)tmpItem).IdItem),
-                                cantidad = Conversions.ToInteger(((dynamic)tmpItem).Cantidad)
+                                IdProduccion = id_produccion,
+                                IdItem = (int)tmpItem.IdItem,
+                                Cantidad = tmpItem.Cantidad
                             };
-                            context.ProduccionItems.Add(nuevoItem);
+                            context.ProduccionItemEntity.Add(nuevoItem);
                         }
                     }
 
                     context.SaveChanges();
 
-                    // 3. Procesar items asociados
-                    var tmpAsocItems = context.TmpProduccionAsocItems.Where(t => t.IdUsuario == id_usuario).ToList();
+                    // 2. Procesar items asociados
+                    var tmpAsocItems = context.TmpProduccionAsocItemEntity
+                        .Where(t => t.IdUsuario == id_usuario)
+                        .ToList();
 
-                    // Actualizar items asociados existentes
                     foreach (var tmpAsocItem in tmpAsocItems)
                     {
-                        var existingAsocItem = context.ProduccionAsocItems.FirstOrDefault(pa => pa.id_produccion == id_produccion && Operators.ConditionalCompareObjectEqual(pa.id_item, ((dynamic)tmpAsocItem).IdItem, false) && Operators.ConditionalCompareObjectEqual(pa.id_item_asoc, ((dynamic)tmpAsocItem).IdItemAsoc, false));
+                        var existingAsocItem = context.ProduccionAsocItemEntity
+                            .FirstOrDefault(pa => pa.IdProduccion == id_produccion
+                                               && pa.IdItem == tmpAsocItem.IdItem
+                                               && pa.IdItemAsoc == tmpAsocItem.IdItemAsoc);
 
-                        if (existingAsocItem is not null)
+                        if (existingAsocItem != null)
                         {
-                            existingAsocItem.cantidad = ((dynamic)tmpAsocItem).Cantidad;
+                            // Actualizar item asociado existente
+                            existingAsocItem.CantidadItemAsocEnviada = tmpAsocItem.CantidadItemAsocEnviada;
                         }
-                    }
-
-                    // Insertar nuevos items asociados
-                    foreach (var tmpAsocItem in tmpAsocItems)
-                    {
-                        bool exists = context.ProduccionAsocItems.Any(pa => pa.id_produccion == id_produccion && Operators.ConditionalCompareObjectEqual(pa.id_item, ((dynamic)tmpAsocItem).IdItem, false) && Operators.ConditionalCompareObjectEqual(pa.id_item_asoc, ((dynamic)tmpAsocItem).IdItemAsoc, false));
-
-                        if (!exists)
+                        else
                         {
-                            var nuevoAsocItem = new ProduccionAsocItemEntity()
+                            // Insertar nuevo item asociado
+                            var nuevoAsocItem = new ProduccionAsocItemEntity
                             {
-                                id_produccion = id_produccion,
-                                id_item = Conversions.ToInteger(((dynamic)tmpAsocItem).IdItem),
-                                id_item_asoc = Conversions.ToInteger(((dynamic)tmpAsocItem).IdItemAsoc),
-                                cantidad = ((dynamic)tmpAsocItem).Cantidad
+                                IdProduccion = id_produccion,
+                                IdItem = tmpAsocItem.IdItem,
+                                IdItemAsoc = tmpAsocItem.IdItemAsoc,
+                                CantidadItemAsocEnviada = tmpAsocItem.CantidadItemAsocEnviada
                             };
-                            context.ProduccionAsocItems.Add(nuevoAsocItem);
+                            context.ProduccionAsocItemEntity.Add(nuevoAsocItem);
                         }
                     }
 
                     context.SaveChanges();
 
-                    // 4. Eliminar items que ya no están en temporal
-                    // Obtener IDs de items en temporal
+                    // 3. Eliminar items que ya no están en temporal
                     var tmpItemIds = tmpItems.Select(t => t.IdItem).ToList();
 
-                    // Eliminar items de produccion_items que no están en temporal
-                    var itemsToDelete = context.ProduccionItems.Where(pi => pi.id_produccion == id_produccion && !tmpItemIds.Contains(pi.id_item)).ToList();
+                    var itemsToDelete = context.ProduccionItemEntity
+                        .Where(pi => pi.IdProduccion == id_produccion
+                                  && !tmpItemIds.Contains(pi.IdItem))
+                        .ToList();
 
-                    foreach (var itemToDelete in itemsToDelete)
-                        context.ProduccionItems.Remove(itemToDelete);
+                    context.ProduccionItemEntity.RemoveRange(itemsToDelete);
+
+                    // 4. Eliminar items asociados que ya no están en temporal
+                    var tmpAsocItemPairs = tmpAsocItems
+                        .Select(t => new { t.IdItem, t.IdItemAsoc })
+                        .ToList();
+
+                    var asocItemsToDelete = context.ProduccionAsocItemEntity
+                        .Where(pa => pa.IdProduccion == id_produccion)
+                        .ToList()
+                        .Where(pa => !tmpAsocItemPairs.Any(tmp => tmp.IdItem == pa.IdItem
+                                                                && tmp.IdItemAsoc == pa.IdItemAsoc))
+                        .ToList();
+
+                    context.ProduccionAsocItemEntity.RemoveRange(asocItemsToDelete);
 
                     context.SaveChanges();
                     return true;
@@ -431,17 +524,17 @@ namespace Centrex
         }
 
         /// <summary>
-    /// Copia items de producción a la tabla temporal para edición
-    /// </summary>
+        /// Copia items de producción a la tabla temporal para edición
+        /// </summary>
         public static bool produccion_a_produccionTmp(int id_produccion)
         {
             // Usa usuario_logueado global
-            return produccion_a_produccionTmp(id_produccion, VariablesGlobales.usuario_logueado.IdUsuario);
+            return produccion_a_produccionTmp(id_produccion, usuario_logueado.IdUsuario);
         }
 
         /// <summary>
-    /// Sobrecarga con id_usuario explícito para compatibilidad interna
-    /// </summary>
+        /// Sobrecarga con id_usuario explícito para compatibilidad interna
+        /// </summary>
         private static bool produccion_a_produccionTmp(int id_produccion, int id_usuario)
         {
             try
@@ -449,18 +542,18 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     // Obtener items de la producción
-                    var itemsProduccion = context.ProduccionItems.Where(pi => pi.id_produccion == id_produccion).ToList();
+                    var itemsProduccionEntity = context.ProduccionItemEntity.Where(pi => pi.IdProduccion == id_produccion).ToList();
 
                     // Copiar a tabla temporal
-                    foreach (var item in itemsProduccion)
+                    foreach (var item in itemsProduccionEntity)
                     {
                         var tmpItem = new TmpProduccionItemEntity()
                         {
-                            IdItem = item.id_item,
-                            cantidad = item.cantidad,
+                            IdItem = item.IdItem,
+                            Cantidad = item.Cantidad,
                             IdUsuario = id_usuario
                         };
-                        context.TmpProduccionItems.Add(tmpItem);
+                        context.TmpProduccionItemEntity.Add(tmpItem);
                     }
 
                     context.SaveChanges();
@@ -475,34 +568,34 @@ namespace Centrex
         }
 
         /// <summary>
-    /// Obtiene la cantidad cargada de un item en producción temporal
-    /// </summary>
-        public static double askCantidadCargadaProduccion(int id_item, int id = -1, int id_tmpProduccionItem = -1)
+        /// Obtiene la cantidad cargada de un item en producción temporal
+        /// </summary>
+        public static double askCantidadCargadaProduccion(int id_item, int id = -1, int id_tmpProduccionEntityItem = -1)
         {
             // Usa usuario_logueado global
-            return askCantidadCargadaProduccion(id_item, VariablesGlobales.usuario_logueado.IdUsuario, id, id_tmpProduccionItem);
+            return askCantidadCargadaProduccion(id_item, usuario_logueado.IdUsuario, id, id_tmpProduccionEntityItem);
         }
 
         /// <summary>
-    /// Sobrecarga con id_usuario explícito para compatibilidad interna
-    /// </summary>
-        private static double askCantidadCargadaProduccion(int id_item, int id_usuario, int id = -1, int id_tmpProduccionItem = -1)
+        /// Sobrecarga con id_usuario explícito para compatibilidad interna
+        /// </summary>
+        public static double askCantidadCargadaProduccion(int id_item, int id_usuario, int id = -1, int id_tmpProduccionEntityItem = -1)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var query = context.TmpProduccionItems.Where(t => t.IdItem == id_item && t.IdUsuario == id_usuario);
+                    var query = context.TmpProduccionItemEntity.Where(t => t.IdItem == id_item && t.IdUsuario == id_usuario);
 
                     if (id != -1)
                     {
-                        // Filtro adicional si se necesita (aunque TmpProduccionItems no tiene id_produccion)
+                        // Filtro adicional si se necesita (aunque TmpProduccionEntityItems no tiene id_produccion)
                         // Este filtro podría no ser necesario en la versión temporal
                     }
 
-                    if (id_tmpProduccionItem != -1)
+                    if (id_tmpProduccionEntityItem != -1)
                     {
-                        query = query.Where(t => Operators.ConditionalCompareObjectEqual(t.IdTmpProduccionItem, id_tmpProduccionItem, false));
+                        query = query.Where(t => Operators.ConditionalCompareObjectEqual(t.IdTmpProduccionItem, id_tmpProduccionEntityItem, false));
                     }
 
                     var tmpItem = query.FirstOrDefault();
@@ -519,14 +612,15 @@ namespace Centrex
             }
             catch (Exception ex)
             {
+                Interaction.MsgBox("Error al consultar cantidad de producción: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
                 return -1;
             }
         }
 
         /// <summary>
-    /// Imprime reporte de producción
-    /// NOTA: Las variables globales id y showrpt deben ser manejadas externamente
-    /// </summary>
+        /// Imprime reporte de producción
+        /// NOTA: Las variables globales id y showrpt deben ser manejadas externamente
+        /// </summary>
         public static void imprimirProduccion(int id_produccion, bool showrpt)
         {
             if (showrpt)
@@ -540,34 +634,34 @@ namespace Centrex
         }
 
         /// <summary>
-    /// Borra las tablas temporales de producción del usuario actual
-    /// </summary>
-        public static void borrarTmpProduccion(int id_usuario)
-        {
-            try
-            {
-                using (var context = new CentrexDbContext())
-                {
-                    // Borrar items asociados temporales
-                    var tmpAsocItems = context.TmpProduccionAsocItems.Where(t => t.IdUsuario == id_usuario).ToList();
+        /// Borra las tablas temporales de producción del usuario actual
+        /// </summary>
+        //public static void borrarTmpProduccion(int id_usuario)
+        //{
+        //    try
+        //    {
+        //        using (var context = new CentrexDbContext())
+        //        {
+        //            // Borrar items asociados temporales
+        //            var tmpAsocItems = context.TmpProduccionAsocItemEntity.Where(t => t.IdUsuario == id_usuario).ToList();
 
-                    foreach (var item in tmpAsocItems)
-                        context.TmpProduccionAsocItems.Remove((TmpProduccionAsocItemEntity)item);
+        //            foreach (var item in tmpAsocItems)
+        //                context.TmpProduccionAsocItemEntity.Remove(item);
 
-                    // Borrar items temporales
-                    var tmpItems = context.TmpProduccionItems.Where(t => t.IdUsuario == id_usuario).ToList();
+        //            // Borrar items temporales
+        //            var tmpItems = context.TmpProduccionItemEntity.Where(t => t.IdUsuario == id_usuario).ToList();
 
-                    foreach (var item in tmpItems)
-                        context.TmpProduccionItems.Remove((TmpProduccionItemEntity)item);
+        //            foreach (var item in tmpItems)
+        //                context.TmpProduccionItemEntity.Remove(item);
 
-                    context.SaveChanges();
-                }
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox("Error al borrar tablas temporales de producción: " + ex.Message);
-            }
-        }
+        //            context.SaveChanges();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Interaction.MsgBox("Error al borrar tablas temporales de producción: " + ex.Message);
+        //    }
+        //}
 
 
 

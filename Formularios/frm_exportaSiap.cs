@@ -1,178 +1,177 @@
-using Centrex.Helpers;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Centrex
 {
-    public partial class frm_exportaSiap
+    public partial class frm_exportaSiap : Form
     {
         public frm_exportaSiap()
         {
             InitializeComponent();
         }
+
         private void frm_exportaSiap_Load(object sender, EventArgs e)
         {
-            // Cargo todas las consultas
-            var argcombo = cmb_consultas;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_consultaSiap, nombre FROM consultas_SIAP ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_consultaSiap"));
-            cmb_consultas = argcombo;
-            cmb_consultas.SelectedValue = 0;
-            cmb_consultas.Text = "Elija una consulta...";
+            try
+            {
+                using var ctx = new CentrexDbContext();
 
-            pExportXLS.Enabled = false;
-            pExportTXT.Enabled = false;
+                // Cargar las consultas personalizadas activas
+                var consultas = ctx.ConsultaPersonalizadaEntity
+                    .Where(c => c.Activo == true)
+                    .OrderBy(c => c.Nombre)
+                    .Select(c => new { c.IdConsulta, c.Nombre })
+                    .ToList();
+
+                cmb_consultas.DataSource = consultas;
+                cmb_consultas.DisplayMember = "Nombre";
+                cmb_consultas.ValueMember = "IdConsulta";
+                cmb_consultas.SelectedIndex = -1;
+
+                pExportXLS.Enabled = false;
+                pExportTXT.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al cargar consultas SIAP: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
         }
 
         private bool checkFilters()
         {
             bool ok = true;
 
-            if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(cmb_consultas.SelectedValue, 0, false)))
+            if (cmb_consultas.SelectedValue is null)
             {
-                Interaction.MsgBox("Debe elegir una consulta para ejecutar", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                Interaction.MsgBox("Debe elegir una consulta para ejecutar",
+                    (MsgBoxStyle)((int)MsgBoxStyle.Exclamation | (int)MsgBoxStyle.OkOnly), "Centrex");
                 ok = false;
             }
 
             if (dtp_desde.Value.Date > dtp_hasta.Value.Date)
             {
-                Interaction.MsgBox("La fecha 'Desde' no puede ser superior a 'Hasta'", Constants.vbExclamation, "Centrex");
+                Interaction.MsgBox("La fecha 'Desde' no puede ser superior a 'Hasta'",
+                    MsgBoxStyle.Exclamation, "Centrex");
                 ok = false;
             }
 
             return ok;
         }
 
-        private string cabecera(DateTime fecha_desde, DateTime fecha_hasta, int id_comprobante = -1, int id_item = -1, int id_cliente = -1)
+        private void cmb_consultas_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            string cabeceraStr;
-
-            cabeceraStr = "DECLARE @desde AS DATE " + "DECLARE @hasta AS DATE ";
-
-            if (chk_desde.Checked)
+            try
             {
-                cabeceraStr += " SET @desde = '" + fecha_desde.ToString("yyyy/MM/dd") + "' ";
-            }
-            else
-            {
-                cabeceraStr += " SET @desde = NULL ";
-            }
+                if (cmb_consultas.SelectedValue is null) return;
 
-            if (chk_hasta.Checked)
-            {
-                cabeceraStr += " SET @hasta = '" + fecha_hasta.ToString("yyyy/MM/dd") + "' ";
+                // Por ahora ambas opciones se habilitan
+                pExportXLS.Enabled = true;
+                pExportTXT.Enabled = true;
             }
-            else
+            catch (Exception ex)
             {
-                cabeceraStr += " SET @hasta = NULL ";
+                Interaction.MsgBox("Error al seleccionar la consulta: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
             }
-
-            if (!chk_desde.Checked & !chk_hasta.Checked)
-            {
-                cabeceraStr += " SET @desde = NULL SET @hasta = NULL ";
-            }
-
-            return cabeceraStr;
         }
 
         private void pExportTXT_Click(object sender, EventArgs e)
         {
-            // Validar filtros
-            if (!checkFilters())
-                return;
+            if (!checkFilters()) return;
 
             try
             {
-                // 🔹 Obtener definición de la consulta (de tu tabla consultasSIAP)
-                var c = consultasSIAP.info_consultaSIAP(Convert.ToInt32(cmb_consultas.SelectedValue));
+                int idConsulta = Conversions.ToInteger(cmb_consultas.SelectedValue);
 
-                // 🔹 Determinar filtros de fecha
-                DateTime? desde = chk_desde.Checked ? dtp_desde.Value.Date : null;
-                DateTime? hasta = chk_hasta.Checked ? dtp_hasta.Value.Date : null;
+                using var ctx = new CentrexDbContext();
+                var consulta = ctx.ConsultaPersonalizadaEntity.FirstOrDefault(c => c.IdConsulta == idConsulta);
 
-                // 🔹 Construir objeto de filtro dinámico
-                var filtro = ConsultasDinamicas.CrearCabecera(
-                    entidad: c.NombreEntidad,               // Por ejemplo: "ComprobanteEntity"
-                    campoFecha: c.CampoFecha ?? "Fecha",    // Campo fecha principal a usar
-                    fecha_desde: desde,
-                    fecha_hasta: hasta,
-                    filtrosExtras: new Dictionary<string, object>
-                    {
-                // Si tu consulta tiene parámetros adicionales, los agregás acá
-                { "IdCliente", c.IdCliente },
-                { "IdItem", c.IdItem },
-                { "IdComprobante", c.IdComprobante }
-                    }
-                );
-
-                // 🔹 Ejecutar consulta dinámica con EF Core (sin SQL)
-                string resultado = generales.ejecutarSQLconResultado(filtro);
-
-                // 🔹 Seleccionar ruta destino
-                using (SaveFileDialog save = new SaveFileDialog())
+                if (consulta == null)
                 {
-                    save.AddExtension = true;
-                    save.CheckFileExists = false;
-                    save.CheckPathExists = true;
-                    save.Filter = "Text Files|*.txt";
-                    save.DefaultExt = "txt";
-                    save.InitialDirectory = @"C:\";
-
-                    if (save.ShowDialog() != DialogResult.OK || string.IsNullOrEmpty(save.FileName))
-                    {
-                        Interaction.MsgBox("Exportación cancelada.", Constants.vbInformation, "Centrex");
-                        return;
-                    }
-
-                    // 🔹 Guardar resultado en archivo
-                    generales.guardarArchivoTexto(save.FileName, resultado);
-
-                    Interaction.MsgBox("Archivo exportado a: " + save.FileName,
-                        (MsgBoxStyle)(Constants.vbInformation + Constants.vbOKOnly), "Centrex");
-
-                    closeandupdate(this);
+                    Interaction.MsgBox("No se encontró la consulta seleccionada.", MsgBoxStyle.Exclamation, "Centrex");
+                    return;
                 }
+
+                DateTime? desde = chk_desde.Checked ? dtp_desde.Value.Date : (DateTime?)null;
+                DateTime? hasta = chk_hasta.Checked ? dtp_hasta.Value.Date : (DateTime?)null;
+
+                string resultado = generales.ejecutarSQLconResultado(consulta.Consulta, desde, hasta);
+
+                using SaveFileDialog save = new SaveFileDialog
+                {
+                    AddExtension = true,
+                    Filter = "Text Files|*.txt",
+                    DefaultExt = "txt",
+                    InitialDirectory = @"C:\"
+                };
+
+                if (save.ShowDialog() != DialogResult.OK) return;
+
+                generales.guardarArchivoTexto(save.FileName, resultado);
+
+                Interaction.MsgBox($"Archivo exportado a: {save.FileName}",
+                    MsgBoxStyle.Information, "Centrex");
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error durante la exportación: " + ex.Message, Constants.vbCritical, "Centrex");
-            }
-        }
-
-        private void cmb_consultas_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            consultaSIAP c;
-
-            c = consultasSIAP.info_consultaSIAP(Conversions.ToInteger(cmb_consultas.SelectedValue));
-
-            if (c.excel)
-            {
-                pExportXLS.Enabled = true;
-                pExportTXT.Enabled = false;
-
-                pExportXLS.Image = My.Resources.Resources.iconoExcel;
-                pExportTXT.Image = My.Resources.Resources.iconotxtByN;
-            }
-            else if (c.txt)
-            {
-                pExportXLS.Enabled = false;
-                pExportTXT.Enabled = true;
-
-                pExportXLS.Image = My.Resources.Resources.iconoExcelByN;
-                pExportTXT.Image = My.Resources.Resources.iconotxt;
+                Interaction.MsgBox("Error al exportar TXT: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
             }
         }
 
         private void pExportXLS_Click(object sender, EventArgs e)
         {
-            // MsgBox("Hola")
+            if (!checkFilters()) return;
+
+            try
+            {
+                int idConsulta = Conversions.ToInteger(cmb_consultas.SelectedValue);
+
+                using var ctx = new CentrexDbContext();
+                var consulta = ctx.ConsultaPersonalizadaEntity.FirstOrDefault(c => c.IdConsulta == idConsulta);
+
+                if (consulta == null)
+                {
+                    Interaction.MsgBox("No se encontró la consulta seleccionada.", MsgBoxStyle.Exclamation, "Centrex");
+                    return;
+                }
+
+                DateTime? desde = chk_desde.Checked ? dtp_desde.Value.Date : (DateTime?)null;
+                DateTime? hasta = chk_hasta.Checked ? dtp_hasta.Value.Date : (DateTime?)null;
+
+                // Obtener los resultados (máx. 500 registros)
+                string entidad = consulta.Consulta;
+                var texto = generales.ejecutarSQLconResultado(entidad, desde, hasta);
+
+                // Convertir a DataGridView temporal para exportar (reutiliza tu función)
+                DataGridView dgtemp = new DataGridView();
+                dgtemp.Columns.Add("Resultado", "Resultado");
+                dgtemp.Rows.Add(texto.Split('\n').Select(line => new object[] { line }).ToArray());
+
+                using SaveFileDialog save = new SaveFileDialog
+                {
+                    AddExtension = true,
+                    Filter = "Excel Files|*.xlsx",
+                    DefaultExt = "xlsx",
+                    InitialDirectory = @"C:\"
+                };
+
+                if (save.ShowDialog() != DialogResult.OK) return;
+
+                generales.exportarExcel(dgtemp, save.FileName);
+
+                Interaction.MsgBox($"Archivo exportado a Excel: {save.FileName}",
+                    MsgBoxStyle.Information, "Centrex");
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox("Error al exportar Excel: " + ex.Message, MsgBoxStyle.Critical, "Centrex");
+            }
         }
 
         private void cmd_cerrar_Click(object sender, EventArgs e)
         {
-            closeandupdate(this);
+            generales.closeandupdate(this);
         }
 
         private void chk_desde_CheckedChanged(object sender, EventArgs e)

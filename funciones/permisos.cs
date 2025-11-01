@@ -1,55 +1,43 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class permisos
     {
         // ************************************ FUNCIONES DE PERMISOS ********************
-        public static permiso info_permiso(string id_permiso)
+        public static PermisoEntity info_permiso(int id_permiso)
         {
-            var tmp = new permiso();
-
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var permisoEntity = context.Permisos.FirstOrDefault(p => p.IdPermiso == Conversions.ToInteger(id_permiso));
-
-                    if (permisoEntity is not null)
+                    if (id_permiso != 0 || id_permiso != -1)
                     {
-                        tmp.id_permiso = permisoEntity.IdPermiso.ToString();
-                        tmp.nombre = permisoEntity.nombre;
+                        return context.PermisoEntity.FirstOrDefault(c => c.IdPermiso == id_permiso);
                     }
                     else
                     {
-                        tmp.nombre = "error";
+                        return null;
                     }
                 }
-                return tmp;
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                tmp.nombre = "error";
-                return tmp;
+                Interaction.MsgBox($"Error al obtener el permiso: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+                return null;
             }
         }
 
-        public static bool addpermiso(permiso p)
+        public static bool addpermiso(PermisoEntity p)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var permisoEntity = new PermisoEntity() { nombre = p.nombre };
 
-                    context.Permisos.Add(permisoEntity);
+                    context.PermisoEntity.Add(p);
                     context.SaveChanges();
                     return true;
                 }
@@ -61,13 +49,13 @@ namespace Centrex
             }
         }
 
-        public static bool updatepermiso(permiso p, bool borra = false)
+        public static bool updatepermiso(PermisoEntity p, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var permisoEntity = context.Permisos.FirstOrDefault(pm => pm.IdPermiso == p.id_permiso);
+                    var permisoEntity = context.PermisoEntity.FirstOrDefault(pm => pm.IdPermiso == p.IdPermiso);
 
                     if (permisoEntity is not null)
                     {
@@ -82,7 +70,7 @@ namespace Centrex
                         }
                         else
                         {
-                            permisoEntity.nombre = p.nombre;
+                            permisoEntity.Nombre = p.Nombre;
                         }
 
                         context.SaveChanges();
@@ -101,17 +89,17 @@ namespace Centrex
             }
         }
 
-        public static bool borrarpermiso(permiso p)
+        public static bool borrarpermiso(PermisoEntity p)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var permisoEntity = context.Permisos.FirstOrDefault(pm => pm.IdPermiso == p.id_permiso);
+                    var permisoEntity = context.PermisoEntity.FirstOrDefault(pm => pm.IdPermiso == p.IdPermiso);
 
                     if (permisoEntity is not null)
                     {
-                        context.Permisos.Remove(permisoEntity);
+                        context.PermisoEntity.Remove(permisoEntity);
                         context.SaveChanges();
                         return true;
                     }

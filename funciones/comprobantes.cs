@@ -1,11 +1,9 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     // ************************************
@@ -17,14 +15,14 @@ namespace Centrex
 
         // =============================================
         // OBTENER INFORMACIÓN DE UN COMPROBANTE
-        // =============================================
-        public static comprobante info_comprobante(string id_comprobante)
+        //  =============================================
+        public static ComprobanteEntity info_comprobante(int id_comprobante)
         {
-            var tmp = new comprobante();
+            var tmp = new ComprobanteEntity();
 
-            if (string.IsNullOrEmpty(id_comprobante))
+            if (id_comprobante == 0 || id_comprobante == -1)
             {
-                tmp.comprobanteField = "error";
+                tmp.Comprobante = "error";
                 return tmp;
             }
 
@@ -32,51 +30,103 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var comprobanteEntity = context.Comprobantes.Include(c => c.TipoComprobante).FirstOrDefault(c => c.IdComprobante == Conversions.ToInteger(id_comprobante));
+                    var comprobanteEntity = context.ComprobanteEntity
+     .Include(c => c.IdTipoComprobanteNavigation)
+      .FirstOrDefault(c => c.IdComprobante == id_comprobante);
 
                     if (comprobanteEntity is not null)
                     {
-                        tmp.id_comprobante = comprobanteEntity.IdComprobante.ToString();
-                        tmp.comprobanteField = comprobanteEntity.comprobante;
-                        tmp.id_tipoComprobante = comprobanteEntity.IdTipoComprobante.ToString();
-                        tmp.numeroComprobante = comprobanteEntity.numeroComprobante;
-                        tmp.puntoVenta = comprobanteEntity.puntoVenta;
-                        tmp.esFiscal = comprobanteEntity.esFiscal.HasValue ? comprobanteEntity.esFiscal.Value : false;
-                        tmp.esElectronica = comprobanteEntity.esElectronica.HasValue ? comprobanteEntity.esElectronica.Value : false;
-                        tmp.esManual = comprobanteEntity.esManual.HasValue ? comprobanteEntity.esManual.Value : false;
-                        tmp.esPresupuesto = comprobanteEntity.esPresupuesto.HasValue ? comprobanteEntity.esPresupuesto.Value : false;
-                        tmp.activo = comprobanteEntity.activo;
-                        tmp.testing = comprobanteEntity.testing;
-                        tmp.maxItems = comprobanteEntity.maxItems.HasValue ? comprobanteEntity.maxItems.Value : 0;
-                        tmp.comprobanteRelacionado = comprobanteEntity.comprobanteRelacionado.HasValue ? comprobanteEntity.comprobanteRelacionado.Value : 0;
-                        tmp.esMiPyME = comprobanteEntity.esMiPyME;
-                        tmp.CBU_emisor = comprobanteEntity.CBUEmisor;
-                        tmp.alias_CBU_emisor = comprobanteEntity.AliasCBUEmisor;
-                        tmp.anula_MiPyME = comprobanteEntity.AnulaMiPyME;
-                        tmp.contabilizar = comprobanteEntity.contabilizar;
-                        tmp.mueveStock = comprobanteEntity.mueveStock;
-                        tmp.id_modoMiPyme = comprobanteEntity.IdModoMiPyme;
-                        tmp.prefijo = comprobanteEntity.TipoComprobante is not null ? comprobanteEntity.TipoComprobante.nombreAbreviado : "";
+                        tmp.IdComprobante = comprobanteEntity.IdComprobante;
+                        tmp.Comprobante = comprobanteEntity.Comprobante;
+                        tmp.IdTipoComprobante = comprobanteEntity.IdTipoComprobante;
+                        tmp.NumeroComprobante = comprobanteEntity.NumeroComprobante;
+                        tmp.PuntoVenta = comprobanteEntity.PuntoVenta;
+                        tmp.EsFiscal = comprobanteEntity.EsFiscal ?? false;
+                        tmp.EsElectronica = comprobanteEntity.EsElectronica ?? false;
+                        tmp.EsManual = comprobanteEntity.EsManual ?? false;
+                        tmp.EsPresupuesto = comprobanteEntity.EsPresupuesto ?? false;
+                        tmp.Activo = comprobanteEntity.Activo;
+                        tmp.Testing = comprobanteEntity.Testing;
+                        tmp.MaxItems = comprobanteEntity.MaxItems ?? 0;
+                        tmp.ComprobanteRelacionado = comprobanteEntity.ComprobanteRelacionado ?? 0;
+                        tmp.EsMiPyMe = comprobanteEntity.EsMiPyMe;
+                        tmp.CbuEmisor = comprobanteEntity.CbuEmisor;
+                        tmp.AliasCbuEmisor = comprobanteEntity.AliasCbuEmisor;
+                        tmp.AnulaMiPyMe = comprobanteEntity.AnulaMiPyMe;
+                        tmp.Contabilizar = comprobanteEntity.Contabilizar;
+                        tmp.MueveStock = comprobanteEntity.MueveStock;
+                        tmp.IdModoMiPyme = comprobanteEntity.IdModoMiPyme;
+                        tmp.Prefijo = comprobanteEntity.Prefijo;
                     }
                     else
                     {
-                        tmp.comprobanteField = "error";
+                        tmp.Comprobante = "error";
                     }
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                tmp.comprobanteField = "error";
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                tmp.Comprobante = "error";
             }
 
             return tmp;
         }
 
         // =============================================
+        // OBTENER COMPROBANTE POR PUNTO DE VENTA Y TIPO
+        // =============================================
+        public static ComprobanteEntity info_comprobante_porPtoYTipo(int puntoVenta, int tipoComprobante)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    var comprobanteEntity = context.ComprobanteEntity
+                    .Include(c => c.IdTipoComprobanteNavigation)
+                       .FirstOrDefault(c => c.PuntoVenta == puntoVenta && c.IdTipoComprobante == tipoComprobante && c.Activo);
+
+                    if (comprobanteEntity is not null)
+                    {
+                        var tmp = new ComprobanteEntity
+                        {
+                            IdComprobante = comprobanteEntity.IdComprobante,
+                            Comprobante = comprobanteEntity.Comprobante,
+                            IdTipoComprobante = comprobanteEntity.IdTipoComprobante,
+                            NumeroComprobante = comprobanteEntity.NumeroComprobante,
+                            PuntoVenta = comprobanteEntity.PuntoVenta,
+                            EsFiscal = comprobanteEntity.EsFiscal ?? false,
+                            EsElectronica = comprobanteEntity.EsElectronica ?? false,
+                            EsManual = comprobanteEntity.EsManual ?? false,
+                            EsPresupuesto = comprobanteEntity.EsPresupuesto ?? false,
+                            Activo = comprobanteEntity.Activo,
+                            Testing = comprobanteEntity.Testing,
+                            MaxItems = comprobanteEntity.MaxItems ?? 0,
+                            ComprobanteRelacionado = comprobanteEntity.ComprobanteRelacionado ?? 0,
+                            EsMiPyMe = comprobanteEntity.EsMiPyMe,
+                            CbuEmisor = comprobanteEntity.CbuEmisor,
+                            AliasCbuEmisor = comprobanteEntity.AliasCbuEmisor,
+                            AnulaMiPyMe = comprobanteEntity.AnulaMiPyMe,
+                            Contabilizar = comprobanteEntity.Contabilizar,
+                            MueveStock = comprobanteEntity.MueveStock,
+                            IdModoMiPyme = comprobanteEntity.IdModoMiPyme
+                        };
+                        return tmp;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error en info_comprobante_porPtoYTipo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return null;
+        }
+
+        // =============================================
         // AGREGAR COMPROBANTE
         // =============================================
-        public static bool addcomprobante(comprobante c)
+        public static bool addcomprobante(ComprobanteEntity c)
         {
             try
             {
@@ -84,35 +134,35 @@ namespace Centrex
                 {
                     var comprobanteEntity = new ComprobanteEntity()
                     {
-                        comprobante = c.comprobanteField,
-                        IdTipoComprobante = c.id_tipoComprobante,
-                        numeroComprobante = c.numeroComprobante,
-                        puntoVenta = c.puntoVenta,
-                        esFiscal = c.esFiscal,
-                        esElectronica = c.esElectronica,
-                        esManual = c.esManual,
-                        esPresupuesto = c.esPresupuesto,
-                        activo = c.activo,
-                        testing = c.testing,
-                        maxItems = c.maxItems,
-                        comprobanteRelacionado = c.comprobanteRelacionado,
-                        esMiPyME = c.esMiPyME,
-                        CBUEmisor = c.CBU_emisor,
-                        AliasCBUEmisor = c.alias_CBU_emisor,
-                        AnulaMiPyME = c.anula_MiPyME,
-                        contabilizar = c.contabilizar,
-                        mueveStock = c.mueveStock,
-                        IdModoMiPyme = c.id_modoMiPyme
+                        Comprobante = c.Comprobante,
+                        IdTipoComprobante = c.IdTipoComprobante,
+                        NumeroComprobante = c.NumeroComprobante,
+                        PuntoVenta = c.PuntoVenta,
+                        EsFiscal = c.EsFiscal,
+                        EsElectronica = c.EsElectronica,
+                        EsManual = c.EsManual,
+                        EsPresupuesto = c.EsPresupuesto,
+                        Activo = c.Activo,
+                        Testing = c.Testing,
+                        MaxItems = c.MaxItems,
+                        ComprobanteRelacionado = c.ComprobanteRelacionado,
+                        EsMiPyMe = c.EsMiPyMe,
+                        CbuEmisor = c.CbuEmisor,
+                        AliasCbuEmisor = c.AliasCbuEmisor,
+                        AnulaMiPyMe = c.AnulaMiPyMe,
+                        Contabilizar = c.Contabilizar,
+                        MueveStock = c.MueveStock,
+                        IdModoMiPyme = c.IdModoMiPyme
                     };
 
-                    context.Comprobantes.Add(comprobanteEntity);
+                    context.ComprobanteEntity.Add(comprobanteEntity);
                     context.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -120,42 +170,42 @@ namespace Centrex
         // =============================================
         // ACTUALIZAR COMPROBANTE
         // =============================================
-        public static bool updatecomprobante(comprobante c, bool borra = false)
+        public static bool updatecomprobante(ComprobanteEntity c, bool borra = false)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var comprobanteEntity = context.Comprobantes.FirstOrDefault(comp => comp.IdComprobante == c.id_comprobante);
+                    var comprobanteEntity = context.ComprobanteEntity.FirstOrDefault(comp => comp.IdComprobante == c.IdComprobante);
 
                     if (comprobanteEntity is null)
                         return false;
 
                     if (borra)
                     {
-                        comprobanteEntity.activo = false;
+                        comprobanteEntity.Activo = false;
                     }
                     else
                     {
-                        comprobanteEntity.comprobante = c.comprobanteField;
-                        comprobanteEntity.IdTipoComprobante = c.id_tipoComprobante;
-                        comprobanteEntity.numeroComprobante = c.numeroComprobante;
-                        comprobanteEntity.puntoVenta = c.puntoVenta;
-                        comprobanteEntity.esFiscal = c.esFiscal;
-                        comprobanteEntity.esElectronica = c.esElectronica;
-                        comprobanteEntity.esManual = c.esManual;
-                        comprobanteEntity.esPresupuesto = c.esPresupuesto;
-                        comprobanteEntity.activo = c.activo;
-                        comprobanteEntity.testing = c.testing;
-                        comprobanteEntity.maxItems = c.maxItems;
-                        comprobanteEntity.comprobanteRelacionado = c.comprobanteRelacionado;
-                        comprobanteEntity.esMiPyME = c.esMiPyME;
-                        comprobanteEntity.CBUEmisor = c.CBU_emisor;
-                        comprobanteEntity.AliasCBUEmisor = c.alias_CBU_emisor;
-                        comprobanteEntity.AnulaMiPyME = c.anula_MiPyME;
-                        comprobanteEntity.contabilizar = c.contabilizar;
-                        comprobanteEntity.mueveStock = c.mueveStock;
-                        comprobanteEntity.IdModoMiPyme = c.id_modoMiPyme;
+                        comprobanteEntity.Comprobante = c.Comprobante;
+                        comprobanteEntity.IdTipoComprobante = c.IdTipoComprobante;
+                        comprobanteEntity.NumeroComprobante = c.NumeroComprobante;
+                        comprobanteEntity.PuntoVenta = c.PuntoVenta;
+                        comprobanteEntity.EsFiscal = c.EsFiscal;
+                        comprobanteEntity.EsElectronica = c.EsElectronica;
+                        comprobanteEntity.EsManual = c.EsManual;
+                        comprobanteEntity.EsPresupuesto = c.EsPresupuesto;
+                        comprobanteEntity.Activo = c.Activo;
+                        comprobanteEntity.Testing = c.Testing;
+                        comprobanteEntity.MaxItems = c.MaxItems;
+                        comprobanteEntity.ComprobanteRelacionado = c.ComprobanteRelacionado;
+                        comprobanteEntity.EsMiPyMe = c.EsMiPyMe;
+                        comprobanteEntity.CbuEmisor = c.CbuEmisor;
+                        comprobanteEntity.AliasCbuEmisor = c.AliasCbuEmisor;
+                        comprobanteEntity.AnulaMiPyMe = c.AnulaMiPyMe;
+                        comprobanteEntity.Contabilizar = c.Contabilizar;
+                        comprobanteEntity.MueveStock = c.MueveStock;
+                        comprobanteEntity.IdModoMiPyme = c.IdModoMiPyme;
                     }
 
                     context.SaveChanges();
@@ -164,7 +214,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -178,15 +228,20 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var comprobantes = context.Comprobantes.Include(c => c.TipoComprobante).Where(c => c.activo == true && (c.IdTipoComprobante == 1 || c.IdTipoComprobante == 2 || c.IdTipoComprobante == 3 || c.IdTipoComprobante == 4 || c.IdTipoComprobante == 5 || c.IdTipoComprobante == 34 || c.IdTipoComprobante == 39 || c.IdTipoComprobante == 60 || c.IdTipoComprobante == 63 || c.IdTipoComprobante == 0 || c.IdTipoComprobante == 99 || c.IdTipoComprobante == 199 || c.IdComprobante == id_comprobanteDefault)).ToList();
+                    var comprobantesValidos = new int[] { 1, 2, 3, 4, 5, 34, 39, 60, 63, 0, 99, 199 };
 
+                    var comprobantes = context.ComprobanteEntity
+             .Include(c => c.IdTipoComprobanteNavigation)
+                  .Where(c => c.Activo == true &&
+             (comprobantesValidos.Contains(c.IdTipoComprobante) || c.IdComprobante == id_comprobanteDefault))
+                   .ToList();
 
                     return comprobantes.Any();
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -200,7 +255,10 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var tipoComprobante = context.TiposComprobantes.FirstOrDefault(tc => tc.IdTipoComprobante == Conversions.ToInteger(id_tipoComprobante));
+                    int idTipo = int.Parse(id_tipoComprobante);
+                    var tipoComprobante = context.TipoComprobanteEntity
+                    .FirstOrDefault(tc => tc.IdTipoComprobante == idTipo);
+
                     if (tipoComprobante is not null && tipoComprobante.IdAnulaTipoComprobante.HasValue)
                     {
                         return tipoComprobante.IdAnulaTipoComprobante.Value;
@@ -210,10 +268,46 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
             }
         }
 
+        // ===============================================
+        // 🔹 Obtener información de comprobante
+        // ===============================================
+        public static ComprobanteEntity InfoComprobante(int comprobanteId)
+        {
+            using var ctx = new CentrexDbContext();
+            return ctx.ComprobanteEntity
+                        .Include(c => c.IdTipoComprobanteNavigation)
+                           .FirstOrDefault(c => c.IdComprobante == comprobanteId);
+        }
+
+        // =============================================
+        // BORRAR COMPROBANTE
+        // =============================================
+        public static bool borrarcomprobante(ComprobanteEntity c)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    var comprobanteEntity = context.ComprobanteEntity.FirstOrDefault(comp => comp.IdComprobante == c.IdComprobante);
+
+                    if (comprobanteEntity is null)
+                        return false;
+
+                    context.ComprobanteEntity.Remove(comprobanteEntity);
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
     }
 }

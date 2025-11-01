@@ -1,60 +1,48 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class perfiles
     {
         // ************************************ FUNCIONES DE PERFILES ********************
-        public static perfil info_perfil(string id_perfil)
+        public static PerfilEntity info_perfil(int id_perfil)
         {
-            var tmp = new perfil();
-
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var perfilEntity = context.Perfiles.FirstOrDefault(p => p.IdPerfil == Conversions.ToInteger(id_perfil));
-
-                    if (perfilEntity is not null)
+                    if (id_perfil != 0 || id_perfil != -1)
                     {
-                        tmp.id_perfil = perfilEntity.IdPerfil.ToString();
-                        tmp.nombre = perfilEntity.nombre;
-                        tmp.activo = perfilEntity.activo;
+                        return context.PerfilEntity.FirstOrDefault(c => c.IdPerfil == id_perfil);
                     }
                     else
                     {
-                        tmp.nombre = "error";
+                        return null;
                     }
                 }
-                return tmp;
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                tmp.nombre = "error";
-                return tmp;
+                Interaction.MsgBox($"Error al obtener el perfil: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+                return null;
             }
         }
 
-        public static bool addperfil(perfil p)
+        public static bool addperfil(PerfilEntity p)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var perfilEntity = new PerfilEntity()
                     {
-                        nombre = p.nombre,
-                        activo = p.activo
+                        Nombre = p.Nombre,
+                        Activo = p.Activo
                     };
 
-                    context.Perfiles.Add(perfilEntity);
+                    context.PerfilEntity.Add(perfilEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -66,24 +54,24 @@ namespace Centrex
             }
         }
 
-        public static bool updateperfil(perfil p, bool borra = false)
+        public static bool updateperfil(PerfilEntity p, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var perfilEntity = context.Perfiles.FirstOrDefault(pf => pf.IdPerfil == p.id_perfil);
+                    var perfilEntity = context.PerfilEntity.FirstOrDefault(pf => pf.IdPerfil == p.IdPerfil);
 
                     if (perfilEntity is not null)
                     {
                         if (borra == true)
                         {
-                            perfilEntity.activo = false;
+                            perfilEntity.Activo = false;
                         }
                         else
                         {
-                            perfilEntity.nombre = p.nombre;
-                            perfilEntity.activo = p.activo;
+                            perfilEntity.Nombre = p.Nombre;
+                            perfilEntity.Activo = p.Activo;
                         }
 
                         context.SaveChanges();
@@ -102,17 +90,17 @@ namespace Centrex
             }
         }
 
-        public static bool borrarperfil(perfil p)
+        public static bool borrarperfil(int id_perfil)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var perfilEntity = context.Perfiles.FirstOrDefault(pf => pf.IdPerfil == p.id_perfil);
+                    var perfilEntity = context.PerfilEntity.FirstOrDefault(pf => pf.IdPerfil == id_perfil);
 
                     if (perfilEntity is not null)
                     {
-                        context.Perfiles.Remove(perfilEntity);
+                        context.PerfilEntity.Remove(perfilEntity);
                         context.SaveChanges();
                         return true;
                     }

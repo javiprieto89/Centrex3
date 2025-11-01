@@ -1,7 +1,9 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -11,7 +13,6 @@ namespace Centrex
         private int pagina_cartera;
         private int nRegs_cartera;
         private int tPaginas_cartera;
-        private ColumnClickEventArgs orderCol_cartera = null;
         // Dim fecha_desde_cartera As Date
         // Dim fecha_hasta_cartera As Date
 
@@ -19,7 +20,6 @@ namespace Centrex
         private int pagina_depositado;
         private int nRegs_depositado;
         private int tPaginas_depositado;
-        private ColumnClickEventArgs orderCol_depositado = null;
 
         public frm_depositarCH()
         {
@@ -35,128 +35,349 @@ namespace Centrex
         // *  4           *   Rechazado  *
         // *******************************
 
-        private void frm_depositarCH_Load(object sender, EventArgs e)
+        private async void frm_depositarCH_Load(object sender, EventArgs e)
         {
-            // fecha_desde_cartera = Today()
-            // fecha_hasta_cartera = Date.MaxValue
+            var ordenBancos = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
+            generales.Cargar_Combo(
+                ref cmb_banco,
+                entidad: "BancoEntity",
+                displaymember: "Nombre",
+                valuemember: "IdBanco",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenBancos);
 
-            var argcombo = cmb_banco;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_banco, nombre FROM bancos WHERE activo = '1' ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_banco"));
-            cmb_banco = argcombo;
+            cmb_banco.SelectedIndex = -1;
 
-            cmb_banco.Text = "Seleccione un banco...";
-            cmb_cuentaBancaria.Text = "Seleccione una cuenta bancaria...";
+            cmb_cuentaBancaria.DataSource = null;
+            cmb_cuentaBancaria.Items.Clear();
+            cmb_cuentaBancaria.Enabled = false;
+            cmb_cuentaBancaria.SelectedIndex = -1;
+
             chk_desdeSiempre_cartera.Checked = true;
             dtp_desde_cartera.Value = dtp_desde_cartera.MinDate;
             chk_hastaSiempre_cartera.Checked = true;
             dtp_hasta_cartera.Value = DateTime.Today.Date;
 
-            cmb_cuentaBancaria.Enabled = false;
-            // cmd_depositar.Enabled = False
-            // cmd_acreditar.Enabled = False
-            // cmd_anular.Enabled = False
+            chk_desdeSiempre_depositado.Checked = true;
+            dtp_desde_depositado.Value = dtp_desde_depositado.MinDate;
+            chk_hastaSiempre_depositado.Checked = true;
+            dtp_hasta_depositado.Value = DateTime.Today.Date;
 
-
-            actualizarDatagrid_cartera();
-
-        }
-
-        private void actualizarDatagrid_cartera()
-        {
-            string sqlstr;
-            DateTime fecha_desde;
-            DateTime fecha_hasta;
-
-            if (chk_desdeSiempre_cartera.Checked)
-            {
-                fecha_desde = dtp_desde_cartera.Value;
-            }
-            else
-            {
-                fecha_desde = DateTime.MinValue;
-            }
-
-            if (chk_hastaSiempre_cartera.Checked)
-            {
-                fecha_hasta = dtp_hasta_cartera.Value;
-            }
-            else
-            {
-                fecha_hasta = DateTime.MaxValue;
-            }
-
-
-            sqlstr = "SELECT ch.id_cheque AS 'ID', CAST(ch.fecha_ingreso AS VARCHAR(50)) AS 'F. Ingreso', CAST(ch.fecha_emision AS VARCHAR(50)) AS 'F. Emisión', " + "c.razon_social AS 'Recibido de', p.razon_social AS 'Entregado a', b.nombre AS 'Banco emisor', " + "cb.nombre AS 'Depositado en', ch.nCheque AS 'Nº cheque', ch.nCheque2 AS '2do nºd/cheque', ch.importe AS 'Monto', sech.estado AS 'Estado', " + "CAST(ch.fecha_cobro AS VARCHAR(50)) AS 'Fecha de cobro', " + "CAST(ch.fecha_salida AS VARCHAR(50)) AS 'Fecha de salida', CAST(ch.fecha_deposito AS VARCHAR(50)) AS 'Fecha de deposito' " + "FROM cheques AS ch " + "LEFT JOIN clientes AS c ON ch.id_cliente = c.id_cliente " + "LEFT JOIN proveedores AS p ON ch.id_proveedor = p.id_proveedor " + "LEFT JOIN bancos AS b ON ch.id_banco = b.id_banco " + "LEFT JOIN cuentas_bancarias AS cb ON ch.id_cuentaBancaria = cb.id_cuentaBancaria " + "LEFT JOIN sysestados_cheques AS sech ON ch.id_estadoch = sech.id_estadoch " + "WHERE ch.activo = '1' " + "AND ch.id_estadoch = '1' " + "AND ch.fecha_cobro BETWEEN '" + fecha_desde.ToString("yyyy/MM/dd") + "' AND '" + fecha_hasta.ToString("yyyy/MM/dd") + "' ";
-            if (!string.IsNullOrEmpty(txt_nCH_cartera.Text))
-                sqlstr += "AND ch.nCheque = '" + txt_nCH_cartera.Text + "' ";
-            if (!string.IsNullOrEmpty(txt_importeCH_cartera.Text))
-                sqlstr += "AND ch.importe = '" + txt_importeCH_cartera.Text + "' ";
-            sqlstr += "AND ch.id_estadoch = '" + VariablesGlobales.ID_CH_CARTERA.ToString() + "' " + "ORDER BY ch.id_cheque ASC";
-
-            desde_cartera = 0;
             pagina_cartera = 1;
-
-
-            var argdataGrid = dg_view_chCartera;
-            var argtxtnPage = txt_nPage_cartera;
-            generales.cargar_datagrid(ref argdataGrid, sqlstr, VariablesGlobales.basedb, desde_cartera, ref nRegs_cartera, ref tPaginas_cartera, pagina_cartera, ref argtxtnPage, "cheques", "cheques");
-            dg_view_chCartera = argdataGrid;
-            txt_nPage_cartera = argtxtnPage;
-            dg_view_chCartera.ClearSelection();
-        }
-
-        private void actualizarDatagrid_cartera(string sqlstr, DateTime fecha_desde, DateTime fecha_hasta)
-        {
             desde_cartera = 0;
-            pagina_cartera = 1;
+            pagina_depositado = 1;
+            desde_depositado = 0;
 
-
-            var argdataGrid = dg_view_chCartera;
-            var argtxtnPage = txt_nPage_cartera;
-            generales.cargar_datagrid(ref argdataGrid, sqlstr, VariablesGlobales.basedb, desde_cartera, ref nRegs_cartera, ref tPaginas_cartera, pagina_cartera, ref argtxtnPage, "cheques", "cheques");
-            dg_view_chCartera = argdataGrid;
-            txt_nPage_cartera = argtxtnPage;
+            await LoadCarteraAsync(resetPage: true);
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void cmd_next_Click_cartera(object sender, EventArgs e)
+        private async Task LoadCarteraAsync(bool resetPage)
         {
-            if (pagina_cartera == Math.Ceiling(nRegs_cartera / (double)VariablesGlobales.itXPage))
+            try
+            {
+                if (resetPage)
+                {
+                    pagina_cartera = 1;
+                    desde_cartera = 0;
+                }
+
+                using var ctx = new CentrexDbContext();
+
+                var query = ctx.ChequeEntity
+                    .AsNoTracking()
+                    .Include(ch => ch.IdClienteNavigation)
+                    .Include(ch => ch.IdProveedorNavigation)
+                    .Include(ch => ch.IdBancoNavigation)
+                    .Include(ch => ch.IdCuentaBancariaNavigation)
+                    .Include(ch => ch.IdEstadochNavigation)
+                    .Where(ch => ch.Activo && ch.IdEstadoch == ID_CH_CARTERA);
+
+                if (chk_desdeSiempre_cartera.Checked)
+                {
+                    var fechaDesde = DateOnly.FromDateTime(dtp_desde_cartera.Value.Date);
+                    query = query.Where(ch => ch.FechaCobro.HasValue && ch.FechaCobro.Value >= fechaDesde);
+                }
+
+                if (chk_hastaSiempre_cartera.Checked)
+                {
+                    var fechaHasta = DateOnly.FromDateTime(dtp_hasta_cartera.Value.Date);
+                    query = query.Where(ch => ch.FechaCobro.HasValue && ch.FechaCobro.Value <= fechaHasta);
+                }
+
+                if (int.TryParse(txt_nCH_cartera.Text, out var numeroCheque))
+                {
+                    query = query.Where(ch => ch.NCheque == numeroCheque);
+                }
+
+                if (decimal.TryParse(txt_importeCH_cartera.Text, NumberStyles.Number, CultureInfo.CurrentCulture, out var importeCheque))
+                {
+                    query = query.Where(ch => ch.Importe == importeCheque);
+                }
+
+                nRegs_cartera = await query.CountAsync();
+
+                var pageSize = itXPage > 0 ? itXPage : 50;
+                tPaginas_cartera = nRegs_cartera == 0 ? 1 : (int)Math.Ceiling(nRegs_cartera / (double)pageSize);
+
+                if (pagina_cartera < 1)
+                    pagina_cartera = 1;
+                if (pagina_cartera > tPaginas_cartera)
+                    pagina_cartera = tPaginas_cartera;
+
+                desde_cartera = (pagina_cartera - 1) * pageSize;
+                if (desde_cartera < 0)
+                    desde_cartera = 0;
+
+                var pagedQuery = query
+                    .OrderBy(ch => ch.IdCheque)
+                    .Skip(desde_cartera)
+                    .Take(pageSize)
+                    .Select(ch => new
+                    {
+                        ID = ch.IdCheque,
+                        FechaIngreso = ch.FechaIngreso,
+                        FechaEmision = ch.FechaEmision,
+                        RecibidoDe = ch.IdClienteNavigation != null ? ch.IdClienteNavigation.RazonSocial : string.Empty,
+                        EntregadoA = ch.IdProveedorNavigation != null ? ch.IdProveedorNavigation.RazonSocial : string.Empty,
+                        BancoEmisor = ch.IdBancoNavigation.Nombre,
+                        DepositadoEn = ch.IdCuentaBancariaNavigation != null ? ch.IdCuentaBancariaNavigation.Nombre : string.Empty,
+                        NumeroCheque = ch.NCheque,
+                        SegundoNumeroCheque = ch.NCheque2,
+                        Monto = ch.Importe,
+                        Estado = ch.IdEstadochNavigation.Estado,
+                        FechaCobro = ch.FechaCobro,
+                        FechaSalida = ch.FechaSalida,
+                        FechaDeposito = ch.FechaDeposito
+                    });
+
+                var result = new DataGridQueryResult
+                {
+                    Query = pagedQuery,
+                    ColumnasOcultar = new List<string> { "ID" },
+                    EsMaterializada = false
+                };
+
+                await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_view_chCartera, result);
+
+                if (dg_view_chCartera.Columns.Contains("FechaIngreso"))
+                    dg_view_chCartera.Columns["FechaIngreso"].HeaderText = "F. Ingreso";
+                if (dg_view_chCartera.Columns.Contains("FechaEmision"))
+                    dg_view_chCartera.Columns["FechaEmision"].HeaderText = "F. Emisión";
+                if (dg_view_chCartera.Columns.Contains("RecibidoDe"))
+                    dg_view_chCartera.Columns["RecibidoDe"].HeaderText = "Recibido de";
+                if (dg_view_chCartera.Columns.Contains("EntregadoA"))
+                    dg_view_chCartera.Columns["EntregadoA"].HeaderText = "Entregado a";
+                if (dg_view_chCartera.Columns.Contains("BancoEmisor"))
+                    dg_view_chCartera.Columns["BancoEmisor"].HeaderText = "Banco emisor";
+                if (dg_view_chCartera.Columns.Contains("NumeroCheque"))
+                    dg_view_chCartera.Columns["NumeroCheque"].HeaderText = "Nº cheque";
+                if (dg_view_chCartera.Columns.Contains("SegundoNumeroCheque"))
+                    dg_view_chCartera.Columns["SegundoNumeroCheque"].HeaderText = "2º nº cheque";
+                if (dg_view_chCartera.Columns.Contains("Monto"))
+                {
+                    dg_view_chCartera.Columns["Monto"].HeaderText = "$$";
+                    dg_view_chCartera.Columns["Monto"].DefaultCellStyle.Format = "N2";
+                }
+                if (dg_view_chCartera.Columns.Contains("Estado"))
+                    dg_view_chCartera.Columns["Estado"].HeaderText = "Estado";
+                if (dg_view_chCartera.Columns.Contains("FechaCobro"))
+                    dg_view_chCartera.Columns["FechaCobro"].HeaderText = "Fecha de cobro";
+                if (dg_view_chCartera.Columns.Contains("FechaSalida"))
+                    dg_view_chCartera.Columns["FechaSalida"].HeaderText = "Fecha de salida";
+                if (dg_view_chCartera.Columns.Contains("FechaDeposito"))
+                    dg_view_chCartera.Columns["FechaDeposito"].HeaderText = "Fecha de depósito";
+
+                txt_nPage_cartera.Text = nRegs_cartera == 0 ? "0 / 0" : $"{pagina_cartera} / {tPaginas_cartera}";
+                dg_view_chCartera.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al cargar cheques en cartera: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
+        }
+
+        private async Task LoadDepositadosAsync(bool resetPage)
+        {
+            try
+            {
+                if (resetPage)
+                {
+                    pagina_depositado = 1;
+                    desde_depositado = 0;
+                }
+
+                using var ctx = new CentrexDbContext();
+
+                var query = ctx.ChequeEntity
+                    .AsNoTracking()
+                    .Include(ch => ch.IdClienteNavigation)
+                    .Include(ch => ch.IdProveedorNavigation)
+                    .Include(ch => ch.IdBancoNavigation)
+                    .Include(ch => ch.IdCuentaBancariaNavigation)
+                    .Include(ch => ch.IdEstadochNavigation)
+                    .Where(ch => ch.Activo && ch.IdEstadoch == ID_CH_DEPOSITADO);
+
+                if (chk_desdeSiempre_depositado.Checked)
+                {
+                    var fechaDesde = DateOnly.FromDateTime(dtp_desde_depositado.Value.Date);
+                    query = query.Where(ch => ch.FechaCobro.HasValue && ch.FechaCobro.Value >= fechaDesde);
+                }
+
+                if (chk_hastaSiempre_depositado.Checked)
+                {
+                    var fechaHasta = DateOnly.FromDateTime(dtp_hasta_depositado.Value.Date);
+                    query = query.Where(ch => ch.FechaCobro.HasValue && ch.FechaCobro.Value <= fechaHasta);
+                }
+
+                if (cmb_cuentaBancaria.Enabled && cmb_cuentaBancaria.SelectedValue is int idCuenta)
+                {
+                    query = query.Where(ch => ch.IdCuentaBancaria == idCuenta);
+                }
+
+                if (int.TryParse(txt_nCH_depositado.Text, out var numeroCheque))
+                {
+                    query = query.Where(ch => ch.NCheque == numeroCheque);
+                }
+
+                if (decimal.TryParse(txt_importeCH_depositado.Text, NumberStyles.Number, CultureInfo.CurrentCulture, out var importeCheque))
+                {
+                    query = query.Where(ch => ch.Importe == importeCheque);
+                }
+
+                nRegs_depositado = await query.CountAsync();
+
+                var pageSize = itXPage > 0 ? itXPage : 50;
+                tPaginas_depositado = nRegs_depositado == 0 ? 1 : (int)Math.Ceiling(nRegs_depositado / (double)pageSize);
+
+                if (pagina_depositado < 1)
+                    pagina_depositado = 1;
+                if (pagina_depositado > tPaginas_depositado)
+                    pagina_depositado = tPaginas_depositado;
+
+                desde_depositado = (pagina_depositado - 1) * pageSize;
+                if (desde_depositado < 0)
+                    desde_depositado = 0;
+
+                var pagedQuery = query
+                    .OrderBy(ch => ch.IdCheque)
+                    .Skip(desde_depositado)
+                    .Take(pageSize)
+                    .Select(ch => new
+                    {
+                        ID = ch.IdCheque,
+                        FechaIngreso = ch.FechaIngreso,
+                        FechaEmision = ch.FechaEmision,
+                        RecibidoDe = ch.IdClienteNavigation != null ? ch.IdClienteNavigation.RazonSocial : string.Empty,
+                        EntregadoA = ch.IdProveedorNavigation != null ? ch.IdProveedorNavigation.RazonSocial : string.Empty,
+                        BancoEmisor = ch.IdBancoNavigation.Nombre,
+                        DepositadoEn = ch.IdCuentaBancariaNavigation != null ? ch.IdCuentaBancariaNavigation.Nombre : string.Empty,
+                        NumeroCheque = ch.NCheque,
+                        SegundoNumeroCheque = ch.NCheque2,
+                        Monto = ch.Importe,
+                        Estado = ch.IdEstadochNavigation.Estado,
+                        FechaCobro = ch.FechaCobro,
+                        FechaSalida = ch.FechaSalida,
+                        FechaDeposito = ch.FechaDeposito
+                    });
+
+                var result = new DataGridQueryResult
+                {
+                    Query = pagedQuery,
+                    ColumnasOcultar = new List<string> { "ID" },
+                    EsMaterializada = false
+                };
+
+                await LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_view_chDepositados, result);
+
+                if (dg_view_chDepositados.Columns.Contains("FechaIngreso"))
+                    dg_view_chDepositados.Columns["FechaIngreso"].HeaderText = "F. Ingreso";
+                if (dg_view_chDepositados.Columns.Contains("FechaEmision"))
+                    dg_view_chDepositados.Columns["FechaEmision"].HeaderText = "F. Emisión";
+                if (dg_view_chDepositados.Columns.Contains("RecibidoDe"))
+                    dg_view_chDepositados.Columns["RecibidoDe"].HeaderText = "Recibido de";
+                if (dg_view_chDepositados.Columns.Contains("EntregadoA"))
+                    dg_view_chDepositados.Columns["EntregadoA"].HeaderText = "Entregado a";
+                if (dg_view_chDepositados.Columns.Contains("BancoEmisor"))
+                    dg_view_chDepositados.Columns["BancoEmisor"].HeaderText = "Banco emisor";
+                if (dg_view_chDepositados.Columns.Contains("NumeroCheque"))
+                    dg_view_chDepositados.Columns["NumeroCheque"].HeaderText = "Nº cheque";
+                if (dg_view_chDepositados.Columns.Contains("SegundoNumeroCheque"))
+                    dg_view_chDepositados.Columns["SegundoNumeroCheque"].HeaderText = "2º nº cheque";
+                if (dg_view_chDepositados.Columns.Contains("Monto"))
+                {
+                    dg_view_chDepositados.Columns["Monto"].HeaderText = "$$";
+                    dg_view_chDepositados.Columns["Monto"].DefaultCellStyle.Format = "N2";
+                }
+                if (dg_view_chDepositados.Columns.Contains("Estado"))
+                    dg_view_chDepositados.Columns["Estado"].HeaderText = "Estado";
+                if (dg_view_chDepositados.Columns.Contains("FechaCobro"))
+                    dg_view_chDepositados.Columns["FechaCobro"].HeaderText = "Fecha de cobro";
+                if (dg_view_chDepositados.Columns.Contains("FechaSalida"))
+                    dg_view_chDepositados.Columns["FechaSalida"].HeaderText = "Fecha de salida";
+                if (dg_view_chDepositados.Columns.Contains("FechaDeposito"))
+                    dg_view_chDepositados.Columns["FechaDeposito"].HeaderText = "Fecha de depósito";
+
+                txt_nPage_depositado.Text = nRegs_depositado == 0 ? "0 / 0" : $"{pagina_depositado} / {tPaginas_depositado}";
+                dg_view_chDepositados.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al cargar cheques depositados: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
+        }
+
+        private async void cmd_next_Click_cartera(object sender, EventArgs e)
+        {
+            if (pagina_cartera >= tPaginas_cartera)
                 return;
-            desde_cartera += VariablesGlobales.itXPage;
             pagina_cartera += 1;
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: false);
         }
 
-        private void cmd_prev_Click_cartera(object sender, EventArgs e)
+        private async void cmd_prev_Click_cartera(object sender, EventArgs e)
         {
             if (pagina_cartera == 1)
                 return;
-            desde_cartera -= VariablesGlobales.itXPage;
             pagina_cartera -= 1;
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: false);
         }
 
-        private void cmd_first_Click_cartera(object sender, EventArgs e)
+        private async void cmd_first_Click_cartera(object sender, EventArgs e)
         {
-            desde_cartera = 0;
             pagina_cartera = 1;
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: true);
         }
 
-        private void cmd_last_Click_cartera(object sender, EventArgs e)
+        private async void cmd_last_Click_cartera(object sender, EventArgs e)
         {
             pagina_cartera = tPaginas_cartera;
-            desde_cartera = nRegs_cartera - VariablesGlobales.itXPage;
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: false);
         }
 
-        private void cmd_go_Click_cartera(object sender, EventArgs e)
+        private async void cmd_go_Click_cartera(object sender, EventArgs e)
         {
-            pagina_cartera = Conversions.ToInteger(txt_nPage_cartera.Text);
+            var partes = txt_nPage_cartera.Text.Split('/');
+            if (partes.Length > 0 && int.TryParse(partes[0].Trim(), out var paginaSolicitada))
+            {
+                pagina_cartera = paginaSolicitada;
+            }
+            else if (int.TryParse(txt_nPage_cartera.Text.Trim(), out var paginaLibre))
+            {
+                pagina_cartera = paginaLibre;
+            }
+            else
+            {
+                pagina_cartera = 1;
+            }
+
             if (pagina_cartera > tPaginas_cartera)
                 pagina_cartera = tPaginas_cartera;
-            desde_cartera = (pagina_cartera - 1) * VariablesGlobales.itXPage;
-            actualizarDatagrid_cartera();
+            if (pagina_cartera < 1)
+                pagina_cartera = 1;
+            await LoadCarteraAsync(resetPage: false);
         }
 
         private void txt_nPage_KeyDown_cartera(object sender, KeyEventArgs e)
@@ -171,90 +392,55 @@ namespace Centrex
         {
             txt_nPage_cartera.Text = "";
         }
-
-        private void actualizarDatagrid_depositado()
+        private async void cmd_next_Click_depositado(object sender, EventArgs e)
         {
-            string sqlstr;
-            DateTime fecha_desde;
-            DateTime fecha_hasta;
-
-            if (chk_desdeSiempre_depositado.Checked)
-            {
-                fecha_desde = dtp_desde_depositado.Value;
-            }
-            else
-            {
-                fecha_desde = DateTime.MinValue;
-            }
-
-            if (chk_hastaSiempre_depositado.Checked)
-            {
-                fecha_hasta = dtp_hasta_depositado.Value;
-            }
-            else
-            {
-                fecha_hasta = DateTime.MaxValue;
-            }
-
-            sqlstr = "SELECT ch.id_cheque AS 'ID', CAST(ch.fecha_ingreso AS VARCHAR(50)) AS 'F. Ingreso', CAST(ch.fecha_emision AS VARCHAR(50)) AS 'F. Emisión', " + "c.razon_social AS 'Recibido de', p.razon_social AS 'Entregado a', b.nombre AS 'Banco emisor', " + "cb.nombre AS 'Depositado en', ch.nCheque AS 'Nº cheque', ch.nCheque2 AS '2do nºd/cheque', ch.importe AS 'Monto', sech.estado AS 'Estado', " + "CAST(ch.fecha_cobro AS VARCHAR(50)) AS 'Fecha de cobro', " + "CAST(ch.fecha_salida AS VARCHAR(50)) AS 'Fecha de salida', CAST(ch.fecha_deposito AS VARCHAR(50)) AS 'Fecha de deposito' " + "FROM cheques AS ch " + "LEFT JOIN clientes AS c ON ch.id_cliente = c.id_cliente " + "LEFT JOIN proveedores AS p ON ch.id_proveedor = p.id_proveedor " + "LEFT JOIN bancos AS b ON ch.id_banco = b.id_banco " + "LEFT JOIN cuentas_bancarias AS cb ON ch.id_cuentaBancaria = cb.id_cuentaBancaria " + "LEFT JOIN sysestados_cheques AS sech ON ch.id_estadoch = sech.id_estadoch " + "WHERE ch.activo = '1' ";
-            if (cmb_cuentaBancaria.Text != "Seleccione una cuenta bancaria...")
-                sqlstr += " AND ch.id_cuentaBancaria = '" + cmb_cuentaBancaria.SelectedValue.ToString() + "'";
-            sqlstr += "AND ch.fecha_cobro BETWEEN '" + fecha_desde.ToString("yyyy/MM/dd") + "' AND '" + fecha_hasta.ToString("yyyy/MM/dd") + "' ";
-            if (!string.IsNullOrEmpty(txt_nCH_depositado.Text))
-                sqlstr += "AND ch.nCheque = '" + txt_nCH_depositado.Text + "' ";
-            if (!string.IsNullOrEmpty(txt_importeCH_depositado.Text))
-                sqlstr += "AND ch.importe = '" + txt_importeCH_depositado.Text + "' ";
-            sqlstr += "AND ch.id_estadoch = '" + VariablesGlobales.ID_CH_DEPOSITADO.ToString() + "' " + "ORDER BY ch.id_cheque ASC";
-
-            desde_cartera = 0;
-            pagina_cartera = 1;
-
-            var argdataGrid = dg_view_chDepositados;
-            var argtxtnPage = txt_nPage_depositado;
-            generales.cargar_datagrid(ref argdataGrid, sqlstr, VariablesGlobales.basedb, desde_depositado, ref nRegs_depositado, ref tPaginas_depositado, pagina_depositado, ref argtxtnPage);
-            dg_view_chDepositados = argdataGrid;
-            txt_nPage_depositado = argtxtnPage;
-        }
-
-        private void cmd_next_Click_depositado(object sender, EventArgs e)
-        {
-            if (pagina_depositado == Math.Ceiling(nRegs_depositado / (double)VariablesGlobales.itXPage))
+            if (pagina_depositado >= tPaginas_depositado)
                 return;
-            desde_depositado += VariablesGlobales.itXPage;
             pagina_depositado += 1;
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: false);
         }
 
-        private void cmd_prev_Click_depositado(object sender, EventArgs e)
+        private async void cmd_prev_Click_depositado(object sender, EventArgs e)
         {
             if (pagina_depositado == 1)
                 return;
-            desde_depositado -= VariablesGlobales.itXPage;
             pagina_depositado -= 1;
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: false);
         }
 
-        private void cmd_first_Click_depositado(object sender, EventArgs e)
+        private async void cmd_first_Click_depositado(object sender, EventArgs e)
         {
-            desde_depositado = 0;
             pagina_depositado = 1;
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void cmd_last_Click_depositado(object sender, EventArgs e)
+        private async void cmd_last_Click_depositado(object sender, EventArgs e)
         {
             pagina_depositado = tPaginas_depositado;
-            desde_depositado = nRegs_depositado - VariablesGlobales.itXPage;
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: false);
         }
 
-        private void cmd_go_Click_depositado(object sender, EventArgs e)
+        private async void cmd_go_Click_depositado(object sender, EventArgs e)
         {
-            pagina_depositado = Conversions.ToInteger(txt_nPage_depositado.Text);
+            var partes = txt_nPage_depositado.Text.Split('/');
+            if (partes.Length > 0 && int.TryParse(partes[0].Trim(), out var paginaSolicitada))
+            {
+                pagina_depositado = paginaSolicitada;
+            }
+            else if (int.TryParse(txt_nPage_depositado.Text.Trim(), out var paginaLibre))
+            {
+                pagina_depositado = paginaLibre;
+            }
+            else
+            {
+                pagina_depositado = 1;
+            }
+
             if (pagina_depositado > tPaginas_depositado)
                 pagina_depositado = tPaginas_depositado;
-            desde_depositado = (pagina_depositado - 1) * VariablesGlobales.itXPage;
-            actualizarDatagrid_depositado();
+            if (pagina_depositado < 1)
+                pagina_depositado = 1;
+            await LoadDepositadosAsync(resetPage: false);
         }
 
         private void txt_nPage_KeyDown_depositado(object sender, KeyEventArgs e)
@@ -270,28 +456,28 @@ namespace Centrex
             txt_nPage_depositado.Text = "";
         }
 
-        private void txt_nCH_cartera_KeyDown(object sender, KeyEventArgs e)
+        private async void txt_nCH_cartera_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
             {
-                actualizarDatagrid_cartera();
+                await LoadCarteraAsync(resetPage: true);
             }
         }
 
-        private void txt_importeCH_cartera_KeyDown(object sender, KeyEventArgs e)
+        private async void txt_importeCH_cartera_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
             {
-                actualizarDatagrid_cartera();
+                await LoadCarteraAsync(resetPage: true);
             }
         }
 
-        private void cmd_depositar_Click(object sender, EventArgs e)
+        private async void cmd_depositar_Click(object sender, EventArgs e)
         {
             int c;
             int sel = 0;
             bool hay_error = false;
-            var ch = new cheque();
+            var ch = new ChequeEntity();
 
             var loopTo = dg_view_chCartera.Rows.Count - 1;
             for (c = 0; c <= loopTo; c++)
@@ -312,12 +498,12 @@ namespace Centrex
                 Interaction.MsgBox("No ha seleccionado ningún cheque para depositar", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
-            else if (cmb_banco.Text == "Seleccione un banco...")
+            else if (cmb_banco.SelectedValue is null)
             {
                 Interaction.MsgBox("No hay seleccionado un banco en el cual depositar el/los cheque(s)", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
-            else if (cmb_cuentaBancaria.Text == "Seleccione una cuenta bancaria...")
+            else if (cmb_cuentaBancaria.SelectedValue is null)
             {
                 Interaction.MsgBox("No hay seleccionada una cuenta bancaria en la cual depositar el/los cheque(s)", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
@@ -331,18 +517,27 @@ namespace Centrex
             var loopTo1 = dg_view_chCartera.Rows.Count - 1;
             for (c = 0; c <= loopTo1; c++)
             {
-                if (dg_view_chCartera.Rows[c].Selected)
+                if (!dg_view_chCartera.Rows[c].Selected)
+                    continue;
+
+                var idValor = dg_view_chCartera.Rows[c].Cells["ID"].Value;
+                if (idValor is null)
+                    continue;
+
+                ch.IdCheque = Convert.ToInt32(idValor);
+                ch.FechaDeposito = ConversorFechas.GetFecha(generales.Hoy(), ch.FechaDeposito);
+                ch.IdCuentaBancaria = Convert.ToInt32(cmb_cuentaBancaria.SelectedValue);
+                var nChequeValor = dg_view_chCartera.Rows[c].Cells["NumeroCheque"].Value;
+                if (nChequeValor != null && int.TryParse(nChequeValor.ToString(), out var numCheque))
+                    ch.NCheque = numCheque;
+                else
+                    ch.NCheque = 0;
+
+
+                if (!cheques.Depositar_cheque(ch))
                 {
-                    ch.id_cheque = Conversions.ToInteger(dg_view_chCartera.Rows[c].Cells[0].Value.ToString());
-                    ch.fecha_deposito = generales.Hoy();
-                    ch.id_cuentaBancaria = Conversions.ToInteger(cmb_cuentaBancaria.SelectedValue);
-                    ch.nCheque = dg_view_chCartera.Rows[c].Cells[7].Value.ToString();
-                    if (!cheques.Depositar_cheque(ch))
-                    {
-                        Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.nCheque.ToString() + "en la cuenta bancaria: " + cmb_cuentaBancaria.Text + "perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
-                        hay_error = true;
-                        // Exit Sub
-                    }
+                    Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.NCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                    hay_error = true;
                 }
             }
 
@@ -356,56 +551,79 @@ namespace Centrex
                 Interaction.MsgBox("Verifique, no todos los cheques se depositaron correctamente, puede ser que no puedan ser depositados.", (MsgBoxStyle)((int)Constants.vbInformation + (int)Constants.vbOKOnly), "Centrex");
             }
 
-            actualizarDatagrid_cartera();
-            actualizarDatagrid_depositado();
+            await LoadCarteraAsync(resetPage: true);
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void cmb_banco_SelectionChangeCommitted(object sender, EventArgs e)
+        private async void cmb_banco_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            var argcombo = cmb_cuentaBancaria;
-            generales.Cargar_Combo(ref argcombo, "SELECT cb.id_cuentaBancaria, CONCAT(b.nombre, ' - ', cb.nombre) AS nombre " + "FROM cuentas_bancarias AS cb " + "INNER JOIN bancos AS b  ON cb.id_banco = b.id_banco " + "WHERE cb.activo = '1' AND cb.id_banco = '" + cmb_banco.SelectedValue.ToString() + "' " + "ORDER BY b.nombre, cb.nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_cuentaBancaria"));
-            cmb_cuentaBancaria = argcombo;
+            if (cmb_banco.SelectedValue is null)
+            {
+                cmb_cuentaBancaria.DataSource = null;
+                cmb_cuentaBancaria.Items.Clear();
+                cmb_cuentaBancaria.Enabled = false;
+                await LoadDepositadosAsync(resetPage: true);
+                return;
+            }
 
-            cmb_cuentaBancaria.Text = "Seleccione una cuenta bancaria...";
+            var filtros = new Dictionary<string, object>
+            {
+                ["IdBanco"] = Convert.ToInt32(cmb_banco.SelectedValue)
+            };
+            var orden = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
+            generales.Cargar_Combo(
+                ref cmb_cuentaBancaria,
+                entidad: "CuentaBancariaEntity",
+                displaymember: "Nombre",
+                valuemember: "IdCuentaBancaria",
+                predet: -1,
+                soloActivos: true,
+                filtros: filtros,
+                orden: orden);
+
+            cmb_cuentaBancaria.SelectedIndex = -1;
             cmb_cuentaBancaria.Enabled = true;
 
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void chk_desdeSiempre_cartera_CheckedChanged(object sender, EventArgs e)
+        private async void chk_desdeSiempre_cartera_CheckedChanged(object sender, EventArgs e)
         {
             dtp_desde_cartera.Enabled = chk_desdeSiempre_cartera.Checked;
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: true);
         }
 
-        private void chk_hastaSiempre_cartera_CheckedChanged(object sender, EventArgs e)
+        private async void chk_hastaSiempre_cartera_CheckedChanged(object sender, EventArgs e)
         {
             dtp_hasta_cartera.Enabled = chk_hastaSiempre_cartera.Checked;
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: true);
         }
 
-        private void chk_desdeSiempre_depositado_CheckedChanged(object sender, EventArgs e)
+        private async void chk_desdeSiempre_depositado_CheckedChanged(object sender, EventArgs e)
         {
             dtp_desde_depositado.Enabled = chk_desdeSiempre_depositado.Checked;
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void chk_hastaSiempre_depositado_CheckedChanged(object sender, EventArgs e)
+        private async void chk_hastaSiempre_depositado_CheckedChanged(object sender, EventArgs e)
         {
             dtp_hasta_depositado.Enabled = chk_hastaSiempre_depositado.Checked;
+            await LoadDepositadosAsync(resetPage: true);
         }
-        private void txt_nCH_depositado_KeyDown(object sender, KeyEventArgs e)
+
+        private async void txt_nCH_depositado_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
             {
-                actualizarDatagrid_depositado();
+                await LoadDepositadosAsync(resetPage: true);
             }
         }
 
-        private void txt_importeCH_depositado_KeyDown(object sender, KeyEventArgs e)
+        private async void txt_importeCH_depositado_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
             {
-                actualizarDatagrid_depositado();
+                await LoadDepositadosAsync(resetPage: true);
             }
         }
 
@@ -414,72 +632,72 @@ namespace Centrex
             closeandupdate(this);
         }
 
-        private void cmb_cuentaBancaria_Leave(object sender, EventArgs e)
+        private async void cmb_cuentaBancaria_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void chk_desdeSiempre_depositado_Leave(object sender, EventArgs e)
+        private async void chk_desdeSiempre_depositado_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void dtp_desde_depositado_Leave(object sender, EventArgs e)
+        private async void dtp_desde_depositado_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void chk_hastaSiempre_depositado_Leave(object sender, EventArgs e)
+        private async void chk_hastaSiempre_depositado_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void dtp_hasta_depositado_Leave(object sender, EventArgs e)
+        private async void dtp_hasta_depositado_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void txt_nCH_depositado_Leave(object sender, EventArgs e)
+        private async void txt_nCH_depositado_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void txt_importeCH_depositado_Leave(object sender, EventArgs e)
+        private async void txt_importeCH_depositado_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void dtp_desde_cartera_Leave(object sender, EventArgs e)
+        private async void dtp_desde_cartera_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: true);
         }
 
-        private void dtp_hasta_cartera_Leave(object sender, EventArgs e)
+        private async void dtp_hasta_cartera_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: true);
         }
 
-        private void txt_nCH_cartera_Leave(object sender, EventArgs e)
+        private async void txt_nCH_cartera_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: true);
         }
 
-        private void txt_importeCH_cartera_Leave(object sender, EventArgs e)
+        private async void txt_importeCH_cartera_Leave(object sender, EventArgs e)
         {
-            actualizarDatagrid_cartera();
+            await LoadCarteraAsync(resetPage: true);
         }
 
-        private void cmb_cuentaBancaria_SelectionChangeCommitted(object sender, EventArgs e)
+        private async void cmb_cuentaBancaria_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            actualizarDatagrid_depositado();
+            await LoadDepositadosAsync(resetPage: true);
         }
 
-        private void cmd_anularDeposito_Click(object sender, EventArgs e)
+        private async void cmd_anularDeposito_Click(object sender, EventArgs e)
         {
             int c;
             int sel = 0;
             bool hay_error = false;
-            var ch = new cheque();
+            var ch = new ChequeEntity();
 
             var loopTo = dg_view_chDepositados.Rows.Count - 1;
             for (c = 0; c <= loopTo; c++)
@@ -509,16 +727,24 @@ namespace Centrex
             var loopTo1 = dg_view_chDepositados.Rows.Count - 1;
             for (c = 0; c <= loopTo1; c++)
             {
-                if (dg_view_chDepositados.Rows[c].Selected)
+                if (!dg_view_chDepositados.Rows[c].Selected)
+                    continue;
+
+                var idValor = dg_view_chDepositados.Rows[c].Cells["ID"].Value;
+                if (idValor is null)
+                    continue;
+
+                ch.IdCheque = Convert.ToInt32(idValor);
+                var nChequeValor = dg_view_chCartera.Rows[c].Cells["NumeroCheque"].Value;
+                if (nChequeValor != null && int.TryParse(nChequeValor.ToString(), out var numCheque))
+                    ch.NCheque = numCheque;
+                else
+                    ch.NCheque = 0;
+
+                if (!cheques.Anular_Deposito_Cheque(ch.IdCheque))
                 {
-                    ch.id_cheque = Conversions.ToInteger(dg_view_chDepositados.Rows[c].Cells[0].Value.ToString());
-                    ch.nCheque = dg_view_chDepositados.Rows[c].Cells[7].Value.ToString();
-                    if (!cheques.Anular_Deposito_Cheque(ch.id_cheque))
-                    {
-                        Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.nCheque.ToString() + "en la cuenta bancaria: " + cmb_cuentaBancaria.Text + "perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
-                        hay_error = true;
-                        // Exit Sub
-                    }
+                    Interaction.MsgBox("Hubo un problema al depositar el cheque con número: " + ch.NCheque + " en la cuenta bancaria: " + cmb_cuentaBancaria.Text + " perteneciente al banco: " + cmb_banco.Text, (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                    hay_error = true;
                 }
             }
 
@@ -532,8 +758,8 @@ namespace Centrex
                 Interaction.MsgBox("Verifique, no se pudo anular el deposito de todos los cheques, posiblemente el deposito no pueda ser anulado.", (MsgBoxStyle)((int)Constants.vbInformation + (int)Constants.vbOKOnly), "Centrex");
             }
 
-            actualizarDatagrid_cartera();
-            actualizarDatagrid_depositado();
+            await LoadCarteraAsync(resetPage: true);
+            await LoadDepositadosAsync(resetPage: true);
         }
 
         private void cmd_filtrarCH_cartera_Click(object sender, EventArgs e)

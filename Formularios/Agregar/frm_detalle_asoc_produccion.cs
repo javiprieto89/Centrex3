@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
-using Microsoft.VisualBasic.CompilerServices;
+using System.Linq;
 
 namespace Centrex
 {
@@ -8,7 +9,7 @@ namespace Centrex
     {
         private int id_item;
         private int id_produccion;
-        private DataTable dt_cantidades_items_asociados;
+        private DataTable dt_cantidades_items_asociados = new DataTable();
 
         public frm_detalle_asoc_produccion()
         {
@@ -32,19 +33,32 @@ namespace Centrex
         }
         private void frm_detalle_asoc_produccion_Load(object sender, EventArgs e)
         {
+            var resultado = (id_produccion != -1)
+                ? asocitems.Traer_Cantidades_Enviadas_Items_Asociados_Default_Produccion(id_item.ToString(), id_produccion)
+                : asocitems.Traer_Cantidades_Enviadas_Items_Asociados_Default_Produccion(id_item.ToString());
+
+            // 🔹 Usa tu ToDataTable<T> genérico con el tipo real del resultado
+            var dataList = resultado?.DataMaterializada as IEnumerable<object>;
+            DataTable dt = new DataTable();
+
+            if (dataList != null && dataList.Any())
+            {
+                // Tomamos el tipo del primer elemento para inferir T
+                var firstType = dataList.First().GetType();
+                var genericMethod = typeof(generales).GetMethod("ToDataTable", new[] { typeof(IEnumerable<>).MakeGenericType(firstType) });
+                if (genericMethod != null)
+                    dt = (DataTable)genericMethod.Invoke(null, new object[] { dataList });
+            }
+
+            dg_view.DataSource = dt;
+
             if (id_produccion != -1)
             {
-                dt_cantidades_items_asociados = asocitems.Traer_Cantidades_Enviadas_Items_Asociados_Default_Produccion(id_item.ToString(), id_produccion);
                 dg_view.ReadOnly = true;
                 cmd_ok.Enabled = false;
             }
-            else
-            {
-                dt_cantidades_items_asociados = asocitems.Traer_Cantidades_Enviadas_Items_Asociados_Default_Produccion(id_item.ToString());
-            }
-
-            dg_view.DataSource = dt_cantidades_items_asociados;
         }
+
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {

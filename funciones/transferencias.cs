@@ -1,13 +1,11 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
-    static class transferencias
+    public static class transferencias
     {
         // ************************************ FUNCIONES DE TRANSFERENCIAS (VERSIÓN EF PURA) ***************************
 
@@ -18,7 +16,7 @@ namespace Centrex
         {
             using (var ctx = new CentrexDbContext())
             {
-                return ctx.Transferencias.Include("CuentaBancaria").FirstOrDefault(t => t.IdTransferencia == idTransferencia);
+                return ctx.TransferenciaEntity.Include(t => t.IdCuentaBancariaNavigation).FirstOrDefault(t => t.IdTransferencia == idTransferencia);
             }
         }
 
@@ -29,7 +27,7 @@ namespace Centrex
         {
             using (var ctx = new CentrexDbContext())
             {
-                return ctx.TmpTransferencias.Include("CuentaBancaria").FirstOrDefault(t => t.id_tmpTransferencia == idTransferencia);
+                return ctx.TmpTransferenciaEntity.Include(t => t.IdCuentaBancariaNavigation).FirstOrDefault(t => t.IdTmpTransferencia == idTransferencia);
             }
         }
 
@@ -42,14 +40,14 @@ namespace Centrex
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    ctx.Transferencias.Add(transferencia);
+                    ctx.TransferenciaEntity.Add(transferencia);
                     ctx.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al agregar transferencia: " + ex.Message);
+                MessageBox.Show("Error al agregar transferencia: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -63,14 +61,14 @@ namespace Centrex
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    ctx.TmpTransferencias.Add(tmp);
+                    ctx.TmpTransferenciaEntity.Add(tmp);
                     ctx.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al agregar transferencia temporal: " + ex.Message);
+                MessageBox.Show("Error al agregar transferencia temporal: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -78,33 +76,33 @@ namespace Centrex
         // --------------------------------------------------------
         // Guarda todas las transferencias temporales como definitivas (Cobro)
         // --------------------------------------------------------
-        public static bool GuardarTransferenciasCobro(int idCobro)
+        public static bool GuardarTransferenciaEntityCobro(int idCobro)
         {
             try
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var tmpList = ctx.TmpTransferencias.ToList();
+                    var tmpList = ctx.TmpTransferenciaEntity.ToList();
 
                     foreach (var t in tmpList)
-                        ctx.Transferencias.Add(new TransferenciaEntity()
+                        ctx.TransferenciaEntity.Add(new TransferenciaEntity()
                         {
                             IdCobro = idCobro,
-                            IdCuentaBancaria = t.id_cuentaBancaria,
-                            fecha = t.fecha,
-                            total = t.total,
-                            nComprobante = t.nComprobante,
-                            notas = t.notas
+                            IdCuentaBancaria = t.IdCuentaBancaria,
+                            Fecha = t.Fecha,
+                            Total = t.Total,
+                            NComprobante = t.NComprobante,
+                            Notas = t.Notas
                         });
 
-                    ctx.TmpTransferencias.RemoveRange(tmpList);
+                    ctx.TmpTransferenciaEntity.RemoveRange(tmpList);
                     ctx.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al guardar transferencias (Cobro): " + ex.Message);
+                MessageBox.Show("Error al guardar transferencias (Cobro): " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -112,33 +110,33 @@ namespace Centrex
         // --------------------------------------------------------
         // Guarda todas las transferencias temporales como definitivas (Pago)
         // --------------------------------------------------------
-        public static bool GuardarTransferenciasPago(int idPago)
+        public static bool GuardarTransferenciaEntityPago(int idPago)
         {
             try
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var tmpList = ctx.TmpTransferencias.ToList();
+                    var tmpList = ctx.TmpTransferenciaEntity.ToList();
 
                     foreach (var t in tmpList)
-                        ctx.Transferencias.Add(new TransferenciaEntity()
+                        ctx.TransferenciaEntity.Add(new TransferenciaEntity()
                         {
                             IdPago = idPago,
-                            IdCuentaBancaria = t.id_cuentaBancaria,
-                            fecha = t.fecha,
-                            total = t.total,
-                            nComprobante = t.nComprobante,
-                            notas = t.notas
+                            IdCuentaBancaria = t.IdCuentaBancaria,
+                            Fecha = t.Fecha,
+                            Total = t.Total,
+                            NComprobante = t.NComprobante,
+                            Notas = t.Notas
                         });
 
-                    ctx.TmpTransferencias.RemoveRange(tmpList);
+                    ctx.TmpTransferenciaEntity.RemoveRange(tmpList);
                     ctx.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al guardar transferencias (Pago): " + ex.Message);
+                MessageBox.Show("Error al guardar transferencias (Pago): " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -152,18 +150,18 @@ namespace Centrex
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var entidad = ctx.TmpTransferencias.FirstOrDefault(t => t.id_tmpTransferencia == tmp.id_tmpTransferencia);
+                    var entidad = ctx.TmpTransferenciaEntity.FirstOrDefault(t => t.IdTmpTransferencia == tmp.IdTmpTransferencia);
                     if (entidad is null)
                     {
-                        Interaction.MsgBox("No se encontró la transferencia temporal a actualizar.", Constants.vbExclamation);
+                        MessageBox.Show("No se encontró la transferencia temporal a actualizar.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return false;
                     }
 
-                    entidad.id_cuentaBancaria = tmp.id_cuentaBancaria;
-                    entidad.fecha = tmp.fecha;
-                    entidad.total = tmp.total;
-                    entidad.nComprobante = tmp.nComprobante;
-                    entidad.notas = tmp.notas;
+                    entidad.IdCuentaBancaria = tmp.IdCuentaBancaria;
+                    entidad.Fecha = tmp.Fecha;
+                    entidad.Total = tmp.Total;
+                    entidad.NComprobante = tmp.NComprobante;
+                    entidad.Notas = tmp.Notas;
 
                     ctx.Entry(entidad).State = EntityState.Modified;
                     ctx.SaveChanges();
@@ -172,7 +170,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al actualizar transferencia temporal: " + ex.Message);
+                MessageBox.Show("Error al actualizar transferencia temporal: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -186,20 +184,20 @@ namespace Centrex
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var entidad = ctx.TmpTransferencias.FirstOrDefault(t => t.id_tmpTransferencia == tmp.id_tmpTransferencia);
+                    var entidad = ctx.TmpTransferenciaEntity.FirstOrDefault(t => t.IdTmpTransferencia == tmp.IdTmpTransferencia);
                     if (entidad is null)
                     {
-                        Interaction.MsgBox("No se encontró la transferencia temporal a eliminar.", Constants.vbExclamation);
+                        MessageBox.Show("No se encontró la transferencia temporal a eliminar.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return false;
                     }
-                    ctx.TmpTransferencias.Remove(entidad);
+                    ctx.TmpTransferenciaEntity.Remove(entidad);
                     ctx.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al borrar transferencia temporal: " + ex.Message);
+                MessageBox.Show("Error al borrar transferencia temporal: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -213,20 +211,20 @@ namespace Centrex
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var entidad = ctx.TmpTransferencias.FirstOrDefault(t => t.id_tmpTransferencia == idTransferencia);
+                    var entidad = ctx.TmpTransferenciaEntity.FirstOrDefault(t => t.IdTmpTransferencia == idTransferencia);
                     if (entidad is null)
                     {
-                        Interaction.MsgBox("No se encontró la transferencia temporal a eliminar.", Constants.vbExclamation);
+                        MessageBox.Show("No se encontró la transferencia temporal a eliminar.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return false;
                     }
-                    ctx.TmpTransferencias.Remove(entidad);
+                    ctx.TmpTransferenciaEntity.Remove(entidad);
                     ctx.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al borrar transferencia temporal por ID: " + ex.Message);
+                MessageBox.Show("Error al borrar transferencia temporal por ID: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -240,20 +238,20 @@ namespace Centrex
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var entidad = ctx.Transferencias.FirstOrDefault(t => t.IdTransferencia == transferencia.IdTransferencia);
+                    var entidad = ctx.TransferenciaEntity.FirstOrDefault(t => t.IdTransferencia == transferencia.IdTransferencia);
                     if (entidad is null)
                     {
-                        Interaction.MsgBox("No se encontró la transferencia a eliminar.", Constants.vbExclamation);
+                        MessageBox.Show("No se encontró la transferencia a eliminar.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return false;
                     }
-                    ctx.Transferencias.Remove(entidad);
+                    ctx.TransferenciaEntity.Remove(entidad);
                     ctx.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al borrar transferencia: " + ex.Message);
+                MessageBox.Show("Error al borrar transferencia: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -261,21 +259,101 @@ namespace Centrex
         // --------------------------------------------------------
         // Elimina todas las transferencias temporales (utilidad)
         // --------------------------------------------------------
-        public static bool BorrarTmpTransferenciasTodas()
+        public static bool BorrarTmpTransferenciaEntityTodas()
         {
             try
             {
                 using (var ctx = new CentrexDbContext())
                 {
-                    var todas = ctx.TmpTransferencias.ToList();
-                    ctx.TmpTransferencias.RemoveRange(todas);
+                    var todas = ctx.TmpTransferenciaEntity.ToList();
+                    ctx.TmpTransferenciaEntity.RemoveRange(todas);
                     ctx.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox("Error al limpiar tabla temporal de transferencias: " + ex.Message);
+                MessageBox.Show("Error al limpiar tabla temporal de transferencias: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        public static bool guardarTransferencias(CobroEntity c)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    // Obtener todas las transferencias temporales
+                    var tmpTransferencias = context.TmpTransferenciaEntity.ToList();
+
+                    // Crear las transferencias definitivas asociadas al cobro
+                    foreach (var tmp in tmpTransferencias)
+                    {
+                        var nuevaTransferencia = new TransferenciaEntity
+                        {
+                            IdCobro = c.IdCobro,
+                            IdCuentaBancaria = tmp.IdCuentaBancaria,
+                            Fecha = tmp.Fecha,
+                            Total = tmp.Total,
+                            NComprobante = tmp.NComprobante,
+                            Notas = tmp.Notas
+                        };
+                        context.TransferenciaEntity.Add(nuevaTransferencia);
+                    }
+
+                    context.SaveChanges();
+
+                    // Limpiar tabla temporal
+                    context.TmpTransferenciaEntity.RemoveRange(tmpTransferencias);
+                    context.SaveChanges();
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        public static bool guardarTransferencias(PagoEntity p)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    // Obtener todas las transferencias temporales
+                    var tmpTransferencias = context.TmpTransferenciaEntity.ToList();
+
+                    // Crear las transferencias definitivas asociadas al pago
+                    foreach (var tmp in tmpTransferencias)
+                    {
+                        var nuevaTransferencia = new TransferenciaEntity
+                        {
+                            IdPago = p.IdPago,
+                            IdCuentaBancaria = tmp.IdCuentaBancaria,
+                            Fecha = tmp.Fecha,
+                            Total = tmp.Total,
+                            NComprobante = tmp.NComprobante,
+                            Notas = tmp.Notas
+                        };
+                        context.TransferenciaEntity.Add(nuevaTransferencia);
+                    }
+
+                    context.SaveChanges();
+
+                    // Limpiar tabla temporal
+                    context.TmpTransferenciaEntity.RemoveRange(tmpTransferencias);
+                    context.SaveChanges();
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

@@ -1,10 +1,7 @@
-using System;
+﻿using System;
 using System.Data;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -32,13 +29,13 @@ namespace Centrex
             using (var context = new CentrexDbContext())
             {
                 // Cargar bancos
-                var bancos = context.Bancos.OrderBy(b => b.nombre).ToList();
+                var bancos = context.BancoEntity.OrderBy(b => b.Nombre).ToList();
                 cmb_banco.DataSource = bancos;
                 cmb_banco.DisplayMember = "Nombre";
                 cmb_banco.ValueMember = "IdBanco";
             }
 
-            if (!VariablesGlobales.edicion & !VariablesGlobales.borrado)
+            if (!edicion & !borrado)
             {
                 cmb_banco.SelectedItem = null;
                 cmb_banco.Text = "Seleccione un banco...";
@@ -47,32 +44,32 @@ namespace Centrex
             }
             else
             {
-                dtp_fecha.Value = DateTime.Parse(Conversions.ToString(VariablesGlobales.edita_transferencia.fecha.Value));
+                dtp_fecha.Value = ConversorFechas.GetFecha(edita_transferencia.Fecha, dtp_fecha.Value);
 
                 using (var context = new CentrexDbContext())
                 {
-                    var cb = context.CuentasBancarias.Include(c => c.Banco).FirstOrDefault(c => c.IdCuentaBancaria == VariablesGlobales.edita_transferencia.IdCuentaBancaria);
+                    var cb = context.CuentaBancariaEntity.Include(c => c.Nombre).FirstOrDefault(c => c.IdCuentaBancaria == edita_transferencia.IdCuentaBancaria);
 
                     if (cb is not null)
                     {
-                        cmb_banco.SelectedValue = cb.Banco.IdBanco;
+                        cmb_banco.SelectedValue = cb.IdBanco;
 
-                        var cuentas = context.CuentasBancarias.Where(c => c.IdBanco == cb.Banco.IdBanco).OrderBy(c => c.Nombre).ToList();
+                        var cuentas = context.CuentaBancariaEntity.Where(c => c.IdBanco == cb.IdBanco).OrderBy(c => c.Nombre).ToList();
 
 
                         cmb_cuentaBancaria.DataSource = cuentas;
                         cmb_cuentaBancaria.DisplayMember = "Nombre";
                         cmb_cuentaBancaria.ValueMember = "IdCuentaBancaria";
-                        cmb_cuentaBancaria.SelectedValue = VariablesGlobales.edita_transferencia.IdCuentaBancaria;
+                        cmb_cuentaBancaria.SelectedValue = edita_transferencia.IdCuentaBancaria;
                     }
                 }
 
-                txt_importe.Text = VariablesGlobales.edita_transferencia.total.ToString();
-                txt_nComprobante.Text = VariablesGlobales.edita_transferencia.nComprobante;
-                txt_notas.Text = VariablesGlobales.edita_transferencia.notas;
+                txt_importe.Text = edita_transferencia.Total.ToString();
+                txt_nComprobante.Text = edita_transferencia.NComprobante;
+                txt_notas.Text = edita_transferencia.Notas;
             }
 
-            if (VariablesGlobales.borrado)
+            if (borrado)
             {
                 dtp_fecha.Enabled = false;
                 cmb_banco.Enabled = false;
@@ -85,7 +82,7 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta transferencia?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion), "Centrex") == MsgBoxResult.Yes)
                 {
-                    if (BorrarTmpTransferencia(VariablesGlobales.edita_transferencia.IdTransferencia) == false)
+                    if (BorrarTmpTransferencia(edita_transferencia.IdTransferencia) == false)
                     {
                         Interaction.MsgBox("No se ha podido borrar la transferencia.");
                     }
@@ -98,7 +95,7 @@ namespace Centrex
 
         private void txt_importe_KeyPress(object sender, KeyPressEventArgs e)
         {
-            e.Handled = VariablesGlobales.valida(e.KeyChar, 5);
+            e.Handled = generales.valida(e.KeyChar, false);
         }
 
         private void cmd_exit_Click(object sender, EventArgs e)
@@ -126,23 +123,23 @@ namespace Centrex
                 return;
             }
 
-            t.fecha = dtp_fecha.Value.Date;
-            t.IdCuentaBancaria = cmb_cuentaBancaria.SelectedValue;
-            t.total = decimal.Parse(txt_importe.Text);
-            t.nComprobante = txt_nComprobante.Text;
-            t.notas = txt_notas.Text;
+            t.Fecha = ConversorFechas.GetFecha(dtp_fecha.Value.Date, t.Fecha);
+            t.IdCuentaBancaria = (int)Conversion.Int(cmb_cuentaBancaria.SelectedValue);
+            t.Total = decimal.Parse(txt_importe.Text);
+            t.NComprobante = txt_nComprobante.Text;
+            t.Notas = txt_notas.Text;
 
-            if (VariablesGlobales.edicion)
+            if (edicion)
             {
-                t.IdTransferencia = VariablesGlobales.edita_transferencia.IdTransferencia;
-                if (!transferencias.UpdateTmpTransferencia(VariablesGlobales.ConvertToTmpTransferencia(t)))
+                t.IdTransferencia = edita_transferencia.IdTransferencia;
+                if (!transferencias.UpdateTmpTransferencia(ConvertToTmpTransferencia(t)))
                 {
                     Interaction.MsgBox("Ocurrió un error al actualizar la transferencia.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 }
             }
             else
             {
-                t.IdTransferencia = transferencias.AddTmpTransferencia(VariablesGlobales.ConvertToTmpTransferencia(t));
+                t.IdTransferencia = ConversorFechas.GetFecha(transferencias.AddTmpTransferencia(ConvertToTmpTransferencia(t)), t.Fecha);
                 if (t.IdTransferencia == 0)
                 {
                     Interaction.MsgBox("Ocurrió un error al agregar la transferencia", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
@@ -158,7 +155,7 @@ namespace Centrex
 
             using (var context = new CentrexDbContext())
             {
-                var cuentas = context.CuentasBancarias.Where(c => c.IdBanco == seleccionado).OrderBy(c => c.Nombre).ToList();
+                var cuentas = context.CuentaBancariaEntity.Where(c => c.IdBanco == seleccionado).OrderBy(c => c.Nombre).ToList();
 
 
                 cmb_cuentaBancaria.DataSource = cuentas;
@@ -173,14 +170,14 @@ namespace Centrex
 
         private void psearch_banco_Click(object sender, EventArgs e)
         {
-            string tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "bancos";
+            string tmp = tabla;
+            tabla = "bancos";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
-            cmb_banco.SelectedValue = VariablesGlobales.id;
-            VariablesGlobales.id = 0;
+            cmb_banco.SelectedValue = id;
+            id = 0;
             cmb_banco_SelectionChangeCommitted(null, null);
         }
 
@@ -189,15 +186,16 @@ namespace Centrex
             if (cmb_banco.Text.Contains("Seleccione"))
                 return;
 
-            string tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "cuentas_bancarias";
+            string tmp = tabla;
+            tabla = "cuentas_bancarias";
             Enabled = false;
             var frm = new search(Conversions.ToInteger(cmb_banco.SelectedValue));
             frm.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
+            Enabled = true;
 
-            cmb_cuentaBancaria.SelectedValue = VariablesGlobales.id;
-            VariablesGlobales.id = 0;
+            cmb_cuentaBancaria.SelectedValue = id;
+            id = 0;
         }
 
         private void add_transferencia_FormClosed(object sender, FormClosedEventArgs e)

@@ -27,7 +27,7 @@ namespace Centrex
         }
 
         // Requerido por el Diseñador de Windows Forms
-        private System.ComponentModel.IContainer components;
+        private System.ComponentModel.IContainer components = null!;
 
         // NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
         // Se puede modificar usando el Diseñador de Windows Forms.  
@@ -47,11 +47,16 @@ namespace Centrex
             dg_view = new DataGridView();
             dg_view.CellDoubleClick += new DataGridViewCellEventHandler(dg_view_CellDoubleClick);
             cmd_go = new Button();
+            cmd_go.Click += new EventHandler(cmd_go_Click);
             txt_nPage = new TextBox();
             cmd_last = new Button();
+            cmd_last.Click += new EventHandler(cmd_last_Click);
             cmd_next = new Button();
+            cmd_next.Click += new EventHandler(cmd_next_Click);
             cmd_prev = new Button();
+            cmd_prev.Click += new EventHandler(cmd_prev_Click);
             cmd_first = new Button();
+            cmd_first.Click += new EventHandler(cmd_first_Click);
             lbl_totalRegistros = new Label();
             ((System.ComponentModel.ISupportInitialize)dg_view).BeginInit();
             SuspendLayout();
@@ -139,6 +144,7 @@ namespace Centrex
             dg_view.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dg_view.Size = new Size(1061, 475);
             dg_view.TabIndex = 54;
+            dg_view.KeyDown += new KeyEventHandler(dg_view_KeyDown);
             // 
             // cmd_go
             // 

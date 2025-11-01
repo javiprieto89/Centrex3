@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace Centrex
 {
@@ -12,51 +12,58 @@ namespace Centrex
 
         public infoagregarstock()
         {
-
-            // Esta llamada es exigida por el diseñador.
             InitializeComponent();
-
-            // Agregue cualquier inicialización después de la llamada a InitializeComponent().
-
         }
 
         public infoagregarstock(int _id_proveedor)
         {
-
-            // Esta llamada es exigida por el diseñador.
             InitializeComponent();
-
-            // Agregue cualquier inicialización después de la llamada a InitializeComponent().
             id_proveedor = _id_proveedor;
         }
+
         private void infoagregarstock_Load(object sender, EventArgs e)
         {
+            var proveedoresCargados = generales.Cargar_Combo(
+              ref cmb_proveedor,
+            entidad: "ProveedorEntity",
+       displaymember: "RazonSocial",
+           valuemember: "IdProveedor",
+         predet: -1,
+         soloActivos: true,
+         filtros: null,
+      orden: OrdenAsc("RazonSocial"));
 
-            var argcombo = cmb_proveedor;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_proveedor, razon_social FROM proveedores ORDER BY razon_social ASC", VariablesGlobales.basedb, "razon_social", Conversions.ToInteger("id_proveedor"));
-            cmb_proveedor = argcombo;
+            if (proveedoresCargados <= 0)
+            {
+                MessageBox.Show("No hay proveedores activos cargados; no es posible registrar stock.",
+              "Centrex",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation);
+                closeandupdate(this);
+                return;
+            }
 
             if (editaStock)
             {
                 psearch_item.Visible = true;
             }
 
-            if (VariablesGlobales.edicion | edicion_item_registro_stock)
+            if (edicion | edicion_item_registro_stock)
             {
-                i = mitem.info_item(VariablesGlobales.edita_item_registro_stock.id_item);
-                VariablesGlobales.id = i.id_item;
+                i = mitem.info_item(edita_item_registro_stock.IdItem);
+                id = i.IdItem;
 
-                lbl_item.Text = i.descript;
-                txt_fecha.Text = Conversions.ToString(DateTime.Parse(VariablesGlobales.edita_item_registro_stock.fecha));
-                txt_factura.Text = VariablesGlobales.edita_item_registro_stock.factura;
-                // cmb_proveedor.SelectedValue = CByte(VariablesGlobales.edita_item_registro_stock.id_proveedor)
+                lbl_item.Text = i.Descript;
+                txt_fecha.Text = ConversorFechas.GetFecha(edita_item_registro_stock.Fecha, txt_fecha);
+                txt_factura.Text = edita_item_registro_stock.Factura;
                 cmb_proveedor.SelectedValue = id_proveedor;
-                txt_cantidad.Text = VariablesGlobales.edita_item_registro_stock.cantidad;
-                txt_costo.Text = VariablesGlobales.edita_item_registro_stock.costo;
-                txt_preciolista.Text = VariablesGlobales.edita_item_registro_stock.precio_lista;
-                txt_factor.Text = VariablesGlobales.edita_item_registro_stock.factor;
-                txt_notas.Text = VariablesGlobales.edita_item_registro_stock.nota;
-                if (VariablesGlobales.edicion & !editaStock)
+                txt_cantidad.Text = edita_item_registro_stock.Cantidad.ToString();
+                txt_costo.Text = edita_item_registro_stock.Costo.ToString();
+                txt_preciolista.Text = edita_item_registro_stock.PrecioLista.ToString();
+                txt_factor.Text = edita_item_registro_stock.Factor.ToString();
+                txt_notas.Text = edita_item_registro_stock.Nota;
+
+                if (edicion & !editaStock)
                 {
                     lbl_item.Enabled = false;
                     txt_fecha.Enabled = false;
@@ -72,90 +79,105 @@ namespace Centrex
             }
             else
             {
-                i = VariablesGlobales.ConvertToItem(mitem.info_item(VariablesGlobales.id.ToString()));
+                i = ConvertToItem(mitem.info_item(id));
 
-                lbl_item.Text = i.descript;
+                lbl_item.Text = i.Descript;
                 txt_fecha.Text = My.MyProject.Forms.add_stock.txt_fecha.Text;
                 txt_factura.Text = My.MyProject.Forms.add_stock.txt_factura.Text;
-                // cmb_proveedor.SelectedValue = CByte(add_stock.cmb_proveedor.SelectedValue)
-                cmb_proveedor.SelectedValue = id_proveedor;
 
-                txt_costo.Text = i.costo.ToString();
-                txt_preciolista.Text = i.precio_lista.ToString();
-                txt_factor.Text = i.factor.ToString();
+                if (id_proveedor > 0)
+                {
+                    cmb_proveedor.SelectedValue = id_proveedor;
+                }
+                else
+                {
+                    cmb_proveedor.SelectedIndex = -1;
+                    cmb_proveedor.Text = "Seleccione un proveedor...";
+                }
+
+                txt_costo.Text = i.Costo.ToString();
+                txt_preciolista.Text = i.PrecioLista.ToString();
+                txt_factor.Text = i.Factor.ToString();
                 txt_notas.Text = My.MyProject.Forms.add_stock.txt_notas.Text;
 
                 // Si el item se encuentra inactivo, al agregar stock se activa
-                if (i.activo == false)
+                if (i.Activo == false)
                 {
                     if (!string.IsNullOrEmpty(txt_notas.Text))
                     {
-                        txt_notas.Text = txt_notas.Text + Constants.vbCrLf + "ESTE ITEM SE ENCUENTRA INACTIVO, SI AGREGA STOCK SE ACTIVARÁ";
+                        txt_notas.Text = txt_notas.Text + "\r\n" + "ESTE ITEM SE ENCUENTRA INACTIVO, SI AGREGA STOCK SE ACTIVARÁ";
                     }
                     else
                     {
                         txt_notas.Text = "ESTE ITEM SE ENCUENTRA INACTIVO, SI AGREGA STOCK SE ACTIVARÁ";
                     }
-                    i.activo = true;
+                    i.Activo = true;
                     mitem.updateitem(i);
                 }
-
             }
+
             ActiveControl = txt_cantidad;
         }
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            if (VariablesGlobales.edicion)
+            if (edicion)
             {
                 closeandupdate(this);
                 return;
             }
 
-            var rs = new registro_stock();
+            var rs = new RegistroStockEntity();
+
+            if (cmb_proveedor.SelectedValue is null)
+            {
+                MessageBox.Show("Debe seleccionar un proveedor", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
 
             if (string.IsNullOrEmpty(txt_cantidad.Text))
             {
-                Interaction.MsgBox("El campo 'Cantidad' no puede estar vació", Constants.vbExclamation, "Centrex");
+                MessageBox.Show("El campo 'Cantidad' no puede estar vació", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (txt_cantidad.Text == "0")
             {
-                Interaction.MsgBox("La cantidad ingresada no puede ser 0", Constants.vbExclamation, "Centrex");
+                MessageBox.Show("La cantidad ingresada no puede ser 0", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (string.IsNullOrEmpty(txt_costo.Text))
             {
-                Interaction.MsgBox("El campo 'Costo' no puede estar vació", Constants.vbExclamation, "Centrex");
+                MessageBox.Show("El campo 'Costo' no puede estar vació", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (string.IsNullOrEmpty(txt_preciolista.Text))
             {
-                Interaction.MsgBox("El campo 'Precio lista' no puede estar vació", Constants.vbExclamation, "Centrex");
+                MessageBox.Show("El campo 'Precio lista' no puede estar vació", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (string.IsNullOrEmpty(txt_factor.Text))
             {
-                Interaction.MsgBox("El campo 'Factor' no puede estar vació", Constants.vbExclamation, "Centrex");
+                MessageBox.Show("El campo 'Factor' no puede estar vació", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
-            rs.id_item = VariablesGlobales.id;
-            rs.fecha = txt_fecha.Text;
-            rs.factura = txt_factura.Text;
-            rs.IdProveedor = Conversions.ToInteger(cmb_proveedor.SelectedValue);
-            rs.cantidad = Conversions.ToDecimal(txt_cantidad.Text);
-            rs.costo = Conversions.ToDecimal(txt_costo.Text);
-            rs.precio_lista = Conversions.ToDecimal(txt_preciolista.Text);
-            rs.factor = Conversions.ToDecimal(txt_factor.Text);
-            rs.cantidad_anterior = (long)i.cantidad;
-            rs.costo_anterior = i.costo;
-            rs.precio_lista_anterior = i.precio_lista;
-            rs.factor_anterior = (decimal)i.factor;
-            rs.nota = txt_notas.Text;
+            rs.IdItem = id;
+            rs.Fecha = DateOnly.Parse(txt_fecha.Text);
+            rs.Factura = txt_factura.Text;
+            rs.IdProveedor = Convert.ToInt32(cmb_proveedor.SelectedValue);
+            rs.Cantidad = Convert.ToInt32(txt_cantidad.Text);
+            rs.Costo = Convert.ToDecimal(txt_costo.Text);
+            rs.PrecioLista = Convert.ToDecimal(txt_preciolista.Text);
+            rs.Factor = Convert.ToDecimal(txt_factor.Text);
+            rs.CantidadAnterior = (int)i.Cantidad;
+            rs.CostoAnterior = i.Costo;
+            rs.PrecioListaAnterior = i.PrecioLista;
+            rs.FactorAnterior = (int)i.Factor;
+            rs.Nota = txt_notas.Text;
+
             if (edicion_item_registro_stock)
             {
-                rs.id_registro = VariablesGlobales.edita_item_registro_stock.id_registro;
+                rs.IdRegistro = edita_item_registro_stock.IdRegistro;
                 stock.UpdateStockTmp(rs);
             }
             else
@@ -175,7 +197,7 @@ namespace Centrex
         {
             if (!string.IsNullOrEmpty(txt_costo.Text))
             {
-                txt_preciolista.Text = (Conversions.ToDouble(txt_costo.Text) * Conversions.ToDouble(txt_factor.Text)).ToString();
+                txt_preciolista.Text = (Convert.ToDouble(txt_costo.Text) * Convert.ToDouble(txt_factor.Text)).ToString();
             }
         }
 
@@ -183,29 +205,33 @@ namespace Centrex
         {
             if (!string.IsNullOrEmpty(txt_costo.Text))
             {
-                txt_preciolista.Text = (Conversions.ToDouble(txt_costo.Text) * Conversions.ToDouble(txt_factor.Text)).ToString();
+                txt_preciolista.Text = (Convert.ToDouble(txt_costo.Text) * Convert.ToDouble(txt_factor.Text)).ToString();
             }
         }
 
         private void psearch_item_Click(object sender, EventArgs e)
         {
-            var i = new item();
+            var i = new ItemEntity();
             string tablatmp;
 
-            tablatmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "items_registros_stock";
+            tablatmp = tabla;
+            tabla = "items_registros_stock";
 
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
             Enabled = true;
 
-            if (VariablesGlobales.id == 0)
+            if (id == 0)
                 return;
-            i = VariablesGlobales.ConvertToItem(mitem.info_item(VariablesGlobales.id.ToString()));
 
-            lbl_item.Text = i.descript;
-            VariablesGlobales.tabla = tablatmp;
+            i = ConvertToItem(mitem.info_item(id));
+
+            lbl_item.Text = i.Descript;
+            tabla = tablatmp;
         }
+
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+     new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
     }
 }
 

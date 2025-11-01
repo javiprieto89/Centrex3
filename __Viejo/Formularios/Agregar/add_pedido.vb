@@ -100,7 +100,7 @@
         edita_pedido = pe
         'borro la tabla temporal
         'borrartbl("tmppedidos_items")
-        generales_multiUsuario.borrar_tabla_pedidos_temporales(idUsuario, idUnico)
+        borrar_tabla_pedidos_temporales(idUsuario, idUnico)
         'restauro los que se borraron porque no se guardaron los cambios
         activaitems("pedidos_items")
         edicion = False
@@ -179,13 +179,11 @@
                    "CAST(ti.cantidad * ti.precio AS DECIMAL(18,3)) AS 'Subtotal' " &
                    "FROM tmppedidos_items AS ti " &
                    "LEFT JOIN items AS i ON ti.id_item = i.id_item " &
+                   "LEFT JOIN items AS i ON ti.id_item = i.id_item " &
                    "LEFT JOIN tipos_items AS tim ON i.id_tipo = tim.id_tipo " &
                    "WHERE ti.activo = '1' AND (i.esMarkup = '0' OR ti.id_item IS NULL) " &
                    "ORDER BY id ASC"
-            Dim nRegs As Integer = 0
-            Dim tPaginas As Integer = 0
-            Dim txtnPage As New TextBox()
-            cargar_datagrid(dg_viewPedido, sqlstr, basedb, 0, nRegs, tPaginas, 1, txtnPage, "tmppedidos_items", "tmppedidos_items")
+            cargar_datagrid(dg_viewPedido, sqlstr, basedb)
             'resaltarcolumna(dg_view, 4, Color.Red)
 
             txt_markup.Text = edita_pedido.markup
@@ -277,11 +275,11 @@
             cmd_exit.Enabled = False
             Me.Show()
             If MsgBox("¿Está seguro que desea borrar este pedido?", vbYesNo + vbQuestion) = MsgBoxResult.Yes Then
-                If BorrarPedido(edita_pedido) = False Then
+                If borrarpedido(edita_pedido) = False Then
                     If (MsgBox("Ocurrió un error al realizar el borrado del pedido, ¿desea intetar desactivarlo para que no aparezca en la búsqueda?" _
                      , MsgBoxStyle.Question + MsgBoxStyle.YesNo)) = vbYes Then
                         'Realizo un borrado lógico
-                        If UpdatePedido(edita_pedido) = True Then
+                        If updatepedido(edita_pedido, True) = True Then
                             MsgBox("Se ha podido realizar un borrado lógico, pero el pedido no se borró definitivamente." + Chr(13) +
                                 "Esto posiblemente se deba a que el pedido, tiene operaciones realizadas y por lo tanto no podrá borrarse", vbInformation)
                         Else
@@ -319,7 +317,7 @@
             Exit Sub
             'cmpAsociado = info_nComprobante(txt_comprobanteAsociado.Text
         ElseIf txt_comprobanteAsociado.Text <> "" And numeroPedido_anulado <> -1 Then
-            If Val(txt_total.Text) > InfoPedido(numeroPedido_anulado).total Then
+            If Val(txt_total.Text) > info_pedido(numeroPedido_anulado).total Then
                 MsgBox("Está emitiendo un comprobante asociado a otro, el monto del comprobante que está queriendo emitir no puede ser superior al comprobante original.", vbExclamation + vbOKOnly, "Centrex")
                 Exit Sub
             End If
@@ -368,7 +366,7 @@
             '   descuento = Math.Round(100 - ((total / ("1." + txt_markup.Text) * 100) / total), 4)
             'End If
             costo = ((total * descuento) / 100) * -1
-            Dim i As New item
+            Dim i As item
             i = info_itemDesc("Descuento: " + descuento.ToString + "%")
             If i.descript = "error" Then
                 i.activo = True
@@ -387,7 +385,7 @@
                 additem(i)
                 i.id_item = infoItem_lastItem().id_item
             End If
-            Dim id_tmpPedidoItem = ExisteDescuentoMarkupTmp(i.id_item)
+            Dim id_tmpPedidoItem = existe_Descuento_Markup_Tmp(i.id_item)
             If id_tmpPedidoItem = -1 Then
                 'addItemPedidotmp(i.id_item, "1", costo, True)
                 addItemPedidotmp(i, "1", costo, idUsuario, idUnico, -1)
@@ -402,31 +400,31 @@
 
             ultimoPedido = p
             p.fecha_edicion = Format(DateTime.Now, "dd/MM/yyyy")
-            If UpdatePedido(p) = False Then
+            If updatepedido(p) = False Then
                 MsgBox("Hubo un problema al actualizar el pedido.", vbExclamation)
                 closeandupdate(Me)
             End If
             'actualizar pedido (items)            
             'actualizo, agrego y borro los items del pedido
-            GuardarPedido(idUsuario, idUnico, edita_pedido.id_pedido)
-            generales_multiUsuario.borrar_tabla_pedidos_temporales(idUsuario, idUnico)
+            guardarPedido(idUsuario, idUnico, edita_pedido.id_pedido)
+            borrar_tabla_pedidos_temporales(idUsuario, idUnico)
             'borrartbl("tmppedidos_items")
         Else
             'Agrego el pedido
-            If AddPedido(p) Then
-                ultimoPedido = InfoPedido(Info_Ultimo_Pedido_Por_Usuario(idUsuario))
+            If addpedido(p) Then
+                ultimoPedido = info_pedido(Info_Ultimo_Pedido_Por_Usuario(idUsuario))
                 'Agrego los items al pedido
-                If Not GuardarPedido(idUsuario, idUnico, ultimoPedido.id_pedido) Then
+                If Not guardarPedido(idUsuario, idUnico, ultimoPedido.id_pedido) Then
                     MsgBox("Hubo un problema al agregar el pedido.", vbExclamation)
-                    generales_multiUsuario.borrar_tabla_pedidos_temporales(idUsuario, idUnico)
+                    borrar_tabla_pedidos_temporales(idUsuario, idUnico)
                     closeandupdate(Me)
                     Exit Sub
                 Else
-                    generales_multiUsuario.borrar_tabla_pedidos_temporales(idUsuario, idUnico)
+                    borrar_tabla_pedidos_temporales(idUsuario, idUnico)
                 End If
             Else
                 MsgBox("Hubo un problema al agregar el pedido.", vbExclamation)
-                generales_multiUsuario.borrar_tabla_pedidos_temporales(idUsuario, idUnico)
+                borrar_tabla_pedidos_temporales(idUsuario, idUnico)
                 closeandupdate(Me)
                 Exit Sub
             End If
@@ -434,7 +432,7 @@
             edita_pedido = ultimoPedido
         End If
 
-        PedidoAPedidoTmp(edita_pedido.id_pedido, idUsuario, idUnico)
+        pedido_a_pedidoTmp(edita_pedido.id_pedido, idUsuario, idUnico)
 
         'If emitir And Not chk_presupuesto.Checked Then
         If emitir Then 'Ahora los comprobantes se contabilizan si tienen el tilde 24/08/2021
@@ -454,7 +452,7 @@
                     End If
                     'ccC.saldo -= edita_pedido.total
                     updateCCCliente(ccC)
-                    'cerrarpedido(InfoPedido(), chk_presupuesto.Checked)
+                    'cerrarpedido(info_pedido(), chk_presupuesto.Checked)
                     'El pedido ya lo cierra la función facturar
                     Dim t As New transaccion
                     p = ultimoPedido
@@ -488,7 +486,7 @@
                 Exit Sub
             End If
         ElseIf emitir Then
-            CerrarPedido(ultimoPedido, chk_presupuesto.Checked, chk_remitos.Checked)
+            cerrarPedido(ultimoPedido, chk_presupuesto.Checked, chk_remitos.Checked)
             emitir = False
         End If
 
@@ -679,7 +677,7 @@
         If markupOriginal <> -1 And markupOriginal <> txt_markup.Text And edicion = True Then
             markupOriginal = txt_markup.Text
 
-            id_itemMarkup = IdItemMarkupPedido(edita_pedido.id_pedido)
+            id_itemMarkup = id_ItemMarkupPedido(edita_pedido.id_pedido)
             borraritemCargado(id_itemMarkup, True)
 
             'Si se borró algún descuento recalcula los descuentos 
@@ -991,7 +989,7 @@
             End If
         End If
 
-        generales_multiUsuario.borrar_tabla_pedidos_temporales(usuario_logueado.id_usuario)
+        borrar_tabla_pedidos_temporales(usuario_logueado.id_usuario)
         c = info_cliente(cmb_cliente.SelectedValue)
         cmp = info_comprobante(cmb_comprobante.SelectedValue)
         tmp = tabla
@@ -1005,10 +1003,10 @@
         End If
         numeroPedido_anulado = id
 
-        PedidoAPedidoTmp(numeroPedido_anulado, usuario_logueado.id_usuario, idUnico)
+        pedido_a_pedidoTmp(numeroPedido_anulado, usuario_logueado.id_usuario, idUnico)
 
         'Duplicar_Pedido_Para_Anularlo(numeroPedido_anulado)
-        txt_comprobanteAsociado.Text = InfoPedido(numeroPedido_anulado).numeroComprobante
+        txt_comprobanteAsociado.Text = info_pedido(numeroPedido_anulado).numeroComprobante
 
         edicion = True
         updateAndCheck()
@@ -1030,16 +1028,16 @@
 
     Private Sub Duplicar_Pedido_Para_Anularlo(ByVal nPedidoAnulado As Integer)
         Dim p As New pedido
-        p = InfoPedido(nPedidoAnulado)
+        p = info_pedido(nPedidoAnulado)
 
-        DuplicarPedido(nPedidoAnulado)
-        edita_pedido = InfoPedido()
-        PedidoAPedidoTmp(edita_pedido.id_pedido, idUsuario, idUnico)
+        duplicarPedido(nPedidoAnulado)
+        edita_pedido = info_pedido()
+        pedido_a_pedidoTmp(edita_pedido.id_pedido, idUsuario, idUnico)
         edita_pedido.numeroComprobante_anulado = p.numeroComprobante
         edita_pedido.id_Cc = p.id_Cc
         edita_pedido.numeroPedido_anulado = nPedidoAnulado
         edita_pedido.id_comprobante = cmb_comprobante.SelectedValue
-        If UpdatePedido(edita_pedido) = False Then
+        If updatepedido(edita_pedido) = False Then
             MsgBox("Hubo un problema al clonar el pedido.", vbExclamation, "Centrex")
             closeandupdate(Me)
         End If

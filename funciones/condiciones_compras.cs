@@ -1,65 +1,55 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class condiciones_compra
     {
 
         // ************************************ FUNCIONES DE CONDICIONES DE COMPRA **********************
-        public static condicion_compra info_condicion_compra(string id_condicion)
+        public static CondicionCompraEntity info_condicion_compra(int id_condicion_compra)
         {
-            var tmp = new condicion_compra();
-
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var condicionEntity = context.CondicionesCompra.FirstOrDefault(c => c.IdCondicionCompra == Conversions.ToInteger(id_condicion));
 
-                    if (condicionEntity is not null)
+                    var condicionCompraEntity = context.CondicionCompraEntity.FirstOrDefault(c => c.IdCondicionCompra == id_condicion_compra);                    
+
+                    if (condicionCompraEntity is not null)
                     {
-                        tmp.id_condicion_compra = condicionEntity.IdCondicionCompra.ToString();
-                        tmp.condicion = condicionEntity.condicion;
-                        tmp.vencimiento = Conversions.ToInteger(condicionEntity.vencimiento.ToString());
-                        tmp.recargo = Conversions.ToDouble(condicionEntity.recargo.ToString());
-                        tmp.activo = condicionEntity.activo;
+                        return condicionCompraEntity;
                     }
                     else
                     {
-                        tmp.condicion = "error";
+                        return null;
                     }
                 }
-
-                return tmp;
             }
             catch (Exception ex)
             {
-                tmp.condicion = "error";
-                return tmp;
+                MessageBox.Show("Error al obtener condición de compra: " + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
         }
 
-        public static bool addCondicion_compra(condicion_compra condicion)
+        public static bool addCondicion_compra(CondicionCompraEntity Condicion)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var condicionEntity = new CondicionCompraEntity()
                     {
-                        condicion = condicion.condicion,
-                        vencimiento = condicion.vencimiento,
-                        recargo = (decimal)condicion.recargo,
-                        activo = condicion.activo
+                        Condicion = Condicion.Condicion,
+                        Vencimiento = Condicion.Vencimiento,
+                        Recargo = (decimal)Condicion.Recargo,
+                        Activo = Condicion.Activo
                     };
 
-                    context.CondicionesCompra.Add(condicionEntity);
+                    context.CondicionCompraEntity.Add(condicionEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -71,26 +61,26 @@ namespace Centrex
             }
         }
 
-        public static bool updateCondicion_compra(condicion_compra condicion, bool borra = false)
+        public static bool updateCondicion_compra(CondicionCompraEntity Condicion, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var condicionEntity = context.CondicionesCompra.FirstOrDefault(c => c.IdCondicionCompra == condicion.id_condicion_compra);
+                    var condicionEntity = context.CondicionCompraEntity.FirstOrDefault(c => c.IdCondicionCompra == Condicion.IdCondicionCompra);
 
                     if (condicionEntity is not null)
                     {
                         if (borra == true)
                         {
-                            condicionEntity.activo = false;
+                            condicionEntity.Activo = false;
                         }
                         else
                         {
-                            condicionEntity.condicion = condicion.condicion;
-                            condicionEntity.vencimiento = condicion.vencimiento;
-                            condicionEntity.recargo = (decimal)condicion.recargo;
-                            condicionEntity.activo = condicion.activo;
+                            condicionEntity.Condicion = Condicion.Condicion;
+                            condicionEntity.Vencimiento = Condicion.Vencimiento;
+                            condicionEntity.Recargo = (decimal)Condicion.Recargo;
+                            condicionEntity.Activo = Condicion.Activo;
                         }
 
                         context.SaveChanges();
@@ -109,17 +99,17 @@ namespace Centrex
             }
         }
 
-        public static bool borrarCondicion_compra(condicion_compra condicion)
+        public static bool borrarCondicion_compra(CondicionCompraEntity Condicion)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var condicionEntity = context.CondicionesCompra.FirstOrDefault(c => c.IdCondicionCompra == condicion.id_condicion_compra);
+                    var condicionEntity = context.CondicionCompraEntity.FirstOrDefault(c => c.IdCondicionCompra == Condicion.IdCondicionCompra);
 
                     if (condicionEntity is not null)
                     {
-                        context.CondicionesCompra.Remove(condicionEntity);
+                        context.CondicionCompraEntity.Remove(condicionEntity);
                         context.SaveChanges();
                         return true;
                     }
@@ -138,3 +128,4 @@ namespace Centrex
         // ************************************ FUNCIONES DE CONDICIONES COMPRA **********************
     }
 }
+

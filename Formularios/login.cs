@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -18,25 +17,34 @@ namespace Centrex
             UsuarioEntity u;
 
             u = info_usuario(txt_usuario.Text, true);
-            if (u.usuario == "error")
+            if (u.Usuario == "error")
             {
-                Interaction.MsgBox("El nombre de usuario: " + txt_usuario.Text + " NO EXISTE", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                MessageBox.Show("El nombre de usuario: " + txt_usuario.Text + " NO EXISTE",
+                       "Centrex",
+             MessageBoxButtons.OK,
+         MessageBoxIcon.Error);
                 return;
             }
 
             u = usuarios.info_login(txt_usuario.Text, txt_password.Text);
-            if (u.usuario == "error")
+            if (u.Usuario == "error")
             {
-                Interaction.MsgBox("La contraseña ingresada para el usuario: " + txt_usuario.Text + " NO ES CORRECTA.", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                MessageBox.Show("La contraseña ingresada para el usuario: " + txt_usuario.Text + " NO ES CORRECTA.",
+                       "Centrex",
+           MessageBoxButtons.OK,
+                 MessageBoxIcon.Error);
                 return;
             }
-            else if (!u.activo)
+            else if (!u.Activo)
             {
-                Interaction.MsgBox("El usuario: " + txt_usuario.Text + " esta deshabilitado para el inicio de sesión", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
+                MessageBox.Show("El usuario: " + txt_usuario.Text + " esta deshabilitado para el inicio de sesión",
+       "Centrex",
+             MessageBoxButtons.OK,
+     MessageBoxIcon.Error);
                 return;
             }
 
-            VariablesGlobales.usuario_logueado = u;
+            usuario_logueado = u;
             iniciar = true;
             closeandupdate(this);
         }
@@ -45,6 +53,7 @@ namespace Centrex
         {
             closeandupdate(this);
         }
+
         private void pic_showPassword_Click(object sender, EventArgs e)
         {
             txt_password.UseSystemPasswordChar = false;
@@ -63,5 +72,9 @@ namespace Centrex
             }
         }
 
+        private void login_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

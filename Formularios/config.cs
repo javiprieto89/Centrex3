@@ -1,8 +1,7 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -18,41 +17,42 @@ namespace Centrex
 
         private void tctrl_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            var argcombo = cmb_clientes;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_cliente AS 'ID', razon_social AS 'Cliente' FROM clientes WHERE activo = '1' ORDER BY razon_social ASC", VariablesGlobales.basedb, "cliente", Conversions.ToInteger("id"));
-            cmb_clientes = argcombo;
+            var ordenClientes = new List<Tuple<string, bool>> { Tuple.Create("RazonSocial", true) };
+            generales.Cargar_Combo(
+                ref cmb_clientes,
+                entidad: "ClienteEntity",
+                displaymember: "RazonSocial",
+                valuemember: "IdCliente",
+                predet: -1,
+                soloActivos: true,
+                orden: ordenClientes);
+            cmb_clientes.SelectedIndex = -1;
         }
 
         private void config_Load(object sender, EventArgs e)
         {
-            {
-                ref var withBlock = ref c;
-                withBlock.leerConfig();
+            c.leerConfig();
 
-                txtdb.Text = withBlock.nameDB;
-                txtserver.Text = withBlock.serverDB;
-                txtuser.Text = withBlock.userDB;
-                txtpassword.Text = withBlock.passwordDB;
-                txt_rutaBackup.Text = withBlock.backupPath;
-                txt_nombreBackup.Text = withBlock.backupFile;
-                txt_itPerPage.Text = withBlock.itemsPorPagina;
-            }
+            txtdb.Text = c.nameDB;
+            txtserver.Text = c.serverDB;
+            txtuser.Text = c.userDB;
+            txtpassword.Text = c.passwordDB;
+            txt_rutaBackup.Text = c.backupPath;
+            txt_nombreBackup.Text = c.backupFile;
+            txt_itPerPage.Text = c.itemsPorPagina;
 
             dtp_fecha_sistema.Value = DateTime.Now;
         }
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            {
-                ref var withBlock = ref c;
-                withBlock.nameDB = txtdb.Text;
-                withBlock.serverDB = txtserver.Text;
-                withBlock.userDB = txtuser.Text;
-                withBlock.passwordDB = txtpassword.Text;
-                withBlock.backupPath = txt_rutaBackup.Text;
-                withBlock.backupFile = txt_nombreBackup.Text;
-                withBlock.itemsPorPagina = txt_itPerPage.Text;
-            }
+            c.nameDB = txtdb.Text;
+            c.serverDB = txtserver.Text;
+            c.userDB = txtuser.Text;
+            c.passwordDB = txtpassword.Text;
+            c.backupPath = txt_rutaBackup.Text;
+            c.backupFile = txt_nombreBackup.Text;
+            c.itemsPorPagina = txt_itPerPage.Text;
 
             c.guardarConfig();
             Dispose();
@@ -77,17 +77,26 @@ namespace Centrex
                 string arglpFile = txt_rutaBackup.Text;
                 string arglpParameters = "";
                 string arglpDirectory = "";
-                config.ShellExecute(0L, ref arglpOperation, ref arglpFile, ref arglpParameters, ref arglpDirectory, 1L);
-                txt_rutaBackup.Text = arglpFile; // Para Abrir Carpetas
+                config.ShellExecute(0L, arglpOperation, arglpFile, arglpParameters, arglpDirectory, 1L);
+                txt_rutaBackup.Text = arglpFile;
             }
             else
             {
-                Interaction.MsgBox("La ruta ingresada: " + Constants.vbCrLf + txt_rutaBackup.Text + "NO existe" + Constants.vbCrLf + "Por favor escriba un directorio válido o seleccioneló desde el botón: 'Elegir carpeta'", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Computron");
+                MessageBox.Show(
+                    "La ruta ingresada:\n" + txt_rutaBackup.Text + "\nNO existe\n\n" +
+                    "Por favor escriba un directorio válido o selecciónelo desde el botón: 'Elegir carpeta'",
+                    "Computron",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
-
         }
 
         private void cmd_cierre_diario_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tBackup_Click(object sender, EventArgs e)
         {
 
         }

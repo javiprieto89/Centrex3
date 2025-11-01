@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -23,9 +22,9 @@ namespace Centrex
             tmp.Marca = txt_marca.Text;
             tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                tmp.IdMarca = VariablesGlobales.edita_marcai.IdMarca;
+                tmp.IdMarca = edita_marcai.IdMarca;
                 if (marcasitems.updatemarcai(tmp) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar la marca, consulte con su programdor", Constants.vbExclamation);
@@ -61,14 +60,14 @@ namespace Centrex
         private void add_marcai_Load(object sender, EventArgs e)
         {
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_marca.Text = VariablesGlobales.edita_marcai.marca;
-                chk_activo.Checked = VariablesGlobales.edita_marcai.activo;
+                txt_marca.Text = edita_marcai.Marca;
+                chk_activo.Checked = edita_marcai.Activo;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_marca.Enabled = false;
                 chk_activo.Enabled = false;
@@ -77,12 +76,12 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta marca de auto?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (marcasitems.borrarmarcai(VariablesGlobales.edita_marcai) == false)
+                    if (marcasitems.borrarmarcai(edita_marcai) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la marca, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (marcasitems.updatemarcai(VariablesGlobales.edita_marcai, true) == true)
+                            if (marcasitems.updatemarcai(edita_marcai, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la marca no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el cliente, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }

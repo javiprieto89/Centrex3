@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
     public partial class add_comprobantes_compras
     {
-        private int id_comprobante_compra = -1;
-        private bool cerrarOk = false;
+        public int id_comprobante_compra = -1;
+        public bool cerrarOk = false;
 
         public add_comprobantes_compras()
         {
@@ -17,32 +17,59 @@ namespace Centrex
 
         private void add_comprobantes_compras_Load(object sender, EventArgs e)
         {
-            string sqlstr;
-
             lbl_fechaCarga.Text = generales.Hoy();
 
-
-            // form = Me ' Comentado para evitar error de compilación
-
-            // Cargo el combo con todos los proveedores
-            sqlstr = "SELECT p.id_proveedor AS 'id_proveedor', p.razon_social AS 'razon_social' FROM proveedores AS p WHERE p.activo = '1' ORDER BY p.razon_social ASC";
-            var argcombo = cmb_proveedor;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "razon_social", Conversions.ToInteger("id_proveedor"));
-            cmb_proveedor = argcombo;
+            var ordenProveedores = OrdenAsc("RazonSocial");
+            var argProveedor = cmb_proveedor;
+            generales.Cargar_Combo(
+                ref argProveedor,
+                entidad: "ProveedorEntity",
+                displaymember: "RazonSocial",
+                valuemember: "IdProveedor",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenProveedores);
+            cmb_proveedor = argProveedor;
+            cmb_proveedor.SelectedIndex = -1;
             cmb_proveedor.Text = "Seleccione un proveedor...";
+            cmb_cc.DataSource = null;
+            cmb_cc.Items.Clear();
             cmb_cc.Enabled = false;
 
-            // Cargo el combo con todos los comprobantes
+            cmb_tipoComprobante.DataSource = null;
+            cmb_tipoComprobante.Items.Clear();
             cmb_tipoComprobante.Enabled = false;
-            cmb_tipoComprobante.Text = "Seleccione un comprobante...";
+            cmb_tipoComprobante.Text = "Seleccione un tipo de comprobante...";
 
-            // Cargo el combo con todas las condiciones de compra
-            sqlstr = "SELECT id_condicion_compra, condicion FROM condiciones_compra ORDER BY condicion ASC";
-            var argcombo1 = cmb_condicionCompra;
-            generales.Cargar_Combo(ref argcombo1, sqlstr, VariablesGlobales.basedb, "condicion", Conversions.ToInteger("id_condicion_compra"));
-            cmb_condicionCompra = argcombo1;
-            cmb_condicionCompra.SelectedValue = VariablesGlobales.id_condicion_compra_default;
-            // cmb_condicionCompra.Text = "Seleccione una condición de compra..."
+            var ordenCondiciones = OrdenAsc("Condicion");
+            var argCondicion = cmb_condicionCompra;
+            generales.Cargar_Combo(
+                ref argCondicion,
+                entidad: "CondicionCompraEntity",
+                displaymember: "Condicion",
+                valuemember: "IdCondicionCompra",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenCondiciones);
+            cmb_condicionCompra = argCondicion;
+
+            if (cmb_condicionCompra.Items.Count > 0)
+            {
+                try
+                {
+                    cmb_condicionCompra.SelectedValue = id_condicion_compra_default;
+                }
+                catch
+                {
+                    cmb_condicionCompra.SelectedIndex = -1;
+                }
+            }
+            else
+            {
+                cmb_condicionCompra.SelectedIndex = -1;
+            }
 
             txt_tasaCambio.Enabled = false;
 
@@ -61,64 +88,144 @@ namespace Centrex
 
         private void cmb_proveedor_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            string sqlstr;
-            int p;
-            int id_ultima_cc;
+            if (cmb_proveedor.SelectedValue is null)
+                return;
 
-            p = Conversions.ToInteger(cmb_proveedor.SelectedValue);
+            int proveedorId = Conversions.ToInteger(cmb_proveedor.SelectedValue);
 
-            // Cargo los combos con todas las cuentas corrientes del proveedor
-            sqlstr = "SELECT id_cc, nombre FROM cc_proveedores WHERE activo = 1 AND id_proveedor = '" + p.ToString() + "' ORDER BY nombre ASC";
-            var argcombo = cmb_cc;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_cc"));
-            cmb_cc = argcombo;
-
-            // Cargo el combo con todos los comprobantes disponibles para el proveedor
-            cmb_tipoComprobante.Enabled = true;
-            sqlstr = "DECLARE @id_claseFiscal AS INTEGER " + "SELECT @id_claseFiscal = id_claseFiscal " + "FROM proveedores " + "WHERE id_proveedor = '" + p.ToString() + "' " + "SELECT id_tipoComprobante, comprobante_AFIP " + "FROM tipos_comprobantes " + "WHERE id_claseFiscal LIKE '%' + CAST(@id_claseFiscal AS VARCHAR(5)) + '%' " + "OR id_tipoComprobante IN (1000, 1001)";
-            // "WHERE CHARINDEX(@id_claseFiscal, id_claseFiscal) > 0 "
-            var argcombo1 = cmb_tipoComprobante;
-            generales.Cargar_Combo(ref argcombo1, sqlstr, VariablesGlobales.basedb, "comprobante_AFIP", Conversions.ToInteger("id_tipoComprobante"));
-            cmb_tipoComprobante = argcombo1;
-            cmb_tipoComprobante.Text = "Seleccione un tipo de comprobante...";
-
-
-            // Selecciono la última cuenta corriente que se uso del cliente
-            id_ultima_cc = comprobantes_compras.Ultima_CC_comprobante_compra_proveedor(p);
-            if (id_ultima_cc == -1)
+            var filtrosCc = new Dictionary<string, object>
             {
+                ["IdProveedor"] = proveedorId
+            };
+
+            var argCc = cmb_cc;
+            generales.Cargar_Combo(
+                ref argCc,
+                entidad: "CcProveedorEntity",
+                displaymember: "Nombre",
+                valuemember: "IdCc",
+                predet: -1,
+                soloActivos: true,
+                filtros: filtrosCc,
+                orden: OrdenAsc("Nombre"));
+            cmb_cc = argCc;
+
+            cmb_cc.Enabled = cmb_cc.Items.Count > 0;
+            if (!cmb_cc.Enabled)
+            {
+                cmb_cc.Text = "Seleccione una cuenta corriente...";
+            }
+            else if (cmb_cc.SelectedIndex < 0)
+            {
+                cmb_cc.SelectedIndex = 0;
+            }
+
+            CargarTiposComprobantesParaProveedor(proveedorId);
+            cmb_tipoComprobante.Enabled = true;
+
+            int idUltimaCc = comprobantes_compras.Ultima_CC_comprobante_compra_proveedor(proveedorId);
+            if (idUltimaCc == -1)
+            {
+                cmb_cc.SelectedIndex = -1;
                 cmb_cc.Text = "Seleccione una cuenta corriente...";
             }
             else
             {
-                cmb_cc.SelectedValue = id_ultima_cc;
-                cmb_cc_SelectionChangeCommitted(null, null);
+                try
+                {
+                    cmb_cc.SelectedValue = idUltimaCc;
+                    cmb_cc_SelectionChangeCommitted(null, null);
+                }
+                catch
+                {
+                    cmb_cc.SelectedIndex = -1;
+                }
             }
-            cmb_cc.Enabled = true;
         }
 
         private void cmb_cc_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            string sqlstr;
-            ccProveedor ccp;
+            if (cmb_cc.SelectedValue is null)
+                return;
 
+            var ccp = ccProveedores.info_ccProveedor(Conversions.ToInteger(cmb_cc.SelectedValue));
 
-            ccp = ccProveedores.info_ccProveedor(Conversions.ToInteger(cmb_cc.SelectedValue));
+            var ordenMoneda = OrdenAsc("Moneda");
+            var argMoneda = cmb_moneda;
+            generales.Cargar_Combo(
+                ref argMoneda,
+                entidad: "SysMonedaEntity",
+                displaymember: "Moneda",
+                valuemember: "IdMoneda",
+                predet: -1,
+                soloActivos: false,
+                filtros: null,
+                orden: ordenMoneda);
+            cmb_moneda = argMoneda;
 
-            // Cargo el combo con todas las monedas disponibles y selecciono la moneda de la cuenta corriente del proveedor seleccionado
-            sqlstr = "SELECT id_moneda, moneda FROM sysMoneda ORDER BY moneda ASC";
-            var argcombo = cmb_moneda;
-            generales.Cargar_Combo(ref argcombo, sqlstr, VariablesGlobales.basedb, "moneda", Conversions.ToInteger("id_moneda"));
-            cmb_moneda = argcombo;
-            cmb_moneda.SelectedValue = ccp.id_moneda;
+            try
+            {
+                cmb_moneda.SelectedValue = ccp.IdMoneda;
+            }
+            catch
+            {
+                cmb_moneda.SelectedIndex = -1;
+            }
+
             cmb_moneda.Enabled = false;
-            if (ccp.id_moneda != VariablesGlobales.ID_PESO)
+            if (ccp.IdMoneda != ID_PESO)
             {
                 txt_tasaCambio.Enabled = true;
             }
             else
             {
+                txt_tasaCambio.Enabled = false;
                 txt_tasaCambio.Text = "0";
+            }
+        }
+
+        private void CargarTiposComprobantesParaProveedor(int idProveedor)
+        {
+            cmb_tipoComprobante.DataSource = null;
+            cmb_tipoComprobante.Items.Clear();
+
+            try
+            {
+                using var ctx = new CentrexDbContext();
+                int? claseFiscal = ctx.ProveedorEntity
+                    .AsNoTracking()
+                    .Where(p => p.IdProveedor == idProveedor)
+                    .Select(p => p.IdClaseFiscal)
+                    .FirstOrDefault();
+
+                var tipos = ctx.TipoComprobanteEntity
+                    .AsNoTracking()
+                    .Where(tc =>
+                        (claseFiscal.HasValue && tc.IdClaseFiscal != null && tc.IdClaseFiscal.Contains(claseFiscal.Value.ToString())) ||
+                        tc.IdTipoComprobante == 1000 ||
+                        tc.IdTipoComprobante == 1001)
+                    .OrderBy(tc => tc.ComprobanteAfip)
+                    .Select(tc => new
+                    {
+                        tc.IdTipoComprobante,
+                        tc.ComprobanteAfip
+                    })
+                    .ToList();
+
+                cmb_tipoComprobante.DataSource = tipos;
+                cmb_tipoComprobante.DisplayMember = "ComprobanteAfip";
+                cmb_tipoComprobante.ValueMember = "IdTipoComprobante";
+                cmb_tipoComprobante.SelectedIndex = -1;
+                cmb_tipoComprobante.Text = "Seleccione un tipo de comprobante...";
+                cmb_tipoComprobante.Enabled = cmb_tipoComprobante.Items.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                cmb_tipoComprobante.DataSource = null;
+                cmb_tipoComprobante.Items.Clear();
+                cmb_tipoComprobante.Text = "Seleccione un tipo de comprobante...";
+                cmb_tipoComprobante.Enabled = false;
+                Interaction.MsgBox($"Error al cargar tipos de comprobante: {ex.Message}", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
             }
         }
 
@@ -126,17 +233,17 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "proveedores";
+            tmp = tabla;
+            tabla = "proveedores";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_proveedor;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_proveedor = argcmb;
         }
 
@@ -149,22 +256,22 @@ namespace Centrex
             if (Conversions.ToBoolean(Operators.OrObject(cmb_proveedor.Text == "Seleccione un proveedor...", Operators.ConditionalCompareObjectEqual(cmb_proveedor.SelectedValue, 0, false))))
                 return;
 
-            tmp = VariablesGlobales.tabla;
-            tmpProveedor = VariablesGlobales.edita_proveedor;
-            // VariablesGlobales.edita_cliente = info_cliente(cmb_proveedor.SelectedValue)
-            VariablesGlobales.edita_proveedor = proveedores.info_proveedor(Conversions.ToString(cmb_proveedor.SelectedValue));
-            VariablesGlobales.tabla = "cc_proveedores";
+            tmp = tabla;
+            tmpProveedor = edita_proveedor;
+            // edita_cliente = info_cliente(cmb_proveedor.SelectedValue)
+            edita_proveedor = proveedores.info_proveedor(Conversions.ToString(cmb_proveedor.SelectedValue));
+            tabla = "cc_proveedores";
             Enabled = false;
 
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
-            VariablesGlobales.edita_proveedor = tmpProveedor;
+            tabla = tmp;
+            edita_proveedor = tmpProveedor;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_cc;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_cc = argcmb;
         }
 
@@ -173,55 +280,75 @@ namespace Centrex
             string tmpTabla;
             bool tmpActivo;
 
-            tmpTabla = VariablesGlobales.tabla;
-            tmpActivo = VariablesGlobales.activo;
+            tmpTabla = tabla;
+            tmpActivo = activo;
 
             switch (tbl_comprobantesCompras.SelectedTab.Name ?? "")
             {
                 case "productos":
                     {
-                        VariablesGlobales.tabla = "items_sinDescuento";
-                        VariablesGlobales.activo = true;
+                        tabla = "items_sinDescuento";
+                        activo = true;
                         break;
                     }
                 case "impuestos":
                     {
-                        VariablesGlobales.tabla = "impuestos";
+                        tabla = "impuestos";
                         break;
                     }
                 case "conceptos":
                     {
-                        VariablesGlobales.tabla = "conceptos_compra";
+                        tabla = "conceptos_compra";
                         break;
                     }
             }
 
-            // activo = True
-
-            // agregaitem = True
             Enabled = false;
 
             var frmSearch = new search(true, id_comprobante_compra);
             frmSearch.ShowDialog();
-            VariablesGlobales.tabla = tmpTabla;
-            VariablesGlobales.activo = tmpActivo;
+            tabla = tmpTabla;
+            activo = tmpActivo;
+            Enabled = true;
 
-            // Select Case tbl_comprobantesCompras.SelectedTab.Name
-            // Case "productos"
+            int seleccionado = id;
+            if (seleccionado > 0)
+            {
+                switch (tbl_comprobantesCompras.SelectedTab.Name ?? string.Empty)
+                {
+                    case "productos":
+                        {
+                            edita_item = mitem.info_item(seleccionado);
+                            agregaitem = true;
+                            var agregaItemFrm = new infoagregaitem(true, id_comprobante_compra);
+                            agregaItemFrm.ShowDialog();
+                            agregaitem = false;
+                            edita_item = new ItemEntity();
+                            break;
+                        }
+                    case "impuestos":
+                        {
+                            var frmImpuestos = new add_comprobantes_compras_impuestos(id_comprobante_compra, seleccionado);
+                            frmImpuestos.ShowDialog();
+                            break;
+                        }
+                    case "conceptos":
+                        {
+                            var frmConceptos = new add_comprobantes_compras_conceptos(id_comprobante_compra, seleccionado);
+                            frmConceptos.ShowDialog();
+                            break;
+                        }
+                }
+            }
 
-            // Case "impuestos"
-
-            // Case "conceptos"
-
-            // End Select
-            // agregaitem = False
-
+            agregaitem = false;
+            id = 0;
             update_form();
         }
 
         private void cmd_confirmar_Click(object sender, EventArgs e)
         {
-            var cc = new comprobante_compra();
+            var cc = new ComprobanteCompraEntity();
             int id_cc;
 
             if (cmb_proveedor.Text == "Seleccione un proveedor...")
@@ -239,7 +366,7 @@ namespace Centrex
                 Interaction.MsgBox("Debe seleccionar una condición de compra.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
             }
-            else if (Conversions.ToBoolean(Operators.AndObject(Operators.ConditionalCompareObjectNotEqual(cmb_moneda.SelectedValue, VariablesGlobales.ID_PESO, false), string.IsNullOrEmpty(txt_tasaCambio.Text))))
+            else if (Conversions.ToBoolean(Operators.AndObject(Operators.ConditionalCompareObjectNotEqual(cmb_moneda.SelectedValue, ID_PESO, false), string.IsNullOrEmpty(txt_tasaCambio.Text))))
             {
                 Interaction.MsgBox("La moneda seleccionada es extranjera, por lo cual escribir la tasa de cambio", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 return;
@@ -250,16 +377,16 @@ namespace Centrex
                 return;
             }
 
-            cc.fecha_comprobante = dtp_fechaComprobanteCompra.Value.Date.ToShortDateString();
+            cc.FechaComprobante = DateOnly.FromDateTime(dtp_fechaComprobanteCompra.Value);
             cc.IdProveedor = Conversions.ToInteger(cmb_proveedor.SelectedValue);
-            cc.id_cc = Conversions.ToInteger(cmb_cc.SelectedValue);
-            cc.id_condicion_compra = Conversions.ToInteger(cmb_condicionCompra.SelectedValue);
-            cc.id_tipoComprobante = Conversions.ToInteger(cmb_tipoComprobante.SelectedValue);
-            cc.id_moneda = Conversions.ToInteger(cmb_moneda.SelectedValue);
-            cc.tasaCambio = Conversions.ToDouble(txt_tasaCambio.Text);
-            cc.puntoVenta = txt_puntoVenta.Text;
-            cc.numeroComprobante = txt_numeroComprobante.Text;
-            cc.cae = txt_CAE.Text;
+            cc.IdCc = Conversions.ToInteger(cmb_cc.SelectedValue);
+            cc.IdCondicionCompra = Conversions.ToInteger(cmb_condicionCompra.SelectedValue);
+            cc.IdTipoComprobante = Conversions.ToInteger(cmb_tipoComprobante.SelectedValue);
+            cc.IdMoneda = Conversions.ToInteger(cmb_moneda.SelectedValue);
+            cc.TasaCambio = Convert.ToDecimal(txt_tasaCambio.Text);
+            cc.PuntoVenta = txt_puntoVenta.Text;
+            cc.NumeroComprobante = txt_numeroComprobante.Text;
+            cc.Cae = txt_CAE.Text;
 
             if (id_comprobante_compra == -1)
             {
@@ -274,7 +401,7 @@ namespace Centrex
             }
             else
             {
-                cc.id_comprobanteCompra = id_comprobante_compra;
+                cc.IdComprobanteCompra = id_comprobante_compra;
                 if (!comprobantes_compras.update_comprobante_compra(cc))
                 {
                     Interaction.MsgBox("Ocurrió un error al actualizar el comprobante de compra, consulte con el programador.", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
@@ -329,56 +456,87 @@ namespace Centrex
 
         public void update_form()
         {
-            string sqlstr;
-            var totalItems = default(double);
-            var totalImpuestos = default(double);
-            var totalConceptos = default(double);
-            double totalFactura;
+            if (id_comprobante_compra == -1)
+            {
+                dg_viewItems.DataSource = null;
+                dg_viewImpuestos.DataSource = null;
+                dg_viewConceptos.DataSource = null;
+                txt_totalItems.Text = "0";
+                txt_totalImpuestos.Text = "0";
+                txt_totalConceptos.Text = "0";
+                txt_totalFactura.Text = "0";
+                return;
+            }
 
-            // Actualizo el datagrid con los productos
-            sqlstr = "SELECT CONCAT(cci.id_comprobanteCompraItem, '-', cci.id_item) AS 'ID', i.item AS 'Código', i.descript AS 'Producto', cci.cantidad AS 'Cantidad' " + ", cci.precio AS 'Subtotal', (cci.cantidad * cci.precio) AS 'Total' " + "FROM comprobantes_compras_items AS cci " + "INNER JOIN items AS i ON cci.id_item = i.id_item " + "WHERE cci.id_comprobanteCompra = '" + id_comprobante_compra.ToString() + "' " + "ORDER BY cci.id_comprobanteCompraItem ASC";
-            var argdataGrid = dg_viewItems;
-            int argnRegs = 0;
-            int argtPaginas = 0;
-            TextBox argtxtnPage = null;
-            generales.cargar_datagrid(ref argdataGrid, sqlstr, VariablesGlobales.basedb, 0, ref argnRegs, ref argtPaginas, 1, ref argtxtnPage, "", "");
-            dg_viewItems = argdataGrid;
+            decimal totalItems = 0m;
+            decimal totalImpuestos = 0m;
+            decimal totalConceptos = 0m;
 
-            // Sumo el precio de todos los productos del datagrid
-            foreach (DataGridViewRow row in dg_viewItems.Rows)
-                totalItems += Conversions.ToDouble(row.Cells["Total"].Value.ToString());
+            using var ctx = new CentrexDbContext();
+
+            var items = ctx.ComprobanteCompraItemEntity
+                .AsNoTracking()
+                .Include(i => i.IdItemNavigation)
+                .Where(i => i.IdComprobanteCompra == id_comprobante_compra)
+                .OrderBy(i => i.IdComprobanteCompraItem)
+                .Select(i => new
+                {
+                    ID = $"{i.IdComprobanteCompraItem}-{i.IdItem}",
+                    Codigo = i.IdItemNavigation.Item,
+                    Producto = i.IdItemNavigation.Descript ?? string.Empty,
+                    Cantidad = i.Cantidad,
+                    Subtotal = i.Precio,
+                    Total = i.Cantidad * i.Precio
+                })
+                .ToList();
+
+            dg_viewItems.DataSource = items;
+            totalItems = items.Sum(row => row.Total);
             txt_totalItems.Text = totalItems.ToString();
+            if (dg_viewItems.Columns.Contains("Codigo"))
+                dg_viewItems.Columns["Codigo"].HeaderText = "Código";
+            if (dg_viewItems.Columns.Contains("Subtotal"))
+                dg_viewItems.Columns["Subtotal"].HeaderText = "Subtotal";
 
-            // Actualizo el datagrid con los impuestos
-            sqlstr = "SELECT CONCAT(cci.id_comprobanteCompraImpuesto, '-', cci.id_impuesto) AS 'ID', i.nombre AS 'Impuesto', cci.importe AS 'Importe' " + "FROM comprobantes_compras_impuestos AS cci " + "INNER JOIN impuestos AS i ON cci.id_impuesto = i.id_impuesto " + "WHERE cci.id_comprobanteCompra = '" + id_comprobante_compra.ToString() + "' " + "ORDER BY cci.id_comprobanteCompraImpuesto ASC";
-            var argdataGrid1 = dg_viewImpuestos;
-            int argnRegs1 = 0;
-            int argtPaginas1 = 0;
-            TextBox argtxtnPage1 = null;
-            generales.cargar_datagrid(ref argdataGrid1, sqlstr, VariablesGlobales.basedb, 0, ref argnRegs1, ref argtPaginas1, 1, ref argtxtnPage1, "", "");
-            dg_viewImpuestos = argdataGrid1;
+            var impuestos = ctx.ComprobanteCompraImpuestoEntity
+                .AsNoTracking()
+                .Include(i => i.IdImpuestoNavigation)
+                .Where(i => i.IdComprobanteCompra == id_comprobante_compra)
+                .OrderBy(i => i.IdComprobanteCompraImpuesto)
+                .Select(i => new
+                {
+                    ID = $"{i.IdComprobanteCompraImpuesto}-{i.IdImpuesto}",
+                    Impuesto = i.IdImpuestoNavigation.Nombre,
+                    Importe = i.Importe
+                })
+                .ToList();
 
-            // Sumo el precio de todos los impuestos del datagrid
-            foreach (DataGridViewRow row in dg_viewImpuestos.Rows)
-                totalImpuestos += Conversions.ToDouble(row.Cells["Importe"].Value.ToString());
+            dg_viewImpuestos.DataSource = impuestos;
+            totalImpuestos = impuestos.Sum(row => row.Importe);
             txt_totalImpuestos.Text = totalImpuestos.ToString();
 
-            // Actualizo el datagrid con los conceptos de compra
-            sqlstr = "SELECT CONCAT(ccc.id_comprobanteCompraConcepto, '-', ccc.id_concepto_compra) AS 'ID', cc.concepto AS 'Concepto', " + "ccc.subtotal AS 'Subtotal', ccc.iva AS 'I.V.A.', ccc.total AS 'Total' " + "FROM comprobantes_compras_conceptos AS ccc " + "INNER JOIN conceptos_compra AS cc ON ccc.id_concepto_compra = cc.id_concepto_compra " + "WHERE ccc.id_comprobanteCompra = '" + id_comprobante_compra.ToString() + "' " + "ORDER BY ccc.id_comprobanteCompraConcepto ASC";
-            var argdataGrid2 = dg_viewConceptos;
-            int argnRegs2 = 0;
-            int argtPaginas2 = 0;
-            TextBox argtxtnPage2 = null;
-            generales.cargar_datagrid(ref argdataGrid2, sqlstr, VariablesGlobales.basedb, 0, ref argnRegs2, ref argtPaginas2, 1, ref argtxtnPage2, "", "");
-            dg_viewConceptos = argdataGrid2;
+            var conceptos = ctx.ComprobanteCompraConceptoEntity
+                .AsNoTracking()
+                .Include(c => c.IdConceptoCompraNavigation)
+                .Where(c => c.IdComprobanteCompra == id_comprobante_compra)
+                .OrderBy(c => c.IdComprobanteCompraConcepto)
+                .Select(c => new
+                {
+                    ID = $"{c.IdComprobanteCompraConcepto}-{c.IdConceptoCompra}",
+                    Concepto = c.IdConceptoCompraNavigation.Concepto,
+                    Subtotal = c.Subtotal,
+                    IVA = c.Iva,
+                    Total = c.Total
+                })
+                .ToList();
 
-            // Sumo el precio de todos los conceptos de compra del datagrid
-            foreach (DataGridViewRow row in dg_viewConceptos.Rows)
-                totalConceptos += Conversions.ToDouble(row.Cells["Total"].Value.ToString());
+            dg_viewConceptos.DataSource = conceptos;
+            totalConceptos = conceptos.Sum(row => row.Total);
             txt_totalConceptos.Text = totalConceptos.ToString();
+            if (dg_viewConceptos.Columns.Contains("IVA"))
+                dg_viewConceptos.Columns["IVA"].HeaderText = "I.V.A.";
 
-
-            totalFactura = totalItems + totalImpuestos + totalConceptos;
+            decimal totalFactura = totalItems + totalImpuestos + totalConceptos;
             txt_totalFactura.Text = totalFactura.ToString();
         }
 
@@ -417,9 +575,12 @@ namespace Centrex
 
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            var cc = new comprobante_compra();
-            var ccp = new ccProveedor();
-            var tc = new TipoComprobante(Conversions.ToInteger(cmb_tipoComprobante.SelectedValue));
+            var cc = new ComprobanteCompraEntity();
+            var ccp = new CcProveedorEntity();
+            var tc = new TipoComprobanteEntity
+            {
+                IdTipoComprobante = Conversions.ToInteger(cmb_tipoComprobante.SelectedValue)
+            };
 
             if (txt_totalFactura.Text == "0" | string.IsNullOrEmpty(txt_totalFactura.Text))
             {
@@ -428,13 +589,13 @@ namespace Centrex
             }
 
             ccp = ccProveedores.info_ccProveedor(Conversions.ToInteger(cmb_cc.SelectedValue));
-            cc = comprobantes_compras.info_comprobante_compra(id_comprobante_compra.ToString());
-            cc.id_comprobanteCompra = id_comprobante_compra;
-            cc.subtotal = Conversions.ToDouble(txt_totalItems.Text);
-            cc.impuestos = Conversions.ToDouble(txt_totalImpuestos.Text);
-            cc.conceptos = Conversions.ToDouble(txt_totalConceptos.Text);
-            cc.total = Conversions.ToDouble(txt_totalFactura.Text);
-            cc.nota = txt_notas.Text;
+            cc = comprobantes_compras.info_comprobante_compra(id_comprobante_compra);
+            cc.IdComprobanteCompra = id_comprobante_compra;
+            cc.Subtotal = Conversions.ToDecimal(txt_totalItems.Text);
+            cc.Impuestos = Conversions.ToDecimal(txt_totalImpuestos.Text);
+            cc.Conceptos = Conversions.ToDecimal(txt_totalConceptos.Text);
+            cc.Conceptos = Conversions.ToDecimal(txt_totalFactura.Text);
+            cc.Nota = txt_notas.Text;
 
             if (!comprobantes_compras.cerrar_comprobante_compra(cc))
             {
@@ -444,36 +605,50 @@ namespace Centrex
             }
             else
             {
-                if (Conversions.ToString(tc.signoProveedor) == "+")
+                if (Conversions.ToString(tc.SignoProveedor) == "+")
                 {
-                    ccp.saldo += cc.total;
+                    ccp.Saldo += (decimal)cc.Total;
                 }
                 else
                 {
-                    ccp.saldo += cc.total;
+                    ccp.Saldo += (decimal)cc.Total;
                 }
                 ccProveedores.updateCCProveedor(ccp);
                 // Dim frm As New frm_prnReportes("rpt_ordenDePago", "datos_empresa", "SP_pago_cabecera", "SP_detalle_pagos_cheques", "SP_detalle_pagos_transferencias", "DS_Datos_Empresa",
                 // "DS_Pago_Cabecera", "DS_Detalle_Pagos_Cheques", "DS_Detalle_Pagos_Transferencias", id_comprobante_compra, True)
                 // frm.ShowDialog()
                 // Se agrega la operación a la tabla transacciones
-                var t = new transaccion();
-                t.id_comprobanteCompra = id_comprobante_compra;
-                t.fecha = cc.fecha_comprobante;
+                var t = new TransaccionEntity();
+                t.IdComprobanteCompra = id_comprobante_compra;
+                t.Fecha = cc.FechaComprobante;
                 // t.id_tipoComprobante = info_comprobante(p.id_comprobante).id_tipoComprobante
-                t.id_tipoComprobante = cc.id_tipoComprobante;
-                t.numeroComprobante = cc.numeroComprobante;
-                t.puntoVenta = Conversions.ToInteger(cc.puntoVenta);
-                t.total = cc.total;
-                t.id_cc = cc.id_cc;
+                t.IdTipoComprobante = cc.IdTipoComprobante;
+                if (int.TryParse(cc.NumeroComprobante, out int numeroComprobanteInt))
+                {
+                    t.NumeroComprobante = numeroComprobanteInt;
+                }
+                else
+                {
+                    t.NumeroComprobante = null;
+                }
+                if (int.TryParse(cc.PuntoVenta, out int puestoVentaInt))
+                {
+                    t.PuntoVenta = puestoVentaInt;
+                }
+                else
+                {
+                    t.PuntoVenta = null;
+                }
+                t.Total = cc.Total;
+                t.IdCc = cc.IdCc;
                 t.IdProveedor = cc.IdProveedor;
                 if (!transacciones.Agregar_Transaccion_Desde_Comprobante_Compra(t))
                 {
                     Interaction.MsgBox("Ha ocurrido un error al agregar la transaccion en el proveedor, verifique el mismo o vuelva a intentarlo más tarde.", Constants.vbExclamation, "Centrex");
                     return;
                 }
-                var rptOrdenDePago = new frm_prnOrdenDePago(id_comprobante_compra);
-                rptOrdenDePago.Show();
+                //var rptOrdenDePago = new frm_prnOrdenDePago(id_comprobante_compra);
+                //rptOrdenDePago.Show();
             }
 
             cerrarOk = true;
@@ -492,17 +667,17 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "BY";
+            tmp = tabla;
+            tabla = "BY";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_proveedor;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_proveedor = argcmb;
         }
 
@@ -510,19 +685,21 @@ namespace Centrex
         {
             // busqueda
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "tipos_Comprobantes";
+            tmp = tabla;
+            tabla = "tipos_Comprobantes";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo, si es 0 elijo el cliente default
-            if (VariablesGlobales.id == 0)
-                VariablesGlobales.id = VariablesGlobales.id_cliente_pedido_default;
+            if (id == 0)
+                id = id_cliente_pedido_default;
             var argcmb = cmb_proveedor;
-            generales.updateform(VariablesGlobales.id.ToString(), ref argcmb);
+            generales.updateform(id.ToString(), ref argcmb);
             cmb_proveedor = argcmb;
         }
+
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+            new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
     }
 }
-

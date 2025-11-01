@@ -1,21 +1,27 @@
-using System;
-using Microsoft.VisualBasic;
-using Centrex.Models;
+﻿using System;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
     static class rutinas
     {
-
         public static void errordb()
         {
-            Interaction.MsgBox("Ocurrió un error en la base de datos, consulte con el programador", (MsgBoxStyle)((int)MsgBoxStyle.Critical + (int)MsgBoxStyle.OkOnly));
+            MessageBox.Show(
+               "Ocurrió un error en la base de datos, consulte con el programador",
+                "Error de Base de Datos",
+               MessageBoxButtons.OK,
+           MessageBoxIcon.Error);
             Environment.Exit(0);
         }
 
         public static void erroradd()
         {
-            Interaction.MsgBox("Ocurrió un error en al ingresar datos a la base de datos, consulte con el programador", (MsgBoxStyle)((int)MsgBoxStyle.Critical + (int)MsgBoxStyle.OkOnly));
+            MessageBox.Show(
+                 "Ocurrió un error al ingresar datos a la base de datos, consulte con el programador",
+                "Error al Agregar Datos",
+                      MessageBoxButtons.OK,
+               MessageBoxIcon.Error);
             Environment.Exit(0);
         }
     }

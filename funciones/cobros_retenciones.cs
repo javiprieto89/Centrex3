@@ -1,10 +1,7 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class cobros_retenciones
@@ -20,7 +17,7 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.CobrosRetenciones.FirstOrDefault(r => r.IdRetencion == id_retencion);
+                    return context.CobroRetencionEntity.FirstOrDefault(r => r.IdRetencion == id_retencion);
                 }
             }
             catch (Exception ex)
@@ -36,7 +33,7 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.TmpCobrosRetenciones.FirstOrDefault(r => r.IdTmpRetencion == id_retencion);
+                    return context.TmpCobroRetencionEntity.FirstOrDefault(r => r.IdTmpRetencion == id_retencion);
                 }
             }
             catch (Exception ex)
@@ -52,7 +49,7 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    context.CobrosRetenciones.Add(cb);
+                    context.CobroRetencionEntity.Add(cb);
                     context.SaveChanges();
                     return true;
                 }
@@ -70,7 +67,7 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    context.TmpCobrosRetenciones.Add(cb);
+                    context.TmpCobroRetencionEntity.Add(cb);
                     context.SaveChanges();
                     return true;
                 }
@@ -89,7 +86,7 @@ namespace Centrex
                 using (var context = new CentrexDbContext())
                 {
                     // Obtener todos los temporales y migrarlos a definitivos
-                    var tmpList = context.TmpCobrosRetenciones.ToList();
+                    var tmpList = context.TmpCobroRetencionEntity.ToList();
 
                     foreach (var tmp in tmpList)
                     {
@@ -97,16 +94,16 @@ namespace Centrex
                         {
                             IdCobro = c.IdCobro,
                             IdImpuesto = tmp.IdImpuesto,
-                            total = tmp.total,
-                            notas = tmp.notas
+                            Total = tmp.Total,
+                            Notas = tmp.Notas
                         };
-                        context.CobrosRetenciones.Add(nuevo);
+                        context.CobroRetencionEntity.Add(nuevo);
                     }
 
                     context.SaveChanges();
 
                     // Borrar temporales
-                    context.TmpCobrosRetenciones.RemoveRange(tmpList);
+                    context.TmpCobroRetencionEntity.RemoveRange(tmpList);
                     context.SaveChanges();
 
                     return true;
@@ -125,13 +122,13 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var entity = context.TmpCobrosRetenciones.FirstOrDefault(r => r.IdTmpRetencion == cb.IdTmpRetencion);
+                    var entity = context.TmpCobroRetencionEntity.FirstOrDefault(r => r.IdTmpRetencion == cb.IdTmpRetencion);
                     if (entity is null)
                         return false;
 
                     entity.IdImpuesto = cb.IdImpuesto;
-                    entity.total = cb.total;
-                    entity.notas = cb.notas;
+                    entity.Total = cb.Total;
+                    entity.Notas = cb.Notas;
 
                     context.Entry(entity).State = EntityState.Modified;
                     context.SaveChanges();
@@ -151,11 +148,11 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var entity = context.TmpCobrosRetenciones.FirstOrDefault(r => r.IdTmpRetencion == id_retencion);
+                    var entity = context.TmpCobroRetencionEntity.FirstOrDefault(r => r.IdTmpRetencion == id_retencion);
                     if (entity is null)
                         return false;
 
-                    context.TmpCobrosRetenciones.Remove(entity);
+                    context.TmpCobroRetencionEntity.Remove(entity);
                     context.SaveChanges();
                     return true;
                 }
@@ -178,11 +175,11 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var entity = context.CobrosRetenciones.FirstOrDefault(r => r.IdRetencion == id_retencion);
+                    var entity = context.CobroRetencionEntity.FirstOrDefault(r => r.IdRetencion == id_retencion);
                     if (entity is null)
                         return false;
 
-                    context.CobrosRetenciones.Remove(entity);
+                    context.CobroRetencionEntity.Remove(entity);
                     context.SaveChanges();
                     return true;
                 }

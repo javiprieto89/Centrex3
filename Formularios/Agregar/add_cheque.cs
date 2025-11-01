@@ -188,7 +188,7 @@ namespace Centrex
                     if (ch.FechaCobro != default)
                     {
                         chk_fCobro.Checked = true;
-                        dtp_fCobro.Value = DateTime.Parse(ch.FechaCobro.ToString());                        
+                        dtp_fCobro.Value = DateTime.Parse(ch.FechaCobro.ToString());
                     }
 
                     if (ch.FechaSalida != default)
@@ -316,6 +316,31 @@ namespace Centrex
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
+        }
+
+        private void cmb_cliente_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cmb_proveedor_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cmb_banco_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cmb_estadoch_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cmb_cuentaBancaria_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
         }
 
         private async void cmd_ok_Click(object sender, EventArgs e)

@@ -1,12 +1,10 @@
+﻿using Centrex.Afip;
+using Centrex.Afip.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using Centrex.Afip;
-using Centrex.Afip.Models;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -27,7 +25,7 @@ namespace Centrex
         private void CargarConfiguracion()
         {
             // Cargar valores por defecto
-            txt_cuit.Text = VariablesGlobales.cuit_emisor_default;
+            txt_cuit.Text = cuit_emisor_default;
 
             // Cargar opciones de modo
             cmb_mode.Items.Clear();
@@ -285,7 +283,7 @@ namespace Centrex
                 // --- Llamada al servicio ---
                 try
                 {
-                    List<PtoVentaInfo> ptosVenta = wsfe.FEParamGetPtosVenta();
+                    List<PtoVentaInfo> ptosVenta = (List<PtoVentaInfo>)wsfe.FEParamGetPtosVenta();
 
                     if (ptosVenta is null || ptosVenta.Count == 0)
                     {
@@ -296,7 +294,7 @@ namespace Centrex
                         resultado.AppendLine("✓ Puntos de venta habilitados:");
 
                         foreach (var pto in ptosVenta)
-                            resultado.AppendLine($"  • Nro: {pto.Nro} | Tipo: {pto.EmisionTipo} | Bloqueado: {pto.Bloqueado} | Baja: {pto.FchBaja}");
+                            resultado.AppendLine($"  • Nro: {pto.PuntoVenta} | Tipo: {pto.EmisionTipo} | Bloqueado: {pto.Bloqueado} | Baja: {pto.FchBaja}");
 
                         resultado.AppendLine();
                         resultado.AppendLine($"Total: {ptosVenta.Count} puntos de venta encontrados.");

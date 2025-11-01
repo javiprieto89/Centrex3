@@ -1,56 +1,52 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class itemsImpuestos
     {
         // ************************************ FUNCIONES DE RELACION ITEMS E IMPUESTOS ********************
-        public static itemImpuesto info_itemImpuesto(string id_item, string id_impuesto)
+        public static ItemImpuestoEntity info_itemImpuesto(int IdItem, int IdImpuesto)
         {
-            var tmp = new itemImpuesto();
-            try
+                     try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var itemImpuestoEntity = context.ItemsImpuestos.FirstOrDefault(ii => ii.IdItem == Conversions.ToInteger(id_item) && ii.IdImpuesto == Conversions.ToInteger(id_impuesto));
-
+                    var itemImpuestoEntity = context.ItemImpuestoEntity.FirstOrDefault(ii => ii.IdItem == IdItem && ii.IdImpuesto == IdImpuesto);
+                    
                     if (itemImpuestoEntity is not null)
                     {
-                        tmp.id_item = itemImpuestoEntity.IdItem.ToString();
-                        tmp.id_impuesto = itemImpuestoEntity.IdImpuesto.ToString();
-                        tmp.activo = itemImpuestoEntity.activo;
+                        return itemImpuestoEntity;
                     }
-                }
+                    else
+                    {
+                        return null;
+                    }
 
-                return tmp;
-            }
+                }            }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                return tmp;
+                MessageBox.Show("Error al obtener los impuestos del item:" + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
         }
 
-        public static bool additemImpuesto(itemImpuesto ii)
+        public static bool additemImpuesto(ItemImpuestoEntity ii)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var itemImpuestoEntity = new ItemImpuestoEntity()
                     {
-                        IdItem = ii.id_item,
-                        IdImpuesto = ii.id_impuesto,
-                        activo = ii.activo
+                        IdItem = ii.IdItem,
+                        IdImpuesto = ii.IdImpuesto,
+                        Activo = ii.Activo
                     };
 
-                    context.ItemsImpuestos.Add(itemImpuestoEntity);
+                    context.ItemImpuestoEntity.Add(itemImpuestoEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -62,33 +58,33 @@ namespace Centrex
             }
         }
 
-        public static bool updateitemImpuesto(itemImpuesto iiViejo, itemImpuesto iiNuevo = null, bool borra = false)
+        public static bool updateitemImpuesto(ItemImpuestoEntity iiViejo, ItemImpuestoEntity iiNuevo = null, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var itemImpuestoEntity = context.ItemsImpuestos.FirstOrDefault(ii => ii.IdItem == iiViejo.id_item && ii.IdImpuesto == iiViejo.id_impuesto);
+                    var itemImpuestoEntity = context.ItemImpuestoEntity.FirstOrDefault(ii => ii.IdItem == iiViejo.IdItem && ii.IdImpuesto == iiViejo.IdImpuesto);
 
                     if (itemImpuestoEntity is not null)
                     {
                         if (borra == true)
                         {
-                            itemImpuestoEntity.activo = false;
+                            itemImpuestoEntity.Activo = false;
                         }
                         else if (iiNuevo is not null)
                         {
                             // Actualizar la clave primaria compuesta requiere eliminar y crear
-                            context.ItemsImpuestos.Remove(itemImpuestoEntity);
+                            context.ItemImpuestoEntity.Remove(itemImpuestoEntity);
                             context.SaveChanges();
 
                             var nuevoItemImpuesto = new ItemImpuestoEntity()
                             {
-                                IdItem = iiNuevo.id_item,
-                                IdImpuesto = iiNuevo.id_impuesto,
-                                activo = iiNuevo.activo
+                                IdItem = iiNuevo.IdItem,
+                                IdImpuesto = iiNuevo.IdImpuesto,
+                                Activo = iiNuevo.Activo
                             };
-                            context.ItemsImpuestos.Add(nuevoItemImpuesto);
+                            context.ItemImpuestoEntity.Add(nuevoItemImpuesto);
                         }
 
                         context.SaveChanges();
@@ -107,17 +103,17 @@ namespace Centrex
             }
         }
 
-        public static bool borraritemImpuesto(itemImpuesto ii)
+        public static bool borraritemImpuesto(ItemImpuestoEntity ii)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var itemImpuestoEntity = context.ItemsImpuestos.FirstOrDefault(iie => iie.IdItem == ii.id_item && iie.IdImpuesto == ii.id_impuesto);
+                    var itemImpuestoEntity = context.ItemImpuestoEntity.FirstOrDefault(iie => iie.IdItem == ii.IdItem && iie.IdImpuesto == ii.IdImpuesto);
 
                     if (itemImpuestoEntity is not null)
                     {
-                        context.ItemsImpuestos.Remove(itemImpuestoEntity);
+                        context.ItemImpuestoEntity.Remove(itemImpuestoEntity);
                         context.SaveChanges();
                         return true;
                     }

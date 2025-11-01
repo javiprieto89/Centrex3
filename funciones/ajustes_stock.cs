@@ -1,32 +1,28 @@
-using System;
+﻿using System;
 using System.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
-
-    static class ajustes_stock
+    public static class ajustes_stock
     {
         // ************************************ FUNCIONES DE RELACION ITEMS E IMPUESTOS ********************
-        public static ajusteStock info_ajuste_stock(string id_ajusteStock)
+        public static AjusteStockEntity info_ajuste_stock(int _as)
         {
-            var tmp = new ajusteStock();
+            var tmp = new AjusteStockEntity();
 
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (var context = new CentrexDbContext())
                 {
-                    var ajusteEntity = context.AjustesStock.FirstOrDefault(a => a.IdAjusteStock == Conversions.ToInteger(id_ajusteStock));
-
-                    if (ajusteEntity is not null)
+                    if (_as != 0 && _as != -1)
                     {
-                        tmp.id_ajusteStock = ajusteEntity.IdAjusteStock.ToString();
-                        tmp.fecha = Conversions.ToString(ajusteEntity.fecha.ToString()[Conversions.ToInteger("dd/MM/yyyy")]);
-                        tmp.id_item = ajusteEntity.IdItem.ToString();
-                        tmp.cantidad = Conversions.ToInteger(ajusteEntity.cantidad.ToString());
-                        tmp.notas = ajusteEntity.notas;
+                        var AjusteStockEntity = context.AjusteStockEntity.FirstOrDefault(i => i.IdAjusteStock == _as);
+                        tmp.IdAjusteStock = AjusteStockEntity.IdAjusteStock;
+                        tmp.Fecha = AjusteStockEntity.Fecha;
+                        tmp.IdItem = AjusteStockEntity.IdItem;
+                        tmp.Cantidad = AjusteStockEntity.Cantidad;
+                        tmp.Notas = AjusteStockEntity.Notas;
                     }
                 }
 
@@ -34,33 +30,33 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return tmp;
             }
         }
 
-        public static bool add_ajusteStock(ajusteStock _as)
+        public static bool add_ajusteStock(AjusteStockEntity _as)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (var context = new CentrexDbContext())
                 {
                     var ajusteEntity = new AjusteStockEntity()
                     {
-                        fecha = DateTime.ParseExact(_as.fecha, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
-                        IdItem = _as.id_item,
-                        cantidad = (int)Math.Round((decimal)_as.cantidad),
-                        notas = _as.notas
+                        Fecha = _as.Fecha,
+                        IdItem = _as.IdItem,
+                        Cantidad = _as.Cantidad,
+                        Notas = _as.Notas
                     };
 
-                    context.AjustesStock.Add(ajusteEntity);
+                    context.AjusteStockEntity.Add(ajusteEntity);
                     context.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

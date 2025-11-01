@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
-//using System.Collections.Generic;
 
 namespace Centrex
 {
     public partial class add_asocItem
     {
-        private asocItem iAsoc = new asocItem();
+        private AsocItemEntity iAsoc = new AsocItemEntity();
         private ItemEntity item = new ItemEntity();
         private ItemEntity asocItem = new ItemEntity();
 
@@ -48,7 +47,7 @@ namespace Centrex
                 withBlock.Cantidad = -99;
             }
 
-            if (edicion == true | borrado == true)
+            if (edicion == true || borrado == true)
             {
                 // Deshabilito controles comunes 
                 txt_item.Enabled = false;
@@ -79,11 +78,11 @@ namespace Centrex
                     txt_cantidad.Enabled = false;
                     cmd_ok.Enabled = false;
                     Show();
-                    if (Interaction.MsgBox("¿Está seguro que desea borrar esta relación?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
+                    if (MessageBox.Show("¿Está seguro que desea borrar esta relación?", "Centrex", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         if (asocitems.borrarAsocItem(edita_asocItem) == false)
                         {
-                            Interaction.MsgBox("No se ha podido borrar la relación de los artículos, consulte con el programador");
+                            MessageBox.Show("No se ha podido borrar la relación de los artículos, consulte con el programador", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         }
                     }
                     closeandupdate(this);
@@ -117,21 +116,21 @@ namespace Centrex
         private void cmd_ok_Click(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(txt_cantidad.Text))
-                iAsoc.Cantidad = Conversions.ToInteger(txt_cantidad.Text);
+                iAsoc.Cantidad = int.Parse(txt_cantidad.Text);
 
             if (iAsoc.IdItem == -1)
             {
-                Interaction.MsgBox("Debe ingresar un item al que se le asignaran el resto de los productos", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                MessageBox.Show("Debe ingresar un item al que se le asignaran el resto de los productos", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (iAsoc.IdItemAsoc == -1)
             {
-                Interaction.MsgBox("Debe ingresar un item asociado al producto maestro", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                MessageBox.Show("Debe ingresar un item asociado al producto maestro", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (iAsoc.Cantidad == -99)
             {
-                Interaction.MsgBox("Debe asignar la cantidad de items que componen al producto maestro", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                MessageBox.Show("Debe asignar la cantidad de items que componen al producto maestro", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
@@ -139,7 +138,7 @@ namespace Centrex
             {
                 if (asocitems.updateAsocItem(iAsoc) == false)
                 {
-                    Interaction.MsgBox("Hubo un problema al actualizar el cliente, consulte con su programdor", Constants.vbExclamation);
+                    MessageBox.Show("Hubo un problema al actualizar el cliente, consulte con su programador", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     closeandupdate(this);
                 }
             }
@@ -167,9 +166,9 @@ namespace Centrex
 
         private void txt_cantidad_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (Conversions.ToInteger(generales.esNumero(e)) == 0)
+            if (!generales.esNumero(e))
             {
-                e.KeyChar = Conversions.ToChar("");
+                e.KeyChar = '\0';
             }
         }
 

@@ -1,11 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Windows.Forms;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
-{
-    [Microsoft.VisualBasic.CompilerServices.DesignerGenerated()]
+{    
     public partial class add_consulta : Form
     {
 
@@ -27,7 +34,7 @@ namespace Centrex
         }
 
         // Requerido por el Diseñador de Windows Forms
-        private System.ComponentModel.IContainer components;
+        private System.ComponentModel.IContainer components = null!;
 
         // NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
         // Se puede modificar usando el Diseñador de Windows Forms.  

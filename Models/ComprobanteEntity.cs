@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -84,4 +82,16 @@ public partial class ComprobanteEntity
 
     [InverseProperty("IdComprobanteNavigation")]
     public virtual ICollection<PedidoEntity> PedidoEntity { get; set; } = new List<PedidoEntity>();
+
+    [NotMapped]
+    private string _prefijo;
+
+    [NotMapped]
+    public string Prefijo
+    {
+        get => !string.IsNullOrEmpty(_prefijo)
+            ? _prefijo
+            : (IdTipoComprobanteNavigation?.NombreAbreviado ?? "");
+        set => _prefijo = value;
+    }
 }

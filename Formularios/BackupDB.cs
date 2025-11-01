@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -26,8 +25,8 @@ namespace Centrex
             ProgressBar1.Visible = true;
 
 
-            archivoBackup_local = VariablesGlobales.archivoBackup + "_" + timeStamp + ".bak";
-            resultado = VariablesGlobales.dbBackup(VariablesGlobales.rutaBackup, archivoBackup_local);
+            archivoBackup_local = archivoBackup + "_" + timeStamp + ".bak";
+            resultado = dbBackup(rutaBackup, archivoBackup_local);
             // If pc = "BRUNO" Then
             // resultado = dbBackup(Application.StartupPath + "\SQL\BKP", archivoBackup_local)
             // End If

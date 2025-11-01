@@ -35,11 +35,11 @@ public partial class CentrexDbContext : DbContext
                 return conn;
 
             // fallback si no existe appsettings.json
-            return "Server=.;Database=CentrexDB;Trusted_Connection=True;TrustServerCertificate=True;";
+            return "Server=127.0.0.1;Database=dbCentrex;User Id=sa;Password=Ladeda78;TrustServerCertificate=True;";
         }
         catch
         {
-            return "Server=.;Database=CentrexDB;Trusted_Connection=True;TrustServerCertificate=True;";
+            return "Server=127.0.0.1;Database=dbCentrex;User Id=sa;Password=Ladeda78;TrustServerCertificate=True;";
         }
     }
 
@@ -85,6 +85,8 @@ public partial class CentrexDbContext : DbContext
     public virtual DbSet<ConceptoCompraEntity> ConceptoCompraEntity { get; set; }
 
     public virtual DbSet<CondicionCompraEntity> CondicionCompraEntity { get; set; }
+
+    public virtual DbSet<CondicionVentaEntity> CondicionVentaEntity { get; set; }
 
     public virtual DbSet<ConsultaPersonalizadaEntity> ConsultaPersonalizadaEntity { get; set; }
 
@@ -329,6 +331,10 @@ public partial class CentrexDbContext : DbContext
             entity.HasOne(d => d.IdProvinciaEntregaNavigation).WithMany(p => p.ClienteEntityIdProvinciaEntregaNavigation).HasConstraintName("FK_clientes_provincias1");
 
             entity.HasOne(d => d.IdProvinciaFiscalNavigation).WithMany(p => p.ClienteEntityIdProvinciaFiscalNavigation).HasConstraintName("FK_clientes_provincias");
+
+            entity.HasOne(d => d.IdPaisEntregaNavigation).WithMany(p => p.ClienteEntityIdPaisEntregaNavigation).HasConstraintName("FK_clientes_paises1");
+
+            entity.HasOne(d => d.IdPaisFiscalNavigation).WithMany(p => p.ClienteEntityIdPaisFiscalNavigation).HasConstraintName("FK_clientes_paises");
 
             entity.HasOne(d => d.IdTipoDocumentoNavigation).WithMany(p => p.ClienteEntity)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -765,6 +771,10 @@ public partial class CentrexDbContext : DbContext
 
             entity.HasOne(d => d.IdProvinciaFiscalNavigation).WithMany(p => p.ProveedorEntityIdProvinciaFiscalNavigation).HasConstraintName("FK_proveedores_provincias");
 
+            entity.HasOne(d => d.IdPaisEntregaNavigation).WithMany(p => p.ProveedorEntityIdPaisEntregaNavigation).HasConstraintName("FK_proveedores_paises1");
+
+            entity.HasOne(d => d.IdPaisFiscalNavigation).WithMany(p => p.ProveedorEntityIdPaisFiscalNavigation).HasConstraintName("FK_proveedores_paises");
+
             entity.HasOne(d => d.IdTipoDocumentoNavigation).WithMany(p => p.ProveedorEntity)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_proveedores_tipos_documentos");
@@ -968,6 +978,9 @@ public partial class CentrexDbContext : DbContext
             entity.HasOne(d => d.IdPedidoNavigation).WithMany(p => p.TransaccionEntity).HasConstraintName("FK_transacciones_pedidos");
 
             entity.HasOne(d => d.IdTipoComprobanteNavigation).WithMany(p => p.TransaccionEntity).HasConstraintName("FK_transacciones_tipos_comprobantes");
+
+            entity.HasOne(d => d.IdClienteNavigation).WithMany(p => p.TransaccionEntity)
+    .HasConstraintName("FK_transacciones_clientes");
         });
 
         modelBuilder.Entity<TransferenciaEntity>(entity =>

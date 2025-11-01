@@ -1,7 +1,5 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -9,7 +7,7 @@ namespace Centrex
     {
         private int id_comprobanteCompra;
         private int id_impuesto;
-        private impuesto i = new impuesto();
+        private ImpuestoEntity i = new ImpuestoEntity();
 
         public add_comprobantes_compras_impuestos()
         {
@@ -35,7 +33,7 @@ namespace Centrex
         private void add_comprobantes_compras_impuestos_Load(object sender, EventArgs e)
         {
             i = impuestos.info_impuesto(id_impuesto);
-            lbl_impuesto.Text = i.nombre;
+            lbl_impuesto.Text = i.Nombre;
         }
 
         private void txt_importe_KeyPress(object sender, KeyPressEventArgs e)
@@ -58,7 +56,7 @@ namespace Centrex
                 return;
             }
 
-            if (!comprobantes_compras.add_impuesto_comprobanteCompra(id_comprobanteCompra, i.id_impuesto, Conversions.ToDouble(txt_importe.Text)))
+            if (!comprobantes_compras.add_impuesto_comprobanteCompra(id_comprobanteCompra, i.IdImpuesto, Conversions.ToDecimal(txt_importe.Text)))
             {
                 Interaction.MsgBox("Hubo un error al agregar el impuesto, consulte con el programador.", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                 return;

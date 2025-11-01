@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 
 namespace Centrex
 {
@@ -17,14 +16,14 @@ namespace Centrex
                 Interaction.MsgBox("El campo 'Perfil' es obligatorio y está vacio");
             }
 
-            var tmp = new perfil();
+            var tmp = new PerfilEntity();
 
-            tmp.nombre = txt_perfil.Text;
-            tmp.activo = chk_activo.Checked;
+            tmp.Nombre = txt_perfil.Text;
+            tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                tmp.id_perfil = VariablesGlobales.edita_perfil.id_perfil;
+                tmp.IdPerfil = edita_perfil.IdPerfil;
                 if (perfiles.updateperfil(tmp) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar el perfil, consulte con su programdor", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
@@ -60,14 +59,14 @@ namespace Centrex
         private void add_perfil_Load(object sender, EventArgs e)
         {
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_perfil.Text = VariablesGlobales.edita_perfil.nombre;
-                chk_activo.Checked = VariablesGlobales.edita_perfil.activo;
+                txt_perfil.Text = edita_perfil.Nombre;
+                chk_activo.Checked = edita_perfil.Activo;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_perfil.Enabled = false;
                 chk_activo.Enabled = false;
@@ -76,12 +75,12 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar este perfil?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (perfiles.borrarperfil(VariablesGlobales.edita_perfil) == false)
+                    if (perfiles.borrarperfil(edita_perfil.IdPerfil) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado del perfil, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (perfiles.updateperfil(VariablesGlobales.edita_perfil, true) == true)
+                            if (perfiles.updateperfil(edita_perfil, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero el perfil no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el perfil, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }

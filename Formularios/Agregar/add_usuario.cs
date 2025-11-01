@@ -1,7 +1,6 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -11,30 +10,39 @@ namespace Centrex
         {
             InitializeComponent();
         }
+
         private void add_usuario_Load(object sender, EventArgs e)
         {
             var encripta = new EncriptarType();
-            var up = new usuario_perfil();
+            var up = new UsuarioPerfilEntity();
 
+            var ordenPerfiles = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
             var argcombo = cmb_perfil;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_perfil, nombre FROM perfiles ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_perfil"));
+            generales.Cargar_Combo(
+             ref argcombo,
+       entidad: "PerfilEntity",
+ displaymember: "Nombre",
+        valuemember: "IdPerfil",
+      predet: -1,
+                soloActivos: true,
+                filtros: null,
+          orden: ordenPerfiles);
             cmb_perfil = argcombo;
+            cmb_perfil.SelectedIndex = -1;
             cmb_perfil.Text = "Seleccione un perfil...";
 
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true || borrado == true)
             {
-                // up = info_perfi
                 chk_secuencia.Enabled = false;
-                txt_usuario.Text = VariablesGlobales.edita_usuario.usuario;
-                txt_password.Text = encripta.Desencriptar(VariablesGlobales.edita_usuario.password);
-                txt_nombre.Text = VariablesGlobales.edita_usuario.nombre;
+                txt_usuario.Text = edita_usuario.Usuario;
+                txt_password.Text = encripta.Desencriptar(edita_usuario.Password);
+                txt_nombre.Text = edita_usuario.Nombre;
                 cmb_perfil.SelectedValue = 1; // Fijo por el momento
-                                              // cmb_perfil.Enabled = False
-                chk_activo.Checked = VariablesGlobales.edita_usuario.activo;
+                chk_activo.Checked = edita_usuario.Activo;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_usuario.Enabled = false;
                 txt_password.Enabled = false;
@@ -43,20 +51,24 @@ namespace Centrex
                 cmd_ok.Visible = false;
                 cmd_exit.Visible = false;
                 Show();
-                if (Interaction.MsgBox("¿Está seguro que desea borrar este usuario?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
+                if (MessageBox.Show("¿Está seguro que desea borrar este usuario?", "Centrex",
+                   MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    if (usuarios.borrarUsuario(VariablesGlobales.edita_usuario) == false)
+                    if (usuarios.borrarUsuario(edita_usuario) == false)
                     {
-                        if (Interaction.MsgBox("Ocurrió un error al realizar el borrado del usuario, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
+                        if (MessageBox.Show("Ocurrió un error al realizar el borrado del usuario, ¿desea intentar desactivarlo para que no aparezca en la búsqueda?",
+                         "Centrex", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         {
                             // Realizo un borrado lógico
-                            if (usuarios.updateUsuario(VariablesGlobales.edita_usuario, true) == true)
+                            if (usuarios.updateUsuario(edita_usuario, true) == true)
                             {
-                                Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero el usuario no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el usuario, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
+                                MessageBox.Show("Se ha podido realizar un borrado lógico, pero el usuario no se borró definitivamente.\r\nEsto posiblemente se deba a que el usuario tiene operaciones realizadas y por lo tanto no podrá borrarse",
+                            "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
-                                Interaction.MsgBox("No se ha podido borrar del usuario, consulte con el programador");
+                                MessageBox.Show("No se ha podido borrar el usuario, consulte con el programador",
+                                    "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                         }
                     }
@@ -69,40 +81,45 @@ namespace Centrex
         {
             if (string.IsNullOrEmpty(txt_usuario.Text))
             {
-                Interaction.MsgBox("El campo 'Usuario' es obligatorio y está vacio");
+                MessageBox.Show("El campo 'Usuario' es obligatorio y está vacio", "Centrex",
+                   MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (string.IsNullOrEmpty(txt_password.Text))
             {
-                Interaction.MsgBox("El campo 'Password' es obligatorio y está vacio");
+                MessageBox.Show("El campo 'Password' es obligatorio y está vacio", "Centrex",
+           MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (string.IsNullOrEmpty(txt_nombre.Text))
             {
-                Interaction.MsgBox("El campo 'Nombre' es obligatorio y está vacio");
+                MessageBox.Show("El campo 'Nombre' es obligatorio y está vacio", "Centrex",
+            MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
             else if (cmb_perfil.Text == "Seleccione un perfil...")
             {
-                Interaction.MsgBox("Debe seleccionar un perfil inicial");
+                MessageBox.Show("Debe seleccionar un perfil inicial", "Centrex",
+                 MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
-            var u = new usuario();
-            var perf_user = new usuario_perfil();
+            var u = new UsuarioEntity();
+            var perf_user = new UsuarioPerfilEntity();
             var encripta = new EncriptarType();
 
-            u.usuarioField = txt_usuario.Text;
-            u.password = encripta.Encriptar(txt_password.Text);
-            u.nombre = txt_nombre.Text;
-            u.activo = chk_activo.Checked;
+            u.Usuario = txt_usuario.Text;
+            u.Password = encripta.Encriptar(txt_password.Text);
+            u.Nombre = txt_nombre.Text;
+            u.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                u.id_usuario = VariablesGlobales.edita_usuario.id_usuario;
+                u.IdUsuario = edita_usuario.IdUsuario;
                 if (usuarios.updateUsuario(u) == false)
                 {
-                    Interaction.MsgBox("Hubo un problema al actualizar el usuario, consulte con su programdor", Constants.vbExclamation);
+                    MessageBox.Show("Hubo un problema al actualizar el usuario, consulte con su programador",
+                                "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     closeandupdate(this);
                 }
             }
@@ -110,17 +127,19 @@ namespace Centrex
             {
                 usuarios.addUsuario(u);
                 u = info_usuario(txt_usuario.Text, false);
-                if (u.usuarioField == "error")
+                if (u.Usuario == "error")
                 {
-                    Interaction.MsgBox("Ha ocurrido un error al crear el usuario, consulte con su programador.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                    MessageBox.Show("Ha ocurrido un error al crear el usuario, consulte con su programador.",
+                   "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
-                perf_user.id_perfil = Conversions.ToInteger(cmb_perfil.SelectedValue);
-                perf_user.id_usuario = u.id_usuario;
+                perf_user.IdPerfil = Convert.ToInt32(cmb_perfil.SelectedValue);
+                perf_user.IdUsuario = u.IdUsuario;
 
                 if (!usuarios.add_usuario_perfil(perf_user))
                 {
-                    Interaction.MsgBox("Ha ocurrido un error al hacer la asignación del usuario con el perfil.", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                    MessageBox.Show("Ha ocurrido un error al hacer la asignación del usuario con el perfil.",
+                      "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
             }
@@ -130,7 +149,7 @@ namespace Centrex
                 txt_usuario.Text = "";
                 txt_password.Text = "";
                 txt_nombre.Text = "";
-                cmb_perfil.Text = "Selecione un perfil...";
+                cmb_perfil.Text = "Seleccione un perfil...";
                 chk_activo.Checked = true;
             }
             else
@@ -161,7 +180,7 @@ namespace Centrex
 
         private void cmb_perfil_KeyPress(object sender, KeyPressEventArgs e)
         {
-            e.KeyChar = Conversions.ToChar("");
+            e.KeyChar = '\0';
         }
     }
 }

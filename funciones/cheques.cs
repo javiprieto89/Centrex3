@@ -1,33 +1,31 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class cheques
     {
         // ************************************ FUNCIONES DE CHEQUES ***************************
-        public static ChequeEntity info_cheque(string id_cheque)
+        public static ChequeEntity info_cheque(int idCheque)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    return context.Cheques.FirstOrDefault(c => c.IdCheque == Conversions.ToInteger(id_cheque));
+                    return context.ChequeEntity.FirstOrDefault(c => c.IdCheque == idCheque);
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show("Error al obtener el cheque: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
         }
 
-        public static bool addch(cheque ch)
+
+        public static bool addch(ChequeEntity ch)
         {
             try
             {
@@ -35,80 +33,67 @@ namespace Centrex
                 {
                     var chequeEntity = new ChequeEntity()
                     {
-                        FechaIngreso = DateTime.Now,
-                        FechaEmision = !string.IsNullOrEmpty(ch.fecha_emision) ? Conversions.ToDate(ch.fecha_emision) : DateTime.Now,
-                        IdCliente = ch.id_cliente != 0 ? ch.id_cliente : default,
+                        FechaEmision = ch.FechaEmision,
+                        IdCliente = ch.IdCliente != 0 ? ch.IdCliente : default,
                         IdProveedor = ch.IdProveedor != 0 ? ch.IdProveedor : default,
-                        IdBanco = ch.id_banco,
-                        nCheque = Conversions.ToInteger(ch.nCheque),
-                        nCheque2 = Conversions.ToInteger(ch.nCheque2),
-                        importe = (decimal)ch.importe,
-                        IdEstadoCh = ch.id_estadoch,
-                        FechaCobro = !string.IsNullOrEmpty(ch.fecha_cobro) ? Conversions.ToDate(ch.fecha_cobro) : default,
-                        FechaSalida = !string.IsNullOrEmpty(ch.fecha_salida) ? Conversions.ToDate(ch.fecha_salida) : default,
-                        FechaDeposito = !string.IsNullOrEmpty(ch.fecha_deposito) ? Conversions.ToDate(ch.fecha_deposito) : default,
-                        recibido = ch.recibido,
+                        IdBanco = ch.IdBanco,
+                        NCheque = ch.NCheque,
+                        NCheque2 = ch.NCheque2,
+                        Importe = ch.Importe,
+                        IdEstadoch = ch.IdEstadoch,
+                        FechaCobro = ch.FechaCobro,
+                        FechaSalida = ch.FechaSalida,
+                        FechaDeposito = ch.FechaDeposito,
+                        Recibido = ch.Recibido,
                         Emitido = ch.Emitido,
-                        IdCuentaBancaria = ch.id_cuentaBancaria != 0 ? ch.id_cuentaBancaria : default,
-                        eCheck = ch.eCheck,
-                        activo = true
+                        IdCuentaBancaria = ch.IdCuentaBancaria != 0 ? ch.IdCuentaBancaria : default,
+                        ECheck = ch.ECheck,
+                        Activo = ch.Activo
                     };
 
-                    context.Cheques.Add(chequeEntity);
+                    context.ChequeEntity.Add(chequeEntity);
                     context.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
-        public static bool updatech(cheque ch, bool borra = false)
+        public static bool updatech(ChequeEntity ch, bool borra = false)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var chequeEntity = context.Cheques.FirstOrDefault(c => c.IdCheque == ch.id_cheque);
+                    var chequeEntity = context.ChequeEntity.FirstOrDefault(c => c.IdCheque == ch.IdCheque);
 
                     if (chequeEntity is not null)
                     {
                         if (borra == true)
                         {
-                            chequeEntity.activo = false;
+                            chequeEntity.Activo = false;
                         }
                         else
                         {
-                            if (!string.IsNullOrEmpty(ch.fecha_emision))
-                            {
-                                chequeEntity.FechaEmision = Conversions.ToDate(ch.fecha_emision);
-                            }
-                            chequeEntity.IdBanco = ch.id_banco;
-                            chequeEntity.nCheque = Conversions.ToInteger(ch.nCheque);
-                            chequeEntity.nCheque2 = Conversions.ToInteger(ch.nCheque2);
-                            chequeEntity.importe = (decimal)ch.importe;
-                            chequeEntity.IdEstadoCh = ch.id_estadoch;
-                            if (!string.IsNullOrEmpty(ch.fecha_cobro))
-                            {
-                                chequeEntity.FechaCobro = Conversions.ToDate(ch.fecha_cobro);
-                            }
-                            if (!string.IsNullOrEmpty(ch.fecha_salida))
-                            {
-                                chequeEntity.FechaSalida = Conversions.ToDate(ch.fecha_salida);
-                            }
-                            if (!string.IsNullOrEmpty(ch.fecha_deposito))
-                            {
-                                chequeEntity.FechaDeposito = Conversions.ToDate(ch.fecha_deposito);
-                            }
-                            chequeEntity.recibido = ch.recibido;
+                            chequeEntity.FechaEmision = ch.FechaEmision;
+                            chequeEntity.IdBanco = ch.IdBanco;
+                            chequeEntity.NCheque = ch.NCheque2;
+                            chequeEntity.NCheque2 = ch.NCheque2;
+                            chequeEntity.Importe = ch.Importe;
+                            chequeEntity.IdEstadoch = ch.IdEstadoch;
+                            chequeEntity.FechaCobro = ch.FechaCobro;
+                            chequeEntity.FechaSalida = ch.FechaSalida;
+                            chequeEntity.FechaDeposito = ch.FechaDeposito;
+                            chequeEntity.Recibido = ch.Recibido;
                             chequeEntity.Emitido = ch.Emitido;
-                            chequeEntity.eCheck = ch.eCheck;
-                            if (ch.id_cliente != 0)
+                            chequeEntity.ECheck = ch.ECheck;
+                            if (ch.IdCliente != 0)
                             {
-                                chequeEntity.IdCliente = ch.id_cliente;
+                                chequeEntity.IdCliente = ch.IdCliente;
                             }
                             else if (ch.IdProveedor != 0)
                             {
@@ -127,22 +112,22 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
-        public static bool borrarch(cheque ch)
+        public static bool borrarch(ChequeEntity ch)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var chequeEntity = context.Cheques.FirstOrDefault(c => c.IdCheque == ch.id_cheque);
+                    var chequeEntity = context.ChequeEntity.FirstOrDefault(c => c.IdCheque == ch.IdCheque);
 
                     if (chequeEntity is not null)
                     {
-                        context.Cheques.Remove(chequeEntity);
+                        context.ChequeEntity.Remove(chequeEntity);
                         context.SaveChanges();
                         return true;
                     }
@@ -154,22 +139,22 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
-        public static bool borrarch(int id_cheque)
+        public static bool borrarch(int IdCheque)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var chequeEntity = context.Cheques.FirstOrDefault(c => c.IdCheque == id_cheque);
+                    var chequeEntity = context.ChequeEntity.FirstOrDefault(c => c.IdCheque == IdCheque);
 
                     if (chequeEntity is not null)
                     {
-                        context.Cheques.Remove(chequeEntity);
+                        context.ChequeEntity.Remove(chequeEntity);
                         context.SaveChanges();
                         return true;
                     }
@@ -181,54 +166,24 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
-        public static bool Depositar_cheque(cheque ch)
+        public static bool Depositar_cheque(ChequeEntity ch)
         {
             try
             {
                 using (var context = new CentrexDbContext())
                 {
-                    var chequeEntity = context.Cheques.FirstOrDefault(c => c.IdCheque == ch.id_cheque);
+                    var chequeEntity = context.ChequeEntity.FirstOrDefault(c => c.IdCheque == ch.IdCheque);
 
                     if (chequeEntity is not null)
                     {
-                        chequeEntity.IdEstadoCh = VariablesGlobales.ID_CH_DEPOSITADO;
-                        chequeEntity.FechaDeposito = !string.IsNullOrEmpty(ch.fecha_deposito) ? Conversions.ToDate(ch.fecha_deposito) : DateTime.Now;
-                        chequeEntity.IdCuentaBancaria = ch.id_cuentaBancaria;
-
-                        context.SaveChanges();
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox(ex.Message);
-                return false;
-            }
-        }
-
-        public static bool Anular_Deposito_Cheque(int id_cheque)
-        {
-            try
-            {
-                using (var context = new CentrexDbContext())
-                {
-                    var chequeEntity = context.Cheques.FirstOrDefault(c => c.IdCheque == id_cheque);
-
-                    if (chequeEntity is not null)
-                    {
-                        chequeEntity.IdEstadoCh = VariablesGlobales.ID_CH_CARTERA;
-                        chequeEntity.FechaDeposito = (object)null;
-                        chequeEntity.IdCuentaBancaria = (object)null;
+                        chequeEntity.IdEstadoch = ID_CH_DEPOSITADO;
+                        chequeEntity.FechaDeposito = ch.FechaDeposito;
+                        chequeEntity.IdCuentaBancaria = ch.IdCuentaBancaria;
 
                         context.SaveChanges();
                         return true;
@@ -241,7 +196,37 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        public static bool Anular_Deposito_Cheque(int IdCheque)
+        {
+            try
+            {
+                using (var context = new CentrexDbContext())
+                {
+                    var chequeEntity = context.ChequeEntity.FirstOrDefault(c => c.IdCheque == IdCheque);
+
+                    if (chequeEntity is not null)
+                    {
+                        chequeEntity.IdEstadoch = ID_CH_CARTERA;
+                        chequeEntity.FechaDeposito = null;
+                        chequeEntity.IdCuentaBancaria = null;
+
+                        context.SaveChanges();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -252,13 +237,14 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    int count = context.Cheques.Count(c => c.nCheque.ToString() == Strings.Trim(nCheque));
+                    string trimmedNCheque = nCheque.Trim();
+                    int count = context.ChequeEntity.Count(c => c.NCheque.ToString() == trimmedNCheque);
                     return count > 0;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -269,9 +255,9 @@ namespace Centrex
             {
                 using (var context = new CentrexDbContext())
                 {
-                    if (context.Cheques.Any())
+                    if (context.ChequeEntity.Any())
                     {
-                        return context.Cheques.Max(c => c.nCheque2);
+                        return context.ChequeEntity.Max(c => c.NCheque2);
                     }
                     else
                     {
@@ -281,7 +267,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return 0;
             }
         }

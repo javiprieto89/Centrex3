@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -56,6 +54,10 @@ public partial class TransaccionEntity
     [ForeignKey("IdComprobanteCompra")]
     [InverseProperty("TransaccionEntity")]
     public virtual ComprobanteCompraEntity? IdComprobanteCompraNavigation { get; set; }
+
+    [ForeignKey("IdCliente")]
+    [InverseProperty("TransaccionEntity")]
+    public virtual ClienteEntity? IdClienteNavigation { get; set; }
 
     [ForeignKey("IdPago")]
     [InverseProperty("TransaccionEntity")]

@@ -1,7 +1,5 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -10,19 +8,15 @@ namespace Centrex
         private bool esRetencion;
         private bool esPercepcion;
         public int id_impuesto;
+
         public add_impuesto()
         {
-
             // Esta llamada es exigida por el diseñador.
             InitializeComponent();
-
-            // Agregue cualquier inicialización después de la llamada a InitializeComponent().
-
         }
 
         public add_impuesto(bool _esRetencion, bool _esPercepcion)
         {
-
             // Esta llamada es exigida por el diseñador.
             InitializeComponent();
 
@@ -30,6 +24,7 @@ namespace Centrex
             esRetencion = _esRetencion;
             esPercepcion = _esPercepcion;
         }
+
         private void cmd_ok_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txt_nombre.Text))
@@ -43,20 +38,20 @@ namespace Centrex
                 return;
             }
 
-            var tmp = new impuesto();
+            var tmp = new ImpuestoEntity();
 
-            tmp.nombre = txt_nombre.Text;
-            tmp.porcentaje = Conversions.ToDouble(txt_porcentaje.Text);
-            tmp.esRetencion = chk_esRetencion.Checked;
-            tmp.esPercepcion = chk_esPercepcion.Checked;
-            tmp.activo = chk_activo.Checked;
+            tmp.Nombre = txt_nombre.Text;
+            tmp.Porcentaje = Conversions.ToDecimal(txt_porcentaje.Text);
+            tmp.EsRetencion = chk_esRetencion.Checked;
+            tmp.EsPercepcion = chk_esPercepcion.Checked;
+            tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                tmp.id_impuesto = VariablesGlobales.edita_impuesto.id_impuesto;
+                tmp.IdImpuesto = edita_impuesto.IdImpuesto;
                 if (impuestos.updateImpuesto(tmp) == false)
                 {
-                    Interaction.MsgBox("Hubo un problema al actualizar el impuesto, consulte con su programdor", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                    Interaction.MsgBox("Hubo un problema al actualizar el impuesto, consulte con su programador", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                     closeandupdate(this);
                 }
             }
@@ -65,7 +60,7 @@ namespace Centrex
                 id_impuesto = impuestos.addImpuesto(tmp);
                 if (id_impuesto == -1)
                 {
-                    Interaction.MsgBox("Hubo un problema al dar de alta el impuesto, consulte con su programdor", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
+                    Interaction.MsgBox("Hubo un problema al dar de alta el impuesto, consulte con su programador", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                     closeandupdate(this);
                 }
             }
@@ -95,17 +90,17 @@ namespace Centrex
         private void add_descuento_Load(object sender, EventArgs e)
         {
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_nombre.Text = VariablesGlobales.edita_impuesto.nombre;
-                txt_porcentaje.Text = VariablesGlobales.edita_impuesto.porcentaje;
-                chk_esPercepcion.Checked = VariablesGlobales.edita_impuesto.esPercepcion;
-                chk_esRetencion.Checked = VariablesGlobales.edita_impuesto.esRetencion;
-                chk_activo.Checked = VariablesGlobales.edita_impuesto.activo;
+                txt_nombre.Text = edita_impuesto.Nombre;
+                txt_porcentaje.Text = edita_impuesto.Porcentaje.ToString();
+                chk_esPercepcion.Checked = edita_impuesto.EsPercepcion ?? false;
+                chk_esRetencion.Checked = edita_impuesto.EsRetencion ?? false;
+                chk_activo.Checked = edita_impuesto.Activo;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_nombre.Enabled = false;
                 txt_porcentaje.Enabled = false;
@@ -117,14 +112,14 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar este impuesto?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (impuestos.borrarImpuesto(VariablesGlobales.edita_impuesto) == false)
+                    if (impuestos.borrarImpuesto(edita_impuesto) == false)
                     {
-                        if (Interaction.MsgBox("Ocurrió un error al realizar el borrado del impuesto, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
+                        if (Interaction.MsgBox("Ocurrió un error al realizar el borrado del impuesto, ¿desea intentar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (impuestos.updateImpuesto(VariablesGlobales.edita_impuesto, true) == true)
+                            if (impuestos.updateImpuesto(edita_impuesto, true) == true)
                             {
-                                Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero el impuesto no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el impuesto, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
+                                Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero el impuesto no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el impuesto tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }
                             else
                             {

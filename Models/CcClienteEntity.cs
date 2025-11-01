@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -31,9 +29,9 @@ public partial class CcClienteEntity
     [Column("activo")]
     public bool Activo { get; set; }
 
-    [ForeignKey("IdCliente")]
     [InverseProperty("CcClienteEntity")]
     public virtual ClienteEntity IdClienteNavigation { get; set; } = null!;
+
 
     [ForeignKey("IdMoneda")]
     [InverseProperty("CcClienteEntity")]

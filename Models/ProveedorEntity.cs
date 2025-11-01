@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -86,6 +84,12 @@ public partial class ProveedorEntity
     [Column("id_claseFiscal")]
     public int? IdClaseFiscal { get; set; }
 
+    [Column("id_pais_fiscal")]
+    public int? IdPaisFiscal { get; set; }
+
+    [Column("id_pais_entrega")]
+    public int? IdPaisEntrega { get; set; }
+
     [InverseProperty("IdProveedorNavigation")]
     public virtual ICollection<CcProveedorEntity> CcProveedorEntity { get; set; } = new List<CcProveedorEntity>();
 
@@ -128,4 +132,12 @@ public partial class ProveedorEntity
 
     [InverseProperty("IdProveedorNavigation")]
     public virtual ICollection<TmpRegistroStockEntity> TmpRegistroStockEntity { get; set; } = new List<TmpRegistroStockEntity>();
+
+    [ForeignKey("IdPaisFiscal")]
+    [InverseProperty("ProveedorEntityIdPaisFiscalNavigation")]
+    public virtual PaisEntity? IdPaisFiscalNavigation { get; set; }
+
+    [ForeignKey("IdPaisEntrega")]
+    [InverseProperty("ProveedorEntityIdPaisEntregaNavigation")]
+    public virtual PaisEntity? IdPaisEntregaNavigation { get; set; }
 }

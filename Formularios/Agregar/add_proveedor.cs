@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -13,31 +12,31 @@ namespace Centrex
         }
         private void cmd_ok_Click(object sender, EventArgs e)
         {
-            if (VariablesGlobales.busquedaavanzada)
+            if (busquedaavanzada)
             {
                 {
-                    ref var withBlock = ref VariablesGlobales.edita_proveedor;
-                    withBlock.razon_social = Strings.Trim(txt_razonSocial.Text);
-                    withBlock.id_claseFiscal = (int?)cmb_claseFiscal.SelectedValue;
-                    withBlock.id_tipoDocumento = Conversions.ToInteger(cmb_tipoDocumento.SelectedValue);
-                    withBlock.contacto = Strings.Trim(txt_contacto.Text);
-                    withBlock.vendedor = Strings.Trim(txt_vendedor.Text);
-                    withBlock.taxNumber = txt_taxNumber.Text;
-                    withBlock.telefono = txt_telefono.Text;
-                    withBlock.celular = txt_celular.Text;
-                    withBlock.email = txt_email.Text;
-                    withBlock.id_pais_fiscal = cmb_paisFiscal.SelectedValue;
-                    withBlock.id_provincia_fiscal = (int?)cmb_provinciaFiscal.SelectedValue;
-                    withBlock.direccion_fiscal = txt_direccionFiscal.Text;
-                    withBlock.localidad_fiscal = txt_localidadFiscal.Text;
-                    withBlock.cp_fiscal = txt_cpFiscal.Text;
-                    withBlock.id_pais_entrega = cmb_paisEntrega.SelectedValue;
-                    withBlock.id_provincia_entrega = (int?)cmb_provinciaEntrega.SelectedValue;
-                    withBlock.direccion_entrega = txt_direccionEntrega.Text;
-                    withBlock.localidad_entrega = txt_localidadEntrega.Text;
-                    withBlock.cp_entrega = txt_cpEntrega.Text;
-                    withBlock.esInscripto = chk_esInscripto.Checked;
-                    withBlock.activo = chk_activo.Checked;
+                    ref var withBlock = ref edita_proveedor;
+                    withBlock.RazonSocial = Strings.Trim(txt_razonSocial.Text);
+                    withBlock.IdClaseFiscal = (int?)cmb_claseFiscal.SelectedValue;
+                    withBlock.IdTipoDocumento = Conversions.ToInteger(cmb_tipoDocumento.SelectedValue);
+                    withBlock.Contacto = Strings.Trim(txt_contacto.Text);
+                    withBlock.Vendedor = Strings.Trim(txt_vendedor.Text);
+                    withBlock.TaxNumber = txt_taxNumber.Text;
+                    withBlock.Telefono = txt_telefono.Text;
+                    withBlock.Celular = txt_celular.Text;
+                    withBlock.Email = txt_email.Text;
+                    withBlock.IdPaisFiscal = (int?)cmb_paisFiscal.SelectedValue;
+                    withBlock.IdProvinciaFiscal = (int?)cmb_provinciaFiscal.SelectedValue;
+                    withBlock.DireccionFiscal = txt_direccionFiscal.Text;
+                    withBlock.LocalidadFiscal = txt_localidadFiscal.Text;
+                    withBlock.CpFiscal = txt_cpFiscal.Text;
+                    withBlock.IdPaisEntrega = (int?)cmb_paisEntrega.SelectedValue;
+                    withBlock.IdProvinciaEntrega = (int?)cmb_provinciaEntrega.SelectedValue;
+                    withBlock.DireccionEntrega = txt_direccionEntrega.Text;
+                    withBlock.LocalidadEntrega = txt_localidadEntrega.Text;
+                    withBlock.CpEntrega = txt_cpEntrega.Text;
+                    withBlock.EsInscripto = chk_esInscripto.Checked;
+                    withBlock.Activo = chk_activo.Checked;
                 }
                 closeandupdate(this);
                 return;
@@ -61,41 +60,41 @@ namespace Centrex
 
             var p = new ProveedorEntity();
 
-            p.razon_social = Strings.Trim(txt_razonSocial.Text);
-            p.id_claseFiscal = (int?)cmb_claseFiscal.SelectedValue;
-            p.id_tipoDocumento = Conversions.ToInteger(cmb_tipoDocumento.SelectedValue);
-            p.contacto = Strings.Trim(txt_contacto.Text);
-            p.vendedor = Strings.Trim(txt_vendedor.Text);
-            p.taxNumber = txt_taxNumber.Text;
-            p.telefono = txt_telefono.Text;
-            p.celular = txt_celular.Text;
-            p.email = txt_email.Text;
-            p.id_pais_fiscal = cmb_paisFiscal.SelectedValue;
-            p.id_provincia_fiscal = (int?)cmb_provinciaFiscal.SelectedValue;
-            p.direccion_fiscal = txt_direccionFiscal.Text;
-            p.localidad_fiscal = txt_localidadFiscal.Text;
-            p.cp_fiscal = txt_cpFiscal.Text;
-            p.id_pais_entrega = cmb_paisEntrega.SelectedValue;
-            p.id_provincia_entrega = (int?)cmb_provinciaEntrega.SelectedValue;
+            p.RazonSocial = Strings.Trim(txt_razonSocial.Text);
+            p.IdClaseFiscal = (int?)cmb_claseFiscal.SelectedValue;
+            p.IdTipoDocumento = Conversions.ToInteger(cmb_tipoDocumento.SelectedValue);
+            p.Contacto = Strings.Trim(txt_contacto.Text);
+            p.Vendedor = Strings.Trim(txt_vendedor.Text);
+            p.TaxNumber = txt_taxNumber.Text;
+            p.Telefono = txt_telefono.Text;
+            p.Celular = txt_celular.Text;
+            p.Email = txt_email.Text;
+            p.IdPaisFiscal = (int?)cmb_paisFiscal.SelectedValue;
+            p.IdProvinciaFiscal = (int?)cmb_provinciaFiscal.SelectedValue;
+            p.DireccionFiscal = txt_direccionFiscal.Text;
+            p.LocalidadFiscal = txt_localidadFiscal.Text;
+            p.CpFiscal = txt_cpFiscal.Text;
+            p.IdPaisEntrega = (int?)cmb_paisEntrega.SelectedValue;
+            p.IdProvinciaEntrega = (int?)cmb_provinciaEntrega.SelectedValue;
             if (string.IsNullOrEmpty(txt_direccionEntrega.Text))
-                p.direccion_entrega = txt_direccionFiscal.Text;
+                p.DireccionEntrega = txt_direccionFiscal.Text;
             else
-                p.direccion_entrega = txt_direccionEntrega.Text;
+                p.DireccionEntrega = txt_direccionEntrega.Text;
             if (string.IsNullOrEmpty(txt_localidadEntrega.Text))
-                p.localidad_entrega = txt_localidadFiscal.Text;
+                p.LocalidadEntrega = txt_localidadFiscal.Text;
             else
-                p.localidad_entrega = txt_localidadEntrega.Text;
+                p.LocalidadEntrega = txt_localidadEntrega.Text;
             if (string.IsNullOrEmpty(txt_cpEntrega.Text))
-                p.cp_entrega = txt_cpFiscal.Text;
+                p.CpEntrega = txt_cpFiscal.Text;
             else
-                p.cp_entrega = txt_cpEntrega.Text;
-            p.esInscripto = chk_esInscripto.Checked;
-            p.activo = chk_activo.Checked;
-            p.notas = txt_notas.Text;
+                p.CpEntrega = txt_cpEntrega.Text;
+            p.EsInscripto = chk_esInscripto.Checked;
+            p.Activo = chk_activo.Checked;
+            p.Notas = txt_notas.Text;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                p.IdProveedor = VariablesGlobales.edita_proveedor.IdProveedor;
+                p.IdProveedor = edita_proveedor.IdProveedor;
                 if (proveedores.updateProveedor(p) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar el proveedor, consulte con su programdor", Constants.vbExclamation);
@@ -111,20 +110,22 @@ namespace Centrex
             {
                 txt_razonSocial.Text = "";
                 cmb_claseFiscal.Text = "Seleccione una clase fiscal...";
-                cmb_tipoDocumento.SelectedValue = VariablesGlobales.id_tipoDocumento_default;
+                cmb_tipoDocumento.SelectedValue = id_tipoDocumento_default;
                 txt_taxNumber.Text = "";
                 txt_contacto.Text = "";
                 txt_vendedor.Text = "";
                 txt_telefono.Text = "";
                 txt_celular.Text = "";
                 txt_email.Text = "";
-                cmb_paisFiscal.SelectedValue = VariablesGlobales.id_pais_default;
-                cmb_provinciaFiscal.SelectedValue = VariablesGlobales.id_provincia_default;
+                cmb_paisFiscal.SelectedValue = id_pais_default;
+                CargarProvinciasFiscales();
+                cmb_provinciaFiscal.SelectedValue = id_provincia_default;
                 txt_direccionFiscal.Text = "";
                 txt_localidadFiscal.Text = "";
                 txt_cpFiscal.Text = "";
-                cmb_paisEntrega.SelectedValue = VariablesGlobales.id_pais_default;
-                cmb_provinciaEntrega.SelectedValue = VariablesGlobales.id_provincia_default;
+                cmb_paisEntrega.SelectedValue = id_pais_default;
+                CargarProvinciasEntrega();
+                cmb_provinciaEntrega.SelectedValue = id_provincia_default;
                 txt_direccionEntrega.Text = "";
                 txt_localidadEntrega.Text = "";
                 txt_cpEntrega.Text = "";
@@ -153,41 +154,83 @@ namespace Centrex
 
         private void add_proveedor_Load(object sender, EventArgs e)
         {
-            // Cargo todos los paises de dirección fiscal
-            var argcombo = cmb_paisFiscal;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_pais, pais FROM paises ORDER BY pais ASC", VariablesGlobales.basedb, "pais", Conversions.ToInteger("id_pais"));
-            cmb_paisFiscal = argcombo;
+            var ordenPais = OrdenAsc("Pais");
+            var ordenProvincia = OrdenAsc("Provincia");
+            var ordenClaseFiscal = OrdenAsc("Descript");
+            var ordenDocumento = OrdenAsc("Documento");
 
-            // Cargo todas las provincias de direccion fiscal
-            var argcombo1 = cmb_provinciaFiscal;
-            generales.Cargar_Combo(ref argcombo1, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + cmb_paisFiscal.SelectedValue.ToString() + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
-            cmb_provinciaFiscal = argcombo1;
+            // Cargo todos los países de dirección fiscal
+            var argPaisFiscal = cmb_paisFiscal;
+            generales.Cargar_Combo(
+                ref argPaisFiscal,
+                entidad: "PaisEntity",
+                displaymember: "Pais",
+                valuemember: "IdPais",
+                predet: 0,
+                soloActivos: false,
+                filtros: null,
+                orden: ordenPais);
+            cmb_paisFiscal = argPaisFiscal;
 
-            // Cargo todos los paises de dirección de entrega
-            var argcombo2 = cmb_paisEntrega;
-            generales.Cargar_Combo(ref argcombo2, "SELECT id_pais, pais FROM paises ORDER BY pais ASC", VariablesGlobales.basedb, "pais", Conversions.ToInteger("id_pais"));
-            cmb_paisEntrega = argcombo2;
+            // Cargo todos los países de dirección de entrega
+            var argPaisEntrega = cmb_paisEntrega;
+            generales.Cargar_Combo(
+                ref argPaisEntrega,
+                entidad: "PaisEntity",
+                displaymember: "Pais",
+                valuemember: "IdPais",
+                predet: 0,
+                soloActivos: false,
+                filtros: null,
+                orden: ordenPais);
+            cmb_paisEntrega = argPaisEntrega;
 
-            // Cargo todas las provincias de direccion de entrega
-            var argcombo3 = cmb_provinciaEntrega;
-            generales.Cargar_Combo(ref argcombo3, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + cmb_paisEntrega.SelectedValue.ToString() + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
-            cmb_provinciaEntrega = argcombo3;
+            // Provincias iniciales en base al país seleccionado
+            CargarProvinciasFiscales(ordenProvincia);
+            CargarProvinciasEntrega(ordenProvincia);
 
-            // Cargo todos las clases fiscales
-            var argcombo4 = cmb_claseFiscal;
-            generales.Cargar_Combo(ref argcombo4, "SELECT id_claseFiscal, descript FROM sys_ClasesFiscales ORDER BY descript ASC", VariablesGlobales.basedb, "descript", Conversions.ToInteger("id_claseFiscal"));
-            cmb_claseFiscal = argcombo4;
+            // Cargo todas las clases fiscales
+            var argClaseFiscal = cmb_claseFiscal;
+            generales.Cargar_Combo(
+                ref argClaseFiscal,
+                entidad: "SysClaseFiscalEntity",
+                displaymember: "Descript",
+                valuemember: "IdClaseFiscal",
+                predet: -1,
+                soloActivos: false,
+                filtros: null,
+                orden: ordenClaseFiscal);
+            cmb_claseFiscal = argClaseFiscal;
+            cmb_claseFiscal.SelectedIndex = -1;
             cmb_claseFiscal.Text = "Seleccione una clase fiscal...";
 
             // Cargo todos los tipos de documentos
-            var argcombo5 = cmb_tipoDocumento;
-            generales.Cargar_Combo(ref argcombo5, "SELECT id_tipoDocumento, documento FROM tipos_documentos WHERE activo = 1 ORDER BY documento ASC", VariablesGlobales.basedb, "documento", Conversions.ToInteger("id_tipoDocumento"));
-            cmb_tipoDocumento = argcombo5;
-            cmb_tipoDocumento.SelectedValue = VariablesGlobales.id_tipoDocumento_default;
+            var argTipoDocumento = cmb_tipoDocumento;
+            generales.Cargar_Combo(
+                ref argTipoDocumento,
+                entidad: "TipoDocumentoEntity",
+                displaymember: "Documento",
+                valuemember: "IdTipoDocumento",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenDocumento);
+            cmb_tipoDocumento = argTipoDocumento;
+            if (cmb_tipoDocumento.Items.Count > 0 && id_tipoDocumento_default != 0)
+            {
+                try
+                {
+                    cmb_tipoDocumento.SelectedValue = id_tipoDocumento_default;
+                }
+                catch
+                {
+                    cmb_tipoDocumento.SelectedIndex = -1;
+                }
+            }
 
             ActiveControl = txt_razonSocial;
 
-            if (VariablesGlobales.busquedaavanzada)
+            if (busquedaavanzada)
             {
                 Text = "Buscar proveedors";
                 cmd_ok.Text = "Buscar";
@@ -197,34 +240,36 @@ namespace Centrex
             }
 
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                txt_razonSocial.Text = VariablesGlobales.edita_proveedor.razon_social;
-                cmb_claseFiscal.SelectedValue = VariablesGlobales.edita_proveedor.id_claseFiscal;
-                cmb_tipoDocumento.SelectedValue = VariablesGlobales.edita_proveedor.id_tipoDocumento;
-                txt_taxNumber.Text = VariablesGlobales.edita_proveedor.taxNumber;
-                txt_contacto.Text = VariablesGlobales.edita_proveedor.contacto;
-                txt_vendedor.Text = VariablesGlobales.edita_proveedor.vendedor;
-                txt_telefono.Text = VariablesGlobales.edita_proveedor.telefono;
-                txt_celular.Text = VariablesGlobales.edita_proveedor.celular;
-                txt_email.Text = VariablesGlobales.edita_proveedor.email;
-                cmb_paisFiscal.SelectedValue = VariablesGlobales.edita_proveedor.id_pais_fiscal;
-                cmb_provinciaFiscal.SelectedValue = VariablesGlobales.edita_proveedor.id_provincia_fiscal;
-                txt_direccionFiscal.Text = VariablesGlobales.edita_proveedor.direccion_fiscal;
-                txt_localidadFiscal.Text = VariablesGlobales.edita_proveedor.localidad_fiscal;
-                txt_cpFiscal.Text = VariablesGlobales.edita_proveedor.cp_fiscal;
-                cmb_paisEntrega.SelectedValue = VariablesGlobales.edita_proveedor.id_pais_entrega;
-                cmb_provinciaEntrega.SelectedValue = VariablesGlobales.edita_proveedor.id_provincia_entrega;
-                txt_direccionEntrega.Text = VariablesGlobales.edita_proveedor.direccion_entrega;
-                txt_localidadEntrega.Text = VariablesGlobales.edita_proveedor.localidad_entrega;
-                txt_cpEntrega.Text = VariablesGlobales.edita_proveedor.cp_entrega;
-                chk_esInscripto.Checked = VariablesGlobales.edita_proveedor.esInscripto;
-                chk_activo.Checked = VariablesGlobales.edita_proveedor.activo;
-                txt_notas.Text = VariablesGlobales.edita_proveedor.notas;
+                txt_razonSocial.Text = edita_proveedor.RazonSocial;
+                cmb_claseFiscal.SelectedValue = edita_proveedor.IdClaseFiscal;
+                cmb_tipoDocumento.SelectedValue = edita_proveedor.IdTipoDocumento;
+                txt_taxNumber.Text = edita_proveedor.TaxNumber;
+                txt_contacto.Text = edita_proveedor.Contacto;
+                txt_vendedor.Text = edita_proveedor.Vendedor;
+                txt_telefono.Text = edita_proveedor.Telefono;
+                txt_celular.Text = edita_proveedor.Celular;
+                txt_email.Text = edita_proveedor.Email;
+                cmb_paisFiscal.SelectedValue = edita_proveedor.IdPaisFiscal;
+                CargarProvinciasFiscales();
+                cmb_provinciaFiscal.SelectedValue = edita_proveedor.IdProvinciaFiscal;
+                txt_direccionFiscal.Text = edita_proveedor.DireccionFiscal;
+                txt_localidadFiscal.Text = edita_proveedor.LocalidadFiscal;
+                txt_cpFiscal.Text = edita_proveedor.CpFiscal;
+                cmb_paisEntrega.SelectedValue = edita_proveedor.IdPaisEntrega;
+                CargarProvinciasEntrega();
+                cmb_provinciaEntrega.SelectedValue = edita_proveedor.IdProvinciaEntrega;
+                txt_direccionEntrega.Text = edita_proveedor.DireccionEntrega;
+                txt_localidadEntrega.Text = edita_proveedor.LocalidadEntrega;
+                txt_cpEntrega.Text = edita_proveedor.CpEntrega;
+                chk_esInscripto.Checked = edita_proveedor.EsInscripto;
+                chk_activo.Checked = edita_proveedor.Activo;
+                txt_notas.Text = edita_proveedor.Notas;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_razonSocial.Enabled = false;
                 cmb_claseFiscal.Enabled = false;
@@ -251,12 +296,12 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar este proveedor?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (proveedores.borrarproveedor(VariablesGlobales.edita_proveedor) == false)
+                    if (proveedores.borrarproveedor(edita_proveedor) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado del proveedor, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (proveedores.updateProveedor(VariablesGlobales.edita_proveedor, true) == true)
+                            if (proveedores.updateProveedor(edita_proveedor, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero el proveedor no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el proveedor, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }
@@ -271,21 +316,116 @@ namespace Centrex
             }
         }
 
-        private void cmb_paisFiscal_SelectionChangeCommitted(object sender, EventArgs e)
+        private void cmb_paisFiscal_SelectionChangeCommitted(object sender, EventArgs e) =>
+            CargarProvinciasFiscales();
+
+        private void cmb_paisEntrega_SelectionChangeCommitted(object sender, EventArgs e) =>
+            CargarProvinciasEntrega();
+
+        private void CargarProvinciasFiscales(List<Tuple<string, bool>>? orden = null)
         {
-            // Cargo todas las provincias de direccion de fiscal
+            if (cmb_paisFiscal.SelectedValue is null)
+            {
+                cmb_provinciaFiscal.DataSource = null;
+                cmb_provinciaFiscal.Items.Clear();
+                return;
+            }
+
+            var filtros = new Dictionary<string, object>
+            {
+                ["IdPais"] = Convert.ToInt32(cmb_paisFiscal.SelectedValue)
+            };
+
             var argcombo = cmb_provinciaFiscal;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + cmb_paisFiscal.SelectedValue.ToString() + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
+            generales.Cargar_Combo(
+                ref argcombo,
+                entidad: "ProvinciaEntity",
+                displaymember: "Provincia",
+                valuemember: "IdProvincia",
+                predet: -1,
+                soloActivos: false,
+                filtros: filtros,
+                orden: orden ?? OrdenAsc("Provincia"));
             cmb_provinciaFiscal = argcombo;
+
+            if (cmb_provinciaFiscal.Items.Count > 0 && cmb_provinciaFiscal.SelectedIndex < 0)
+            {
+                cmb_provinciaFiscal.SelectedIndex = 0;
+            }
         }
 
-        private void cmb_paisEntrega_SelectionChangeCommitted(object sender, EventArgs e)
+        private void CargarProvinciasEntrega(List<Tuple<string, bool>>? orden = null)
         {
-            // Cargo todas las provincias de direccion de entrega
+            if (cmb_paisEntrega.SelectedValue is null)
+            {
+                cmb_provinciaEntrega.DataSource = null;
+                cmb_provinciaEntrega.Items.Clear();
+                return;
+            }
+
+            var filtros = new Dictionary<string, object>
+            {
+                ["IdPais"] = Convert.ToInt32(cmb_paisEntrega.SelectedValue)
+            };
+
             var argcombo = cmb_provinciaEntrega;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_provincia, provincia FROM provincias WHERE id_pais = '" + cmb_paisEntrega.SelectedValue.ToString() + "' ORDER BY provincia ASC", VariablesGlobales.basedb, "provincia", Conversions.ToInteger("id_provincia"));
+            generales.Cargar_Combo(
+                ref argcombo,
+                entidad: "ProvinciaEntity",
+                displaymember: "Provincia",
+                valuemember: "IdProvincia",
+                predet: -1,
+                soloActivos: false,
+                filtros: filtros,
+                orden: orden ?? OrdenAsc("Provincia"));
             cmb_provinciaEntrega = argcombo;
+
+            if (cmb_provinciaEntrega.Items.Count > 0 && cmb_provinciaEntrega.SelectedIndex < 0)
+            {
+                cmb_provinciaEntrega.SelectedIndex = 0;
+            }
         }
+
+        private void CargarPaisesFiscales(List<Tuple<string, bool>>? orden = null)
+        {
+            var argcombo = cmb_paisFiscal;
+            generales.Cargar_Combo(
+                ref argcombo,
+                entidad: "PaisEntity",
+                displaymember: "Pais",
+                valuemember: "IdPais",
+                predet: -1,
+                soloActivos: false,
+                orden: orden ?? OrdenAsc("Pais"));
+            cmb_paisFiscal = argcombo;
+
+            if (cmb_paisFiscal.Items.Count > 0 && cmb_paisFiscal.SelectedIndex < 0)
+            {
+                cmb_paisFiscal.SelectedIndex = 0;
+            }
+        }
+
+        private void CargarPaisesEntrega(List<Tuple<string, bool>>? orden = null)
+        {
+            var argcombo = cmb_paisEntrega;
+            generales.Cargar_Combo(
+                ref argcombo,
+                entidad: "PaisEntity",
+                displaymember: "Pais",
+                valuemember: "IdPais",
+                predet: -1,
+                soloActivos: false,
+                orden: orden ?? OrdenAsc("Pais"));
+            cmb_paisEntrega = argcombo;
+
+            if (cmb_paisEntrega.Items.Count > 0 && cmb_paisEntrega.SelectedIndex < 0)
+            {
+                cmb_paisEntrega.SelectedIndex = 0;
+            }
+        }
+
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+            new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
 
         private void txt_taxNumber_KeyPress(object sender, KeyPressEventArgs e)
         {

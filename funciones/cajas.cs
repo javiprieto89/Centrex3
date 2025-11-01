@@ -1,36 +1,29 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
 
     static class cajas
     {
         // ************************************ FUNCIONES DE CAJAS ********************
-        public static caja info_caja(string id_caja)
+        public static CajaEntity info_caja(int IdCaja)
         {
-            var tmp = new caja();
+            var tmp = new CajaEntity();
 
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var cajaEntity = context.Cajas.FirstOrDefault(c => c.IdCaja == Conversions.ToInteger(id_caja));
+                    var cajaEntity = context.CajaEntity.FirstOrDefault(c => c.IdCaja == IdCaja);
 
                     if (cajaEntity is not null)
                     {
-                        tmp.id_caja = cajaEntity.IdCaja.ToString();
-                        tmp.nombre = cajaEntity.nombre;
-                        tmp.esCC = cajaEntity.esCC;
-                        tmp.activo = cajaEntity.activo;
+                        return cajaEntity;
                     }
                     else
                     {
-                        tmp.nombre = "error";
+                        tmp.Nombre = "error";
                     }
                 }
 
@@ -38,25 +31,26 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                tmp.nombre = "error";
+                tmp.Nombre = "error";
+                Interaction.MsgBox(ex.Message);
                 return tmp;
             }
         }
 
-        public static bool addCaja(caja c)
+        public static bool addCaja(CajaEntity c)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var cajaEntity = new CajaEntity()
                     {
-                        nombre = c.nombre,
-                        esCC = c.esCC,
-                        activo = c.activo
+                        Nombre = c.Nombre,
+                        EsCc = c.EsCc,
+                        Activo = c.Activo
                     };
 
-                    context.Cajas.Add(cajaEntity);
+                    context.CajaEntity.Add(cajaEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -68,25 +62,25 @@ namespace Centrex
             }
         }
 
-        public static bool updateCaja(caja c, bool borra = false)
+        public static bool updateCaja(CajaEntity c, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var cajaEntity = context.Cajas.FirstOrDefault(ce => ce.IdCaja == c.id_caja);
+                    var cajaEntity = context.CajaEntity.FirstOrDefault(ce => ce.IdCaja == c.IdCaja);
 
                     if (cajaEntity is not null)
                     {
                         if (borra == true)
                         {
-                            cajaEntity.activo = false;
+                            cajaEntity.Activo = false;
                         }
                         else
                         {
-                            cajaEntity.nombre = c.nombre;
-                            cajaEntity.esCC = c.esCC;
-                            cajaEntity.activo = c.activo;
+                            cajaEntity.Nombre = c.Nombre;
+                            cajaEntity.EsCc = c.EsCc;
+                            cajaEntity.Activo = c.Activo;
                         }
 
                         context.SaveChanges();
@@ -105,17 +99,17 @@ namespace Centrex
             }
         }
 
-        public static bool borrarCaja(caja c)
+        public static bool borrarCaja(CajaEntity c)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var cajaEntity = context.Cajas.FirstOrDefault(ce => ce.IdCaja == c.id_caja);
+                    var cajaEntity = context.CajaEntity.FirstOrDefault(ce => ce.IdCaja == c.IdCaja);
 
                     if (cajaEntity is not null)
                     {
-                        context.Cajas.Remove(cajaEntity);
+                        context.CajaEntity.Remove(cajaEntity);
                         context.SaveChanges();
                         return true;
                     }

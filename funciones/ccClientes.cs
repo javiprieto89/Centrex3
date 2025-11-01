@@ -1,279 +1,247 @@
-using System;
-using System.ComponentModel;
+﻿using System;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
-
     static class ccClientes
     {
-
-        // ************************************ FUNCIONES DE CUENTAS CORRIENTES DE CLIENTES **********************
-        public static ccCliente info_ccCliente(int id_cc)
+        // ============================
+        // INFO CUENTA CORRIENTE CLIENTE
+        // ============================
+        public static CcClienteEntity info_ccCliente(int id_cc)
         {
-            var tmp = new ccCliente();
-
             try
             {
-                using (CentrexDbContext context = GetDbContext())
-                {
-                    var ccEntity = context.CcClientes.FirstOrDefault(cc => cc.IdCc == id_cc);
+                using var context = new CentrexDbContext();
+                var ccEntity = context.CcClienteEntity
+                    .AsNoTracking()
+                    .FirstOrDefault(cc => cc.IdCc == id_cc);
 
-                    if (ccEntity is not null)
-                    {
-                        tmp.id_cc = ccEntity.IdCc.ToString();
-                        tmp.id_cliente = ccEntity.IdCliente.ToString();
-                        tmp.id_moneda = ccEntity.IdMoneda.ToString();
-                        tmp.nombre = ccEntity.nombre;
-                        tmp.saldo = Conversions.ToDouble(ccEntity.saldo.ToString());
-                        tmp.activo = ccEntity.activo;
-                    }
-                    else
-                    {
-                        tmp.nombre = "error";
-                    }
-                }
-
-                return tmp;
+                return ccEntity ?? new CcClienteEntity { Nombre = "error" };
             }
             catch (Exception ex)
             {
-                tmp.nombre = "error";
-                return tmp;
+                Interaction.MsgBox(ex.Message, MsgBoxStyle.Critical, "Centrex");
+                return new CcClienteEntity { Nombre = "error" };
             }
         }
 
-        public static bool addCCCliente(ccCliente cc)
+        // ============================
+        // AGREGAR CUENTA CORRIENTE CLIENTE
+        // ============================
+        public static bool addCCCliente(CcClienteEntity cc)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
-                {
-                    var ccEntity = new CcClienteEntity()
-                    {
-                        IdCliente = cc.id_cliente,
-                        IdMoneda = cc.id_moneda,
-                        nombre = cc.nombre,
-                        saldo = (decimal)cc.saldo,
-                        activo = cc.activo
-                    };
-
-                    context.CcClientes.Add(ccEntity);
-                    context.SaveChanges();
-                    return true;
-                }
+                using var context = new CentrexDbContext();
+                context.CcClienteEntity.Add(cc);
+                context.SaveChanges();
+                return true;
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                Interaction.MsgBox(ex.Message, MsgBoxStyle.Critical, "Centrex");
                 return false;
             }
         }
 
-        public static bool updateCCCliente(ccCliente cc, bool borra = false)
+        // ============================
+        // ACTUALIZAR / BORRAR LÓGICAMENTE
+        // ============================
+        public static bool updateCCCliente(CcClienteEntity cc, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using var context = new CentrexDbContext();
+                var entity = context.CcClienteEntity.FirstOrDefault(c => c.IdCc == cc.IdCc);
+
+                if (entity == null)
+                    return false;
+
+                if (borra)
                 {
-                    var ccEntity = context.CcClientes.FirstOrDefault(c => c.IdCc == cc.id_cc);
-
-                    if (ccEntity is not null)
-                    {
-                        if (borra == true)
-                        {
-                            ccEntity.activo = false;
-                        }
-                        else
-                        {
-                            ccEntity.IdCliente = cc.id_cliente;
-                            ccEntity.IdMoneda = cc.id_moneda;
-                            ccEntity.nombre = cc.nombre;
-                            ccEntity.saldo = (decimal)cc.saldo;
-                            ccEntity.activo = cc.activo;
-                        }
-
-                        context.SaveChanges();
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox(ex.Message);
-                return false;
-            }
-        }
-
-        public static bool borrarccCliente(ccCliente cc)
-        {
-            try
-            {
-                using (CentrexDbContext context = GetDbContext())
-                {
-                    var ccEntity = context.CcClientes.FirstOrDefault(c => c.IdCc == cc.id_cc);
-
-                    if (ccEntity is not null)
-                    {
-                        context.CcClientes.Remove(ccEntity);
-                        context.SaveChanges();
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox(ex.Message.ToString());
-                return false;
-            }
-        }
-
-        public static void consultaCcCliente(ref DataGridView dataGrid, int id_cliente, int id_Cc, DateTime fecha_desde, DateTime fecha_hasta, int desde, ref int nRegs, ref int tPaginas, int pagina, ref TextBox txtnPage, bool traerTodo)
-        {
-
-            var datatable = new DataTable();
-            DataGridViewColumn oldSortColumn = null;
-            var oldSortDir = default(ListSortDirection);
-
-            oldSortColumn = dataGrid.SortedColumn;
-            if (dataGrid.SortedColumn is not null)
-            {
-                if (dataGrid.SortOrder == (int)System.Data.SqlClient.SortOrder.Ascending)
-                {
-                    oldSortDir = ListSortDirection.Ascending;
+                    entity.Activo = false;
                 }
                 else
                 {
-                    oldSortDir = ListSortDirection.Descending;
+                    entity.IdCliente = cc.IdCliente;
+                    entity.IdMoneda = cc.IdMoneda;
+                    entity.Nombre = cc.Nombre;
+                    entity.Saldo = cc.Saldo;
+                    entity.Activo = cc.Activo;
                 }
-            }
 
-            dataGrid.Columns.Clear();
-
-            try
-            {
-                using (CentrexDbContext context = GetDbContext())
-                {
-                    // Usar stored procedure
-                    var resultado = context.Database.SqlQuery<object>("EXEC SP_consulta_CC_Cliente @id_cliente, @id_cc, @fecha_desde, @fecha_hasta", new SqlParameter("@id_cliente", id_cliente), new SqlParameter("@id_cc", id_Cc), new SqlParameter("@fecha_desde", fecha_desde), new SqlParameter("@fecha_hasta", fecha_hasta)).ToList();
-
-                    // Convertir a DataTable
-                    if (resultado.Count > 0)
-                    {
-                        System.Reflection.PropertyInfo[] props = resultado[0].GetType().GetProperties();
-                        foreach (var prop in props)
-                            datatable.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
-
-                        foreach (var item in resultado)
-                        {
-                            var row = datatable.NewRow();
-                            foreach (var prop in props)
-                                row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
-                            datatable.Rows.Add(row);
-                        }
-                    }
-
-                    if (!traerTodo)
-                    {
-                        nRegs = datatable.Rows.Count;
-                        tPaginas = (int)Math.Round(Math.Ceiling(nRegs / (double)VariablesGlobales.itXPage));
-                        txtnPage.Text = pagina + " / " + tPaginas;
-
-                        // Paginar manualmente
-                        var pagedTable = new DataTable();
-                        pagedTable = datatable.Clone();
-                        int endIndex = Math.Min(desde + VariablesGlobales.itXPage - 1, datatable.Rows.Count - 1);
-                        for (int idx = desde, loopTo = endIndex; idx <= loopTo; idx++)
-                        {
-                            if (idx < datatable.Rows.Count)
-                            {
-                                pagedTable.ImportRow(datatable.Rows[idx]);
-                            }
-                        }
-                        datatable = pagedTable;
-                    }
-
-                    dataGrid.DataSource = datatable;
-                    dataGrid.RowsDefaultCellStyle.BackColor = Color.White;
-                    dataGrid.AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue;
-
-                    int i = 0;
-                    foreach (DataGridViewColumn columna in dataGrid.Columns)
-                    {
-                        dataGrid.Columns[columna.Name.ToString()].DisplayIndex = i;
-                        i = i + 1;
-                    }
-
-                    dataGrid.Height = dataGrid.Height + 1;
-                    dataGrid.Height = dataGrid.Height - 1;
-
-                    if (dataGrid.Rows.Count > 0)
-                    {
-                        dataGrid.AutoSizeColumnsMode = (DataGridViewAutoSizeColumnsMode)DataGridViewAutoSizeColumnMode.AllCells;
-                    }
-                    else
-                    {
-                        dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-                    }
-
-                    if (oldSortColumn is not null)
-                    {
-                        dataGrid.Sort(dataGrid.Columns[oldSortColumn.Name], oldSortDir);
-                    }
-
-                    dataGrid.Refresh();
-                }
+                context.SaveChanges();
+                return true;
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                Interaction.MsgBox(ex.Message, MsgBoxStyle.Critical, "Centrex");
+                return false;
             }
         }
 
+        // ============================
+        // BORRAR DEFINITIVO
+        // ============================
+        public static bool borrarccCliente(CcClienteEntity cc)
+        {
+            try
+            {
+                using var context = new CentrexDbContext();
+                var entity = context.CcClienteEntity.FirstOrDefault(c => c.IdCc == cc.IdCc);
+                if (entity == null) return false;
+
+                context.CcClienteEntity.Remove(entity);
+                context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox(ex.Message, MsgBoxStyle.Critical, "Centrex");
+                return false;
+            }
+        }
+
+        // ============================
+        // CONSULTA GENERAL DE CC CLIENTE (usa infraestructura genérica)
+        // ============================
+        public static void consultaCcCliente(
+      ref DataGridView dataGrid,
+      int id_cliente,
+      int id_Cc,
+      DateTime fecha_desde,
+      DateTime fecha_hasta,
+      int desde,
+      ref int nRegs,
+      ref int tPaginas,
+      int pagina,
+      ref TextBox txtnPage,
+      bool traerTodo)
+        {
+            try
+            {
+                using var ctx = new CentrexDbContext();
+
+                // =======================
+                // Tipos de comprobantes (según AFIP)
+                // =======================
+                var tiposDebito = new int[] { 1, 6, 11, 51, 201, 206, 211, 1006, 2, 7, 12, 52, 202, 207, 212, 1007, 1002, 1003, 1004, 1005, 1010 };
+                var tiposCredito = new int[] { 3, 8, 13, 53, 203, 208, 213, 1008, 4, 9, 15, 54, 1009 };
+
+                // =======================
+                // Consulta base (reemplaza el WITH del SP)
+                // =======================
+                var movimientos = ctx.TransaccionEntity
+                    .Include(t => t.IdTipoComprobanteNavigation)
+                    .Include(t => t.IdClienteNavigation)
+                    .Where(t =>
+                        t.IdCliente == id_cliente &&
+                        t.IdCc == id_Cc &&
+                        t.Fecha >= DateOnly.FromDateTime(fecha_desde) &&
+                        t.Fecha <= DateOnly.FromDateTime(fecha_hasta) &&
+                        t.IdTipoComprobanteNavigation.Contabilizar == true)
+                    .OrderBy(t => t.IdTransaccion)
+                    .Select(t => new
+                    {
+                        t.IdTransaccion,
+                        t.IdCliente,
+                        t.IdCc,
+                        t.NumeroComprobante,
+                        t.PuntoVenta,
+                        t.IdTipoComprobante,
+                        t.IdTipoComprobanteNavigation.NombreAbreviado,
+                        t.Fecha,
+                        t.Total,
+                        Debito = tiposDebito.Contains(t.IdTipoComprobante.Value) ? t.Total ?? 0 : 0,
+                        Credito = tiposCredito.Contains(t.IdTipoComprobante.Value) ? (t.Total ?? 0) * -1 : 0,
+                        Signo = tiposDebito.Contains(t.IdTipoComprobante.Value)
+                                    ? 1
+                                    : tiposCredito.Contains(t.IdTipoComprobante.Value)
+                                        ? -1
+                                        : 0
+                    })
+                    .AsEnumerable() // pasamos a memoria para poder calcular saldo incremental
+                    .ToList();
+
+                // =======================
+                // Calcular saldo acumulado manualmente
+                // =======================
+                decimal saldo = 0;
+                var resultado = movimientos.Select(m =>
+                {
+                    saldo += (m.Total ?? 0) * m.Signo;
+                    return new
+                    {
+                        ID = m.IdTransaccion,
+                        Fecha = m.Fecha,
+                        Comprobante = generales.CalculoComprobanteLocal(m.NombreAbreviado, m.PuntoVenta ?? 0, m.NumeroComprobante ?? 0),
+                        Débito = m.Debito,
+                        Crédito = m.Credito,
+                        Saldo = saldo
+                    };
+                }).ToList();
+
+                // =======================
+                // Cargar el DataGrid con la infraestructura unificada
+                // =======================
+                var result = new DataGridQueryResult
+                {
+                    EsMaterializada = true,
+                    DataMaterializada = resultado,
+                    GridName = "ccClientes"
+                };
+
+                LoadDataGridDynamic.LoadDataGridWithEntityAsync(dataGrid, result)
+                    .GetAwaiter()
+                    .GetResult();
+
+                // =======================
+                // Calcular paginación
+                // =======================
+                nRegs = dataGrid.Rows.Count;
+                tPaginas = (int)Math.Ceiling(nRegs / (double)itXPage);
+                txtnPage.Text = $"{pagina} / {tPaginas}";
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error en consultaCcCliente: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+            }
+        }
+
+        // ============================
+        // TOTAL CUENTA CORRIENTE
+        // ============================
+        //
         public static string consultaTotalCcCliente(int id_cliente, DateTime fecha_desde, DateTime fecha_hasta)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
-                {
-                    var importeTotal = (from trans in context.Transacciones
-                                        join tipoComp in context.TiposComprobantes on trans.IdTipoComprobante equals tipoComp.IdTipoComprobante
-                                        join comp in context.Comprobantes on tipoComp.IdTipoComprobante equals comp.IdTipoComprobante
-                                        where trans.fecha >= fecha_desde && trans.fecha <= fecha_hasta && trans.IdCliente == id_cliente && comp.contabilizar == true
-                                        select trans.total).Distinct().Sum();
+                using var ctx = new CentrexDbContext();
 
-                    // Evitar NullReference (Sum puede devolver Nothing)
-                    if (importeTotal is null)
-                    {
-                        return "0";
-                    }
-                    else
-                    {
-                        return importeTotal.ToString();
-                    }
-                }
+                var total = (
+                    from t in ctx.TransaccionEntity
+                    join tc in ctx.TipoComprobanteEntity on t.IdTipoComprobante equals tc.IdTipoComprobante
+                    join c in ctx.ComprobanteEntity on tc.IdTipoComprobante equals c.IdTipoComprobante
+                    where
+                        t.IdCliente == id_cliente &&
+                        t.Fecha >= DateOnly.FromDateTime(fecha_desde) &&
+                        t.Fecha <= DateOnly.FromDateTime(fecha_hasta) &&
+                        c.Contabilizar == true
+                    select t.Total
+                ).Sum() ?? 0m;
+
+                return total.ToString("N2");
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                return "";
+                Interaction.MsgBox($"Error en consultaTotalCcCliente: {ex.Message}", MsgBoxStyle.Critical, "Centrex");
+                return "0";
             }
         }
-        // ************************************ FUNCIONES DE CUENTAS CORRIENTES DE CLIENTES **********************
+
+
     }
 }

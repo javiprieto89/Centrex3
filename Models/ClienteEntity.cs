@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Centrex.Models;
 
@@ -86,6 +84,12 @@ public partial class ClienteEntity
     [Column("id_claseFiscal")]
     public int? IdClaseFiscal { get; set; }
 
+    [Column("id_pais_fiscal")]
+    public int? IdPaisFiscal { get; set; }
+
+    [Column("id_pais_entrega")]
+    public int? IdPaisEntrega { get; set; }
+
     [InverseProperty("IdClienteNavigation")]
     public virtual ICollection<CcClienteEntity> CcClienteEntity { get; set; } = new List<CcClienteEntity>();
 
@@ -113,4 +117,16 @@ public partial class ClienteEntity
 
     [InverseProperty("IdClienteNavigation")]
     public virtual ICollection<PedidoEntity> PedidoEntity { get; set; } = new List<PedidoEntity>();
+
+    [ForeignKey("IdPaisFiscal")]
+    [InverseProperty("ClienteEntityIdPaisFiscalNavigation")]
+    public virtual PaisEntity? IdPaisFiscalNavigation { get; set; }
+
+    [ForeignKey("IdPaisEntrega")]
+    [InverseProperty("ClienteEntityIdPaisEntregaNavigation")]
+    public virtual PaisEntity? IdPaisEntregaNavigation { get; set; }
+
+    [InverseProperty("IdClienteNavigation")]
+    public virtual ICollection<TransaccionEntity> TransaccionEntity { get; set; } = new List<TransaccionEntity>();
+
 }

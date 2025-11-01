@@ -1,7 +1,6 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -13,40 +12,61 @@ namespace Centrex
         }
         private void add_permisos_perfiles_Load(object sender, EventArgs e)
         {
+            var ordenNombre = new List<Tuple<string, bool>> { Tuple.Create("Nombre", true) };
+
             // Cargo todos los permisos
-            var argcombo = cmb_perfiles;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_permiso, nombre FROM permisos ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_permiso"));
-            cmb_perfiles = argcombo;
-            cmb_perfiles.Text = "Selecione un permiso...";
+            var argPermisos = cmb_permisos;
+            generales.Cargar_Combo(
+                ref argPermisos,
+                entidad: "PermisoEntity",
+                displaymember: "Nombre",
+                valuemember: "IdPermiso",
+                predet: -1,
+                soloActivos: false,
+                filtros: null,
+                orden: ordenNombre);
+            cmb_permisos = argPermisos;
+            cmb_permisos.SelectedIndex = -1;
+            cmb_permisos.Text = "Seleccione un permiso...";
+
             // Cargo todos los perfiles
-            var argcombo1 = cmb_perfiles;
-            generales.Cargar_Combo(ref argcombo1, "SELECT id_perfil, nombre FROM perfiles ORDER BY nombre ASC", VariablesGlobales.basedb, "nombre", Conversions.ToInteger("id_perfil"));
-            cmb_perfiles = argcombo1;
-            cmb_perfiles.Text = "Selecione un perfil...";
+            var argPerfiles = cmb_perfiles;
+            generales.Cargar_Combo(
+                ref argPerfiles,
+                entidad: "PerfilEntity",
+                displaymember: "Nombre",
+                valuemember: "IdPerfil",
+                predet: -1,
+                soloActivos: true,
+                filtros: null,
+                orden: ordenNombre);
+            cmb_perfiles = argPerfiles;
+            cmb_perfiles.SelectedIndex = -1;
+            cmb_perfiles.Text = "Seleccione un perfil...";
 
 
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
-                cmb_permisos.SelectedValue = VariablesGlobales.edita_permiso_perfil.id_permiso;
-                cmb_perfiles.SelectedValue = VariablesGlobales.edita_permiso_perfil.id_perfil;
+                cmb_permisos.SelectedValue = edita_permiso_perfil.IdPermiso;
+                cmb_perfiles.SelectedValue = edita_permiso_perfil.IdPefil;
                 cmb_permisos.Enabled = false;
                 cmb_perfiles.Enabled = false;
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 cmd_exit.Visible = false;
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta relación entre el perfil y el permiso?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    // If (borrarTarjeta(VariablesGlobales.edita_tarjeta)) = False Then
+                    // If (borrarTarjeta(edita_tarjeta)) = False Then
                     // MsgBox("No se ha podido borrar la relación, consulte con el programador")
                     // End If
                 }
                 closeandupdate(this);
             }
-            else if (VariablesGlobales.edicion == true)
+            else if (edicion == true)
             {
                 Interaction.MsgBox("La relación entre un permiso y un perfil no puede editarse", (MsgBoxStyle)((int)Constants.vbExclamation + (int)Constants.vbOKOnly), "Centrex");
                 closeandupdate(this);
@@ -66,11 +86,11 @@ namespace Centrex
                 return;
             }
 
-            var tmp = new perfil_permiso();
+            var tmp = new PermisoPerfilEntity();
 
 
-            tmp.id_permiso = Conversions.ToInteger(cmb_permisos.SelectedValue);
-            tmp.id_perfil = Conversions.ToInteger(cmb_perfiles.SelectedValue);
+            tmp.IdPermiso = Conversions.ToInteger(cmb_permisos.SelectedValue);
+            tmp.IdPefil = Conversions.ToInteger(cmb_perfiles.SelectedValue);
 
             usuarios.add_permiso_perfil(tmp);
 

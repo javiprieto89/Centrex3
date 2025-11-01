@@ -1,11 +1,12 @@
+﻿using MessagingToolkit.QRCode.Codec;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Drawing;
 using System.IO;
-using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Windows.Forms;
-using MessagingToolkit.QRCode.Codec;
-using Microsoft.VisualBasic;
-using Newtonsoft.Json.Linq;
 
 namespace Centrex
 {
@@ -16,9 +17,9 @@ namespace Centrex
         private string paymentLink;
         private string preferenceId;
         private string accessToken = "APP_USR-1861910115308653-101722-495e69898d2624ff1c403ff05258b364-2932397376";
-        private string publicKey = "APP_USR-8bbcffb2-a950-4a17-9f87-8e196fab2255";
         private Timer checkTimer;
         private string referencia;
+        private static readonly HttpClient httpClient = new HttpClient();
 
         public frm_mercadopago_qr()
         {
@@ -36,7 +37,7 @@ namespace Centrex
                 lbl_titulo.Font = new Font("Arial", 14f, FontStyle.Bold);
                 lbl_titulo.TextAlign = ContentAlignment.MiddleCenter;
 
-                lbl_instrucciones.Text = "1. Abre la app de MercadoPago" + Constants.vbCrLf + "2. Toca 'Escanear código'" + Constants.vbCrLf + "3. Apunta la cámara al QR" + Constants.vbCrLf + "4. Confirma el pago";
+                lbl_instrucciones.Text = "1. Abre la app de MercadoPago\r\n2. Toca 'Escanear código'\r\n3. Apunta la cámara al QR\r\n4. Confirma el pago";
                 lbl_instrucciones.TextAlign = ContentAlignment.MiddleLeft;
 
                 btn_generar_qr.Text = "Generar Nuevo QR";
@@ -110,23 +111,22 @@ namespace Centrex
                 // JSON de preferencia
                 string json = "{" + "\"items\":[{\"title\":\"" + descripcion + "\",\"quantity\":1,\"unit_price\":" + monto + "}]," + "\"external_reference\":\"" + referencia + "\",\"back_urls\":{\"success\":\"https://www.mercadopago.com\",\"failure\":\"https://www.mercadopago.com\"},\"auto_return\":\"approved\"" + "}";
 
-                var request = WebRequest.Create("https://api.mercadopago.com/checkout/preferences");
-                request.Method = "POST";
-                request.ContentType = "application/json";
-                request.Headers.Add("Authorization", "Bearer " + accessToken);
-
-                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
+                using var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://api.mercadopago.com/checkout/preferences")
                 {
-                    streamWriter.Write(json);
+                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                };
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                using var response = httpClient.Send(requestMessage);
+                string result = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new InvalidOperationException($"MercadoPago respondió {(int)response.StatusCode}: {response.ReasonPhrase}\n{result}");
                 }
 
-                var response = request.GetResponse();
-                using (var reader = new StreamReader(response.GetResponseStream()))
-                {
-                    string result = reader.ReadToEnd();
-                    var j = JObject.Parse(result);
-                    return j["id"].ToString(); // preference_id real
-                }
+                var j = JObject.Parse(result);
+                return j["id"]?.ToString(); // preference_id real
             }
 
             catch (Exception ex)
@@ -193,10 +193,18 @@ namespace Centrex
                     return;
 
                 string url = "https://api.mercadopago.com/v1/payments/search?external_reference=" + referencia;
-                var client = new WebClient();
-                client.Headers.Add("Authorization", "Bearer " + accessToken);
-                string response = client.DownloadString(url);
-                var j = JObject.Parse(response);
+
+                using var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                using var response = httpClient.Send(requestMessage);
+                string responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                if (!response.IsSuccessStatusCode || string.IsNullOrWhiteSpace(responseBody))
+                {
+                    return;
+                }
+
+                var j = JObject.Parse(responseBody);
                 var results = j["results"];
 
                 if (results.HasValues)

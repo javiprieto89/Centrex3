@@ -1,7 +1,5 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -19,8 +17,6 @@ namespace Centrex
 
         private void add_modeloa_Load(object sender, EventArgs e)
         {
-            // form = Me ' Comentado para evitar error de compilación
-
             // Cargo todos los items (EF)
             cmb_items.DataSource = combos_ef_extra.ComboItems();
             cmb_items.DisplayMember = "descript";
@@ -34,19 +30,19 @@ namespace Centrex
             cmb_impuestos.Text = "Seleccione un impuesto";
 
             chk_activo.Checked = true;
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
 
                 {
-                    var withBlock = VariablesGlobales.edita_itemImpuesto;
-                    cmb_items.SelectedValue = withBlock.id_item;
-                    cmb_impuestos.SelectedValue = withBlock.id_impuesto;
-                    chk_activo.Checked = withBlock.activo;
+                    var withBlock = edita_itemImpuesto;
+                    cmb_items.SelectedValue = withBlock.IdItem;
+                    cmb_impuestos.SelectedValue = withBlock.IdImpuesto;
+                    chk_activo.Checked = withBlock.Activo;
                 }
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 cmb_items.Enabled = false;
                 cmb_impuestos.Enabled = false;
@@ -56,14 +52,14 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta relación?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (itemsImpuestos.borraritemImpuesto(VariablesGlobales.edita_itemImpuesto) == false)
+                    if (itemsImpuestos.borraritemImpuesto(edita_itemImpuesto) == false)
                     {
-                        if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la relación, ¿desea intectar desactivarla para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
+                        if (Interaction.MsgBox("Ocurrió un error al realizar el borrado de la relación, ¿desea intentar desactivarla para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (itemsImpuestos.updateitemImpuesto(VariablesGlobales.edita_itemImpuesto, borra: true) == true)
+                            if (itemsImpuestos.updateitemImpuesto(edita_itemImpuesto, borra: true) == true)
                             {
-                                Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la realación no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el está relación, tiene operaciones realizadas y/o dependencias por lo tanto no podrá borrarse", Constants.vbInformation);
+                                Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero la relación no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que esta relación tiene operaciones realizadas y/o dependencias por lo tanto no podrá borrarse", Constants.vbInformation);
                             }
                             else
                             {
@@ -94,18 +90,18 @@ namespace Centrex
                 return;
             }
 
-            var tmp = new itemImpuesto();
-            tmp.id_item = Conversions.ToInteger(cmb_items.SelectedValue);
-            tmp.id_impuesto = Conversions.ToInteger(cmb_impuestos.SelectedValue);
-            tmp.activo = chk_activo.Checked;
+            var tmp = new ItemImpuestoEntity();
+            tmp.IdItem = Conversions.ToInteger(cmb_items.SelectedValue);
+            tmp.IdImpuesto = Conversions.ToInteger(cmb_impuestos.SelectedValue);
+            tmp.Activo = chk_activo.Checked;
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                // tmp.id_item = VariablesGlobales.edita_itemImpuesto.id_item
-                // tmp.id_impuesto = VariablesGlobales.edita_impuesto.id_impuesto
-                if (itemsImpuestos.updateitemImpuesto(VariablesGlobales.edita_itemImpuesto, tmp) == false)
+                // tmp.IdItem = edita_itemImpuesto.IdItem
+                // tmp.IdImpuesto = edita_impuesto.IdImpuesto
+                if (itemsImpuestos.updateitemImpuesto(edita_itemImpuesto, tmp) == false)
                 {
-                    Interaction.MsgBox("Hubo un problema al actualizar la relación, consulte con su programdor", Constants.vbExclamation);
+                    Interaction.MsgBox("Hubo un problema al actualizar la relación, consulte con su programador", Constants.vbExclamation);
                     closeandupdate(this);
                 }
             }
@@ -117,7 +113,7 @@ namespace Centrex
             if (chk_secuencia.Checked == true)
             {
                 cmb_items.Text = "Seleccione un item";
-                cmb_items.Text = "Seleccione un impuesto";
+                cmb_impuestos.Text = "Seleccione un impuesto";
                 chk_activo.Checked = true;
             }
             else
@@ -129,31 +125,31 @@ namespace Centrex
         private void pic_search_item_Click(object sender, EventArgs e)
         {
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "itemsImpuestosItems";
+            tmp = tabla;
+            tabla = "itemsImpuestosItems";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo
             // cmb_items.SelectedIndex = cmb_items.FindString(info_item(id).descript)
-            cmb_items.SelectedValue = VariablesGlobales.id;
-            VariablesGlobales.id = 0;
+            cmb_items.SelectedValue = id;
+            id = 0;
         }
 
         private void pic_search_impuestos_Click(object sender, EventArgs e)
         {
             string tmp;
-            tmp = VariablesGlobales.tabla;
-            VariablesGlobales.tabla = "itemsImpuestosImpuestos";
+            tmp = tabla;
+            tabla = "itemsImpuestosImpuestos";
             Enabled = false;
             My.MyProject.Forms.search.ShowDialog();
-            VariablesGlobales.tabla = tmp;
+            tabla = tmp;
 
             // Establezco la opción del combo
             // cmb_impuestos.SelectedIndex = cmb_impuestos.FindString(info_impuesto(id).nombre)
-            cmb_impuestos.SelectedValue = VariablesGlobales.id;
-            VariablesGlobales.id = 0;
+            cmb_impuestos.SelectedValue = id;
+            id = 0;
         }
 
         private void cmb_items_KeyPress(object sender, KeyPressEventArgs e)

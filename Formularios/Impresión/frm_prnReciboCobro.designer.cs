@@ -27,7 +27,7 @@ namespace Centrex
         }
 
         // Requerido por el Diseñador de Windows Forms
-        private System.ComponentModel.IContainer components;
+        private System.ComponentModel.IContainer components = null!;
 
         // NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
         // Se puede modificar usando el Diseñador de Windows Forms.  
@@ -35,7 +35,7 @@ namespace Centrex
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            rpt_view = new Microsoft.Reporting.WinForms.ReportViewer();
+            rpt_view = new Panel();
             SuspendLayout();
             // 
             // rpt_view
@@ -54,11 +54,11 @@ namespace Centrex
             Controls.Add(rpt_view);
             Name = "frm_prnReciboCobro";
             Text = "Impresión";
-            Load += new EventHandler(frm_prnReciboCobro_Load);
+            //Load += new EventHandler(frm_prnReciboCobro_Load);
             ResumeLayout(false);
 
         }
 
-        internal Microsoft.Reporting.WinForms.ReportViewer rpt_view;
+        internal Panel rpt_view;
     }
 }

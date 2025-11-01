@@ -1,7 +1,6 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -19,37 +18,49 @@ namespace Centrex
                 Interaction.MsgBox("El campo 'Comprobante' es obligatorio y está vacio", (MsgBoxStyle)((int)Constants.vbOKOnly + (int)Constants.vbExclamation), "Centrex");
                 return;
             }
-            else if (chk_esMipyme.Checked & cmb_comprobanteRelacionado.Text == "Seleccione un comprobante asociado...")
+            else if (cmb_tipoComprobante.SelectedValue is null)
+            {
+                Interaction.MsgBox("Debe seleccionar un tipo de comprobante", (MsgBoxStyle)((int)Constants.vbOKOnly + (int)Constants.vbExclamation), "Centrex");
+                return;
+            }
+            else if (chk_esMipyme.Checked && cmb_modoMiPyme.SelectedValue is null)
+            {
+                Interaction.MsgBox("Debe seleccionar un modo MiPyME", (MsgBoxStyle)((int)Constants.vbOKOnly + (int)Constants.vbExclamation), "Centrex");
+                return;
+            }
+            else if (chk_esMipyme.Checked && cmb_comprobanteRelacionado.Text == "Seleccione un comprobante asociado...")
             {
                 Interaction.MsgBox("El campo 'Comprobant asociado' es obligatorio al ser un comprobante MiPyME y está vacio", (MsgBoxStyle)((int)Constants.vbOKOnly + (int)Constants.vbExclamation), "Centrex");
                 return;
             }
 
-            var c = new comprobante();
+            var c = new ComprobanteEntity();
 
-            c.comprobanteField = txt_comprobante.Text;
-            c.id_tipoComprobante = Conversions.ToInteger(cmb_tipoComprobante.SelectedValue);
-            c.numeroComprobante = (int)Math.Round(nup_numero.Value);
-            c.puntoVenta = (int)Math.Round(nup_puntoVenta.Value);
-            c.esFiscal = rb_fiscal.Checked;
-            c.esElectronica = rb_electronico.Checked;
-            c.esManual = rb_manual.Checked;
-            c.esPresupuesto = rb_presupuesto.Checked;
-            c.activo = chk_activo.Checked;
-            c.testing = chk_testing.Checked;
-            c.maxItems = (int)Math.Round(nup_maxItems.Value);
-            c.contabilizar = chk_contabilizar.Checked;
-            c.mueveStock = chk_mueveStock.Checked;
+            c.Comprobante = txt_comprobante.Text;
+            c.IdTipoComprobante = Convert.ToInt32(cmb_tipoComprobante.SelectedValue);
+            c.NumeroComprobante = (int)Math.Round(nup_numero.Value);
+            c.PuntoVenta = (int)Math.Round(nup_puntoVenta.Value);
+            c.EsFiscal = rb_fiscal.Checked;
+            c.EsElectronica = rb_electronico.Checked;
+            c.EsManual = rb_manual.Checked;
+            c.EsPresupuesto = rb_presupuesto.Checked;
+            c.Activo = chk_activo.Checked;
+            c.Testing = chk_testing.Checked;
+            c.MaxItems = (int?)Math.Round(nup_maxItems.Value);
+            c.Contabilizar = chk_contabilizar.Checked;
+            c.MueveStock = chk_mueveStock.Checked;
             // .comprobanteRelacionado = cmb_comprobanteRelacionado.SelectedValue
-            c.esMiPyME = chk_esMipyme.Checked;
-            c.CBU_emisor = txt_CBU_emisor.Text;
-            c.alias_CBU_emisor = txt_alias_CBU_emisor.Text;
-            c.id_modoMiPyme = Conversions.ToInteger(cmb_modoMiPyme.SelectedValue);
-            c.anula_MiPyME = Conversions.ToChar(txt_comprobanteAnulacion.Text);
+            c.EsMiPyMe = chk_esMipyme.Checked;
+            c.CbuEmisor = txt_CBU_emisor.Text;
+            c.AliasCbuEmisor = txt_alias_CBU_emisor.Text;
+            c.IdModoMiPyme = Convert.ToInt32(cmb_modoMiPyme.SelectedValue);
+            c.AnulaMiPyMe = string.IsNullOrEmpty(txt_comprobanteAnulacion.Text)
+           ? null
+             : txt_comprobanteAnulacion.Text.Substring(0, 1);
 
-            if (VariablesGlobales.edicion == true)
+            if (edicion == true)
             {
-                c.id_comprobante = VariablesGlobales.edita_comprobante.id_comprobante;
+                c.IdComprobante = edita_comprobante.IdComprobante;
                 if (comprobantes.updatecomprobante(c) == false)
                 {
                     Interaction.MsgBox("Hubo un problema al actualizar el comprobante, consulte con su programdor", Constants.vbExclamation);
@@ -64,7 +75,10 @@ namespace Centrex
             if (chk_secuencia.Checked == true)
             {
                 txt_comprobante.Text = "";
-                cmb_tipoComprobante.SelectedValue = VariablesGlobales.id_tipoComprobante_default;
+                if (id_tipoComprobante_default > 0)
+                    cmb_tipoComprobante.SelectedValue = id_tipoComprobante_default;
+                else
+                    cmb_tipoComprobante.SelectedIndex = -1;
                 nup_numero.Value = 1m;
                 nup_puntoVenta.Value = 1m;
                 rb_electronico.Checked = true;
@@ -94,10 +108,24 @@ namespace Centrex
         private void add_comprobante_Load(object sender, EventArgs e)
         {
             // Cargo todos los tipos de documentos
-            var argcombo = cmb_tipoComprobante;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_tipoComprobante, comprobante_AFIP FROM tipos_comprobantes ORDER BY comprobante_AFIP ASC", VariablesGlobales.basedb, "comprobante_AFIP", Conversions.ToInteger("id_tipoComprobante"));
-            cmb_tipoComprobante = argcombo;
-            cmb_tipoComprobante.SelectedValue = VariablesGlobales.id_tipoComprobante_default;
+            generales.Cargar_Combo(
+              ref cmb_tipoComprobante,
+             entidad: "TipoComprobanteEntity",
+                         displaymember: "ComprobanteAfip",
+            valuemember: "IdTipoComprobante",
+                  predet: -1,
+                   soloActivos: true,
+                      filtros: null,
+                orden: OrdenAsc("ComprobanteAfip"));
+            if (id_tipoComprobante_default > 0)
+            {
+                cmb_tipoComprobante.SelectedValue = id_tipoComprobante_default;
+            }
+            else
+            {
+                cmb_tipoComprobante.SelectedIndex = -1;
+                cmb_tipoComprobante.Text = "Seleccione un tipo...";
+            }
 
             // Cargo todos los comprobantes asociados
             // cargar_combo(cmb_comprobanteRelacionado, "SELECT id_comprobante, comprobante FROM comprobantes ORDER BY comprobante ASC", basedb, "comprobante", "id_comprobante")
@@ -106,43 +134,52 @@ namespace Centrex
             // cmb_comprobanteAsociado.SelectedValue = id_tipoComprobante_default
 
             // Cargo todos los modos de MiPyme
-            var argcombo1 = cmb_modoMiPyme;
-            generales.Cargar_Combo(ref argcombo1, "SELECT id_modoMiPyme, modo FROM sys_modoMiPyme ORDER BY id_modoMiPyme ASC", VariablesGlobales.basedb, "modo", Conversions.ToInteger("id_modoMiPyme"));
-            cmb_modoMiPyme = argcombo1;
-            cmb_modoMiPyme.SelectedValue = 1; // 1=No es MiPyme
+            generales.Cargar_Combo(
+      ref cmb_modoMiPyme,
+                     entidad: "SysModoMiPymeEntity",
+                   displaymember: "Modo",
+         valuemember: "IdModoMiPyme",
+              predet: -1,
+         soloActivos: false,
+            filtros: null,
+              orden: OrdenAsc("Modo"));
+            if (cmb_modoMiPyme.Items.Count > 0)
+            {
+                cmb_modoMiPyme.SelectedValue = 1; // 1=No es MiPyME
+            }
 
             rb_electronico.Checked = true;
             chk_activo.Checked = true;
 
-            if (VariablesGlobales.edicion == true | VariablesGlobales.borrado == true)
+            if (edicion == true | borrado == true)
             {
                 chk_secuencia.Enabled = false;
                 {
-                    var withBlock = VariablesGlobales.edita_comprobante;
-                    txt_comprobante.Text = withBlock.comprobante;
-                    cmb_tipoComprobante.SelectedValue = withBlock.id_tipoComprobante;
+                    var withBlock = edita_comprobante;
+                    txt_comprobante.Text = withBlock.Comprobante;
+                    cmb_tipoComprobante.SelectedValue = withBlock.IdTipoComprobante;
                     cmb_tipoComprobante.Enabled = false;
-                    nup_numero.Value = withBlock.numeroComprobante;
-                    nup_puntoVenta.Value = withBlock.puntoVenta;
-                    rb_fiscal.Checked = withBlock.esFiscal;
-                    rb_electronico.Checked = withBlock.esElectronica;
-                    rb_manual.Checked = withBlock.esManual;
-                    rb_presupuesto.Checked = withBlock.esPresupuesto;
-                    chk_activo.Checked = withBlock.activo;
-                    chk_testing.Checked = withBlock.testing;
-                    nup_maxItems.Value = withBlock.maxItems;
-                    chk_contabilizar.Checked = withBlock.contabilizar;
-                    chk_mueveStock.Checked = withBlock.mueveStock;
-                    chk_esMipyme.Checked = withBlock.esMiPyME;
+                    nup_numero.Value = withBlock.NumeroComprobante;
+                    nup_puntoVenta.Value = withBlock.PuntoVenta;
+                    rb_fiscal.Checked = withBlock.EsFiscal ?? false;
+                    rb_electronico.Checked = withBlock.EsElectronica ?? false;
+                    rb_manual.Checked = withBlock.EsManual ?? false;
+                    rb_presupuesto.Checked = withBlock.EsPresupuesto ?? false;
+                    chk_activo.Checked = withBlock.Activo;
+                    chk_testing.Checked = withBlock.Testing;
+                    nup_maxItems.Value = withBlock.MaxItems ?? 0;
+                    chk_contabilizar.Checked = withBlock.Contabilizar;
+                    chk_mueveStock.Checked = withBlock.MueveStock;
+                    chk_esMipyme.Checked = withBlock.EsMiPyMe;
                     // cmb_comprobanteRelacionado.SelectedValue = .comprobanteRelacionado
-                    txt_CBU_emisor.Text = withBlock.CBU_emisor;
-                    txt_alias_CBU_emisor.Text = withBlock.alias_CBU_emisor;
-                    cmb_modoMiPyme.SelectedValue = withBlock.id_modoMiPyme;
-                    txt_comprobanteAnulacion.Text = withBlock.anula_MiPyME;
+                    txt_CBU_emisor.Text = withBlock.CbuEmisor;
+                    txt_alias_CBU_emisor.Text = withBlock.AliasCbuEmisor;
+                    cmb_modoMiPyme.SelectedValue = withBlock.IdModoMiPyme;
+                    txt_comprobanteAnulacion.Text = withBlock.AnulaMiPyMe;
                 }
             }
 
-            if (VariablesGlobales.borrado == true)
+            if (borrado == true)
             {
                 txt_comprobante.Enabled = false;
                 cmb_tipoComprobante.Enabled = false;
@@ -168,12 +205,12 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar este comprobante?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion)) == MsgBoxResult.Yes)
                 {
-                    if (borrarcomprobante(VariablesGlobales.edita_comprobante) == false)
+                    if (comprobantes.borrarcomprobante(edita_comprobante) == false)
                     {
                         if (Interaction.MsgBox("Ocurrió un error al realizar el borrado del comprobante, ¿desea intectar desactivarlo para que no aparezca en la búsqueda?", (MsgBoxStyle)((int)MsgBoxStyle.Question + (int)MsgBoxStyle.YesNo)) == Constants.vbYes)
                         {
                             // Realizo un borrado lógico
-                            if (comprobantes.updatecomprobante(VariablesGlobales.edita_comprobante, true) == true)
+                            if (comprobantes.updatecomprobante(edita_comprobante, true) == true)
                             {
                                 Interaction.MsgBox("Se ha podido realizar un borrado lógico, pero el comprobante no se borró definitivamente." + "\r" + "Esto posiblemente se deba a que el comprobante, tiene operaciones realizadas y por lo tanto no podrá borrarse", Constants.vbInformation);
                             }
@@ -203,6 +240,8 @@ namespace Centrex
             txt_comprobanteAnulacion.Enabled = chk;
             cmb_modoMiPyme.Enabled = chk;
         }
+
+        private static List<Tuple<string, bool>> OrdenAsc(string columna) =>
+                new List<Tuple<string, bool>> { Tuple.Create(columna, true) };
     }
 }
-

@@ -1,19 +1,29 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.Versioning;
 using Microsoft.EntityFrameworkCore;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
+    [SupportedOSPlatform("windows6.1")]
     public static class LoadDataGridDynamic
     {
-        /// <summary>
-        /// Carga un DataGridView dinámicamente desde un DataGridQueryResult de forma asíncrona
-        /// </summary>
+        // Clase auxiliar para guardar configuración y aplicarla al finalizar el DataBinding
+        private class GridConfig
+        {
+            public List<string> ColumnasOcultar { get; set; } = new();
+            public Dictionary<string, Color> ColoresColumnas { get; set; } = new();
+            public bool TieneCheckbox { get; set; }
+            public string NombreColumnCheckbox { get; set; } = "Seleccionar";
+            public int PosicionColumnCheckbox { get; set; }
+            public bool Depuracion { get; set; }
+        }
+
         public static async Task LoadDataGridWithEntityAsync(
             DataGridView grid,
             DataGridQueryResult queryResult,
@@ -21,39 +31,35 @@ namespace Centrex
         {
             try
             {
-                if (queryResult == null || queryResult.Query == null)
+                if (queryResult?.Query is null)
                 {
                     MessageBox.Show("No hay datos para mostrar.", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
-                // Ejecutar consulta y materializar datos
                 object data;
 
-                if (queryResult.EsMaterializada && queryResult.DataMaterializada != null)
+                if (queryResult.EsMaterializada && queryResult.DataMaterializada is not null)
                 {
-                    // Ya está materializada
                     data = queryResult.DataMaterializada;
                 }
                 else
                 {
-                    // Materializar la query de forma asíncrona
                     var queryable = queryResult.Query;
-                    var listMethod = typeof(EntityFrameworkQueryableExtensions)
+                    var listMethod = typeof(Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions)
                         .GetMethod("ToListAsync")
-                        .MakeGenericMethod(queryable.ElementType);
+                        ?.MakeGenericMethod(queryable.ElementType)
+                        ?? throw new InvalidOperationException("No se pudo materializar la consulta");
 
                     var task = (Task)listMethod.Invoke(null, new object[] { queryable, default(System.Threading.CancellationToken) });
                     await task.ConfigureAwait(false);
-
                     var resultProperty = task.GetType().GetProperty("Result");
-                    data = resultProperty.GetValue(task);
+                    data = resultProperty?.GetValue(task);
                 }
 
-                // Convertir a DataTable para el grid
                 var dt = ConvertToDataTable(data);
 
-                // Aplicar formato de depositado si es necesario (para cheques)
+                // Agregar columna "Depositado" si corresponde (caso cheques)
                 if (dt.Columns.Contains("CuentaBancariaNombre") && dt.Columns.Contains("BancoCuentaNombre"))
                 {
                     dt.Columns.Add("Depositado", typeof(string));
@@ -65,71 +71,71 @@ namespace Centrex
                     }
                 }
 
-                // Asignar al grid
-                grid.DataSource = dt;
+                // Limpiar y cargar DataGrid
+                grid.DataSource = null;
+                grid.Columns.Clear();
+                grid.Rows.Clear();
+                grid.Refresh();
 
-                // Configurar apariencia y comportamiento del grid
-                ConfigurarDataGrid(
-                    grid,
-                    queryResult.ColumnasOcultar,
-                    queryResult.ColoresColumnas,
-                    queryResult.TieneCheckbox,
-                    queryResult.NombreColumnCheckbox,
-                    queryResult.PosicionColumnCheckbox,
-                    depuracion);
+                grid.SuspendLayout();
+                grid.DataSource = dt;
+                grid.ResumeLayout();
+
+                // Guardar configuración para aplicar al finalizar el DataBinding
+                grid.Tag = new GridConfig
+                {
+                    ColumnasOcultar = queryResult.ColumnasOcultar,
+                    ColoresColumnas = queryResult.ColoresColumnas,
+                    TieneCheckbox = queryResult.TieneCheckbox,
+                    NombreColumnCheckbox = queryResult.NombreColumnCheckbox,
+                    PosicionColumnCheckbox = queryResult.PosicionColumnCheckbox,
+                    Depuracion = depuracion
+                };
+
+                // Suscribirse al evento solo una vez
+                grid.DataBindingComplete -= grid_DataBindingComplete;
+                grid.DataBindingComplete += grid_DataBindingComplete;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error cargando grilla: {ex.Message}\n\n{ex.StackTrace}", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorLogger.Log(ex, "LoadDataGridWithEntityAsync");
             }
         }
 
-        /// <summary>
-        /// Convierte una lista de objetos anónimos a DataTable
-        /// </summary>
         private static DataTable ConvertToDataTable(object data)
         {
             var dt = new DataTable();
 
-            if (data == null)
-                return dt;
-
-            var enumerable = data as System.Collections.IEnumerable;
-            if (enumerable == null)
+            if (data is not System.Collections.IEnumerable enumerable)
                 return dt;
 
             var enumerator = enumerable.GetEnumerator();
             if (!enumerator.MoveNext())
-                return dt; // Lista vacía
+                return dt;
 
             var firstItem = enumerator.Current;
             var properties = firstItem.GetType().GetProperties();
 
-            // Crear columnas
             foreach (var prop in properties)
             {
                 var columnType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
                 dt.Columns.Add(prop.Name, columnType);
             }
 
-            // Agregar primera fila
             var firstRow = dt.NewRow();
             foreach (var prop in properties)
             {
-                var value = prop.GetValue(firstItem);
-                firstRow[prop.Name] = value ?? DBNull.Value;
+                firstRow[prop.Name] = prop.GetValue(firstItem) ?? DBNull.Value;
             }
             dt.Rows.Add(firstRow);
 
-            // Agregar resto de filas
             while (enumerator.MoveNext())
             {
                 var item = enumerator.Current;
                 var row = dt.NewRow();
                 foreach (var prop in properties)
                 {
-                    var value = prop.GetValue(item);
-                    row[prop.Name] = value ?? DBNull.Value;
+                    row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
                 }
                 dt.Rows.Add(row);
             }
@@ -137,17 +143,37 @@ namespace Centrex
             return dt;
         }
 
-        /// <summary>
-        /// Configura la apariencia y funcionalidad visual de un DataGridView.
-        /// Permite personalizar columnas, colores, visibilidad y agregar checkbox de selección.
-        /// </summary>
-        /// <param name="dataGrid">El control DataGridView a configurar.</param>
-        /// <param name="colsHide">Lista opcional de nombres de columnas a ocultar.</param>
-        /// <param name="coloresColumnas">Diccionario (columna → color) para personalizar columnas específicas.</param>
-        /// <param name="check">Si es True, agrega una columna checkbox editable.</param>
-        /// <param name="colCheckName">Nombre de la columna checkbox.</param>
-        /// <param name="colCheckPos">Posición de la columna checkbox.</param>
-        /// <param name="depuracion">Si está en modo depuración, evita ocultar la primera columna.</param>
+        private static void grid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            var grid = (DataGridView)sender;
+
+            try
+            {
+                grid.ClearSelection();
+                grid.CurrentCell = null;
+
+                // Aplicar configuración almacenada
+                if (grid.Tag is GridConfig cfg)
+                {
+                    ConfigurarDataGrid(
+                        grid,
+                        cfg.ColumnasOcultar,
+                        cfg.ColoresColumnas,
+                        cfg.TieneCheckbox,
+                        cfg.NombreColumnCheckbox,
+                        cfg.PosicionColumnCheckbox,
+                        cfg.Depuracion
+                    );
+                }
+
+                AjustarColumnas(grid);
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex, "DataBindingComplete");
+            }
+        }
+
         public static void ConfigurarDataGrid(
             DataGridView dataGrid,
             List<string> colsHide = null,
@@ -159,115 +185,128 @@ namespace Centrex
         {
             try
             {
-                // 🎨 Estilo general
+                // 🎨 Estilo base
                 dataGrid.RowsDefaultCellStyle.BackColor = Color.White;
                 dataGrid.AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue;
-                dataGrid.EnableHeadersVisualStyles = false;
-                dataGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
-                dataGrid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9f, FontStyle.Bold);
+                //dataGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
+                //dataGrid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9f, FontStyle.Bold);
+                dataGrid.ColumnHeadersDefaultCellStyle.SelectionBackColor = dataGrid.ColumnHeadersDefaultCellStyle.BackColor;
+                dataGrid.ColumnHeadersDefaultCellStyle.SelectionForeColor = dataGrid.ColumnHeadersDefaultCellStyle.ForeColor;
+                //dataGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
+                //dataGrid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9f, FontStyle.Bold);
                 dataGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
                 dataGrid.MultiSelect = false;
                 dataGrid.RowHeadersVisible = false;
+                dataGrid.EnableHeadersVisualStyles = false;
 
-                // 🔢 Mantener orden de columnas
-                int i = 0;
-                foreach (DataGridViewColumn columna in dataGrid.Columns)
+                // Limpia selección para evitar resaltado de columna activa
+                dataGrid.CurrentCellChanged += (s, e) =>
                 {
-                    dataGrid.Columns[columna.Name].DisplayIndex = i;
-                    i++;
-                }
+                    if (dataGrid.CurrentCell != null)
+                        dataGrid.ClearSelection();
+                };
 
-                // 👁️ Ocultar columnas por nombre
-                if (colsHide != null)
+                // Ocultar columnas
+                if (colsHide is not null)
                 {
                     foreach (var col in colsHide)
                     {
                         if (dataGrid.Columns.Contains(col))
-                        {
                             dataGrid.Columns[col].Visible = false;
-                        }
                     }
                 }
 
-                // 🟡 Aplicar color personalizado por columna
-                if (coloresColumnas != null)
+                // Aplicar colores personalizados
+                if (coloresColumnas is not null)
                 {
                     foreach (var par in coloresColumnas)
                     {
                         if (dataGrid.Columns.Contains(par.Key))
-                        {
                             dataGrid.Columns[par.Key].DefaultCellStyle.BackColor = par.Value;
-                        }
                     }
                 }
 
-                // 🧩 Agregar columna checkbox (si corresponde)
+                // Agregar columna CheckBox si corresponde
                 if (check)
                 {
-                    var column = new DataGridViewCheckBoxColumn
+                    if (!dataGrid.Columns.Contains(colCheckName))
                     {
-                        Name = colCheckName,
-                        ReadOnly = false
-                    };
-                    dataGrid.ReadOnly = false;
-                    dataGrid.Columns.Add(column);
-                    dataGrid.Columns[colCheckName].DisplayIndex = colCheckPos;
-                    dataGrid.Columns[colCheckName].ReadOnly = false;
+                        var column = new DataGridViewCheckBoxColumn
+                        {
+                            Name = colCheckName,
+                            ReadOnly = false,
+                            HeaderText = string.Empty,
+                            ThreeState = false
+                        };
+                        column.DefaultCellStyle.NullValue = false;
+                        dataGrid.ReadOnly = false;
+                        dataGrid.Columns.Insert(Math.Min(colCheckPos, dataGrid.Columns.Count), column);
+                    }
 
-                    // Solo permitir edición en la columna de checkbox
+                    var checkColumn = dataGrid.Columns[colCheckName];
+                    checkColumn.DisplayIndex = colCheckPos;
+                    checkColumn.ReadOnly = false;
+
                     foreach (DataGridViewColumn col in dataGrid.Columns)
                     {
-                        if (!col.Name.Equals(colCheckName))
-                        {
+                        if (!col.Name.Equals(colCheckName, StringComparison.OrdinalIgnoreCase))
                             col.ReadOnly = true;
-                        }
                     }
                 }
 
-                // 👀 Reglas específicas por formulario
+                // Reglas por formulario
                 if (dataGrid.Name != "dg_view_resultados" && !depuracion)
                 {
                     if (dataGrid.Columns.Count > 0)
                         dataGrid.Columns[0].Visible = false;
                 }
 
-                if (dataGrid.Name == "dg_viewPedido")
+                if (dataGrid.Name == "dg_viewPedido" && dataGrid.Columns.Count > 1)
                 {
-                    if (dataGrid.Columns.Count > 1)
-                        dataGrid.Columns[1].Visible = false;
+                    dataGrid.Columns[1].Visible = false;
                 }
 
-                // 🔄 Ajuste visual rápido
+                // Ajuste visual rápido
                 dataGrid.Height += 1;
                 dataGrid.Height -= 1;
 
-                // 📐 Ajuste de ancho automático
-                if (dataGrid.Rows.Count > 0)
-                {
-                    dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-                }
-                else
-                {
-                    dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-                }
+                // Ajuste automático de ancho
+                dataGrid.AutoSizeColumnsMode = dataGrid.Rows.Count > 0
+                    ? DataGridViewAutoSizeColumnsMode.AllCells
+                    : DataGridViewAutoSizeColumnsMode.None;
 
                 dataGrid.Refresh();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al configurar DataGrid: {ex.Message}", "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorLogger.Log(ex, "ConfigurarDataGrid");
             }
         }
 
-        /// <summary>
-        /// Sobrecarga del método para mantener compatibilidad con código existente que usa IQueryable directamente
-        /// </summary>
+        private static void AjustarColumnas(DataGridView grid)
+        {
+            if (grid is null)
+                return;
+
+            try
+            {
+                grid.AutoSizeColumnsMode = grid.Rows.Count > 0
+                    ? DataGridViewAutoSizeColumnsMode.AllCells
+                    : DataGridViewAutoSizeColumnsMode.None;
+            }
+            catch
+            {
+                grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            }
+        }
+
         public static async Task LoadDataGridWithEntityAsync<T>(DataGridView grid, IQueryable<T> query)
         {
             var queryResult = new DataGridQueryResult
             {
                 Query = query
             };
+
             await LoadDataGridWithEntityAsync(grid, queryResult);
         }
     }

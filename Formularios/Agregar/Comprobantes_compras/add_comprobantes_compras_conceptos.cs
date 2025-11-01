@@ -1,7 +1,5 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
@@ -9,7 +7,7 @@ namespace Centrex
     {
         private int id_concepto;
         private int id_comprobanteCompra;
-        private concepto_compra c = new concepto_compra();
+        private ConceptoCompraEntity c = new ConceptoCompraEntity();
         public add_comprobantes_compras_conceptos()
         {
 
@@ -32,9 +30,9 @@ namespace Centrex
         }
         private void add_comprobantes_compras_conceptos_Load(object sender, EventArgs e)
         {
-            c = conceptos_compra.info_concepto_compra(id_concepto.ToString());
+            c = info_concepto_compra(id_concepto);
 
-            lbl_concepto.Text = c.concepto;
+            lbl_concepto.Text = c.Concepto;
         }
 
         private void txt_subtotal_KeyPress(object sender, KeyPressEventArgs e)
@@ -91,7 +89,7 @@ namespace Centrex
                 return;
             }
 
-            if (!comprobantes_compras.add_concepto_comprobanteCompra(id_comprobanteCompra, c.id_concepto_compra, Conversions.ToDouble(txt_subtotal.Text), Conversions.ToDouble(txt_iva.Text), Conversions.ToDouble(txt_total.Text)))
+            if (!comprobantes_compras.add_concepto_comprobanteCompra(id_comprobanteCompra, c.IdConceptoCompra, Conversions.ToDecimal(txt_subtotal.Text), Conversions.ToDecimal(txt_iva.Text), Conversions.ToDecimal(txt_total.Text)))
             {
                 Interaction.MsgBox("Hubo un problema al cargar el concepto en la base de datos, consulte con el programador.", (MsgBoxStyle)((int)Constants.vbCritical + (int)Constants.vbOKOnly), "Centrex");
                 closeandupdate(this);

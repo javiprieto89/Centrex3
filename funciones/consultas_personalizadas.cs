@@ -1,62 +1,58 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Centrex.Models;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
-
     static class consultas
     {
         // ************************************
         // FUNCIONES DE CONSULTAS PERSONALIZADAS
         // ************************************
 
-        public static consultaP info_consulta(int id_consulta)
+        public static ConsultaPersonalizadaEntity info_consulta(int id_consulta)
         {
-            var tmp = new consultaP();
+            var tmp = new ConsultaPersonalizadaEntity();
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (var context = new CentrexDbContext())
                 {
-                    var consultaEntity = context.ConsultasPersonalizadas.FirstOrDefault(c => c.IdConsulta == id_consulta);
+                    var consultaEntity = context.ConsultaPersonalizadaEntity.FirstOrDefault(c => c.IdConsulta == id_consulta);
 
                     if (consultaEntity is not null)
                     {
-                        tmp.id_consulta = consultaEntity.IdConsulta.ToString();
-                        tmp.nombre = consultaEntity.nombre;
-                        tmp.consulta = consultaEntity.SqlTexto;
-                        tmp.activo = consultaEntity.activo;
+                        tmp.IdConsulta = consultaEntity.IdConsulta;
+                        tmp.Nombre = consultaEntity.Nombre;
+                        tmp.Consulta = consultaEntity.Consulta;
+                        tmp.Activo = consultaEntity.Activo;
                     }
                     else
                     {
-                        tmp.nombre = "error";
+                        tmp.Nombre = "error";
                     }
                 }
             }
             catch (Exception ex)
             {
                 Interaction.MsgBox("Error en info_consulta: " + ex.Message);
-                tmp.nombre = "error";
+                tmp.Nombre = "error";
             }
             return tmp;
         }
 
-        public static bool addConsulta(consultaP c)
+        public static bool addConsulta(ConsultaPersonalizadaEntity c)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (var context = new CentrexDbContext())
                 {
                     var consultaEntity = new ConsultaPersonalizadaEntity()
                     {
-                        nombre = c.nombre,
-                        SqlTexto = c.consulta,
-                        activo = c.activo
+                        Nombre = c.Nombre,
+                        Consulta = c.Consulta,
+                        Activo = c.Activo
                     };
 
-                    context.ConsultasPersonalizadas.Add(consultaEntity);
+                    context.ConsultaPersonalizadaEntity.Add(consultaEntity);
                     context.SaveChanges();
                     return true;
                 }
@@ -68,25 +64,25 @@ namespace Centrex
             }
         }
 
-        public static bool updateConsulta(consultaP c, bool borra = false)
+        public static bool updateConsulta(ConsultaPersonalizadaEntity c, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (var context = new CentrexDbContext())
                 {
-                    var consultaEntity = context.ConsultasPersonalizadas.FirstOrDefault(ce => ce.IdConsulta == c.id_consulta);
+                    var consultaEntity = context.ConsultaPersonalizadaEntity.FirstOrDefault(ce => ce.IdConsulta == c.IdConsulta);
 
                     if (consultaEntity is not null)
                     {
                         if (borra)
                         {
-                            consultaEntity.activo = false;
+                            consultaEntity.Activo = false;
                         }
                         else
                         {
-                            consultaEntity.nombre = c.nombre;
-                            consultaEntity.SqlTexto = c.consulta;
-                            consultaEntity.activo = c.activo;
+                            consultaEntity.Nombre = c.Nombre;
+                            consultaEntity.Consulta = c.Consulta;
+                            consultaEntity.Activo = c.Activo;
                         }
                         context.SaveChanges();
                         return true;
@@ -104,17 +100,17 @@ namespace Centrex
             }
         }
 
-        public static bool borrarConsulta(consultaP c)
+        public static bool borrarConsulta(ConsultaPersonalizadaEntity c)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (var context = new CentrexDbContext())
                 {
-                    var consultaEntity = context.ConsultasPersonalizadas.FirstOrDefault(ce => ce.IdConsulta == c.id_consulta);
+                    var consultaEntity = context.ConsultaPersonalizadaEntity.FirstOrDefault(ce => ce.IdConsulta == c.IdConsulta);
 
                     if (consultaEntity is not null)
                     {
-                        context.ConsultasPersonalizadas.Remove(consultaEntity);
+                        context.ConsultaPersonalizadaEntity.Remove(consultaEntity);
                         context.SaveChanges();
                         return true;
                     }

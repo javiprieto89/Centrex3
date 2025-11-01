@@ -1,72 +1,45 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
-using Centrex.Models;
+using System.Windows.Forms;
 
-namespace Centrex
+namespace Centrex.Funciones
 {
-
     static class clientes
     {
         // ************************************ FUNCIONES DE CLIENTES ***************************
-        public static cliente info_cliente(string id_cliente)
+        public static ClienteEntity info_cliente(int id_cliente)
         {
-            var tmp = new cliente();
-
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var clienteEntity = context.Clientes.Include(c => c.ProvinciaFiscal).Include(c => c.ProvinciaEntrega).FirstOrDefault(c => c.IdCliente == Conversions.ToInteger(id_cliente));
-
+                    var clienteEntity = context.ClienteEntity.AsNoTracking().Include(c => c.IdProvinciaFiscalNavigation).Include(c => c.IdProvinciaEntregaNavigation).FirstOrDefault(c => c.IdCliente == id_cliente);
 
                     if (clienteEntity is not null)
                     {
-                        tmp.IdCliente = clienteEntity.IdCliente;
-                        tmp.RazonSocial = clienteEntity.RazonSocial;
-                        tmp.NombreFantasia = clienteEntity.NombreFantasia;
-                        tmp.TaxNumber = clienteEntity.TaxNumber;
-                        tmp.Contacto = clienteEntity.Contacto;
-                        tmp.Telefono = clienteEntity.Telefono;
-                        tmp.Celular = clienteEntity.Celular;
-                        tmp.Email = clienteEntity.Email;
-                        tmp.IdProvinciaFiscal = clienteEntity.IdProvinciaFiscal;
-                        tmp.DireccionFiscal = clienteEntity.DireccionFiscal;
-                        tmp.LocalidadFiscal = clienteEntity.LocalidadFiscal;
-                        tmp.CpFiscal = clienteEntity.CpFiscal;
-                        tmp.IdProvinciaEntrega = clienteEntity.IdProvinciaEntrega;
-                        tmp.DireccionEntrega = clienteEntity.DireccionEntrega;
-                        tmp.LocalidadEntrega = clienteEntity.LocalidadEntrega;
-                        tmp.CpEntrega = clienteEntity.CpEntrega;
-                        tmp.Notas = clienteEntity.Notas;
-                        tmp.EsInscripto = clienteEntity.EsInscripto;
-                        tmp.Activo = clienteEntity.Activo;
-                        tmp.IdTipoDocumento = clienteEntity.IdTipoDocumento;
-                        tmp.IdClaseFiscal = clienteEntity.IdClaseFiscal;
+                        return clienteEntity;
                     }
                     else
                     {
-                        tmp.RazonSocial = "error";
+                        return null;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
-                tmp.RazonSocial = "error";
+                MessageBox.Show("Error al obtener el cliente:" + ex.Message, "Centrex", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
 
-            return tmp;
+
         }
 
-        public static bool addcliente(cliente cl)
+        public static bool addcliente(ClienteEntity cl)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
                     var clienteEntity = new ClienteEntity();
 
@@ -90,26 +63,28 @@ namespace Centrex
                     clienteEntity.Activo = cl.Activo;
                     clienteEntity.IdTipoDocumento = cl.IdTipoDocumento;
                     clienteEntity.IdClaseFiscal = cl.IdClaseFiscal;
+                    clienteEntity.IdPaisFiscal = cl.IdPaisFiscal;
+                    clienteEntity.IdPaisEntrega = cl.IdPaisEntrega;
 
-                    context.Clientes.Add(clienteEntity);
+                    context.ClienteEntity.Add(clienteEntity);
                     context.SaveChanges();
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
-        public static bool updatecliente(cliente cl, bool borra = false)
+        public static bool updatecliente(ClienteEntity cl, bool borra = false)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var clienteEntity = context.Clientes.FirstOrDefault(c => c.IdCliente == cl.IdCliente);
+                    var clienteEntity = context.ClienteEntity.FirstOrDefault(c => c.IdCliente == cl.IdCliente);
 
                     if (clienteEntity is not null)
                     {
@@ -139,6 +114,8 @@ namespace Centrex
                             clienteEntity.Activo = cl.Activo;
                             clienteEntity.IdTipoDocumento = cl.IdTipoDocumento;
                             clienteEntity.IdClaseFiscal = cl.IdClaseFiscal;
+                            clienteEntity.IdPaisFiscal = cl.IdPaisFiscal;
+                            clienteEntity.IdPaisEntrega = cl.IdPaisEntrega;
                         }
 
                         context.SaveChanges();
@@ -152,22 +129,22 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
-        public static bool borrarcliente(cliente cl)
+        public static bool borrarcliente(ClienteEntity cl)
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var clienteEntity = context.Clientes.FirstOrDefault(c => c.IdCliente == cl.id_cliente);
+                    var clienteEntity = context.ClienteEntity.FirstOrDefault(c => c.IdCliente == cl.IdCliente);
 
                     if (clienteEntity is not null)
                     {
-                        context.Clientes.Remove(clienteEntity);
+                        context.ClienteEntity.Remove(clienteEntity);
                         context.SaveChanges();
                         return true;
                     }
@@ -179,7 +156,7 @@ namespace Centrex
             }
             catch (Exception ex)
             {
-                Interaction.MsgBox(ex.Message.ToString());
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -188,18 +165,16 @@ namespace Centrex
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var clienteEntity = context.Clientes.Where(c => c.activo == true && c.IdCliente == id_clientePedidoDefault).OrderBy(c => c.RazonSocial).FirstOrDefault();
-
-
+                    var clienteEntity = context.ClienteEntity.Where(c => c.Activo == true && c.IdCliente == id_clientePedidoDefault).OrderBy(c => c.RazonSocial).FirstOrDefault();
 
                     return clienteEntity is not null;
                 }
             }
             catch (Exception ex)
             {
-                // MsgBox(ex.Message.ToString)
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -208,9 +183,10 @@ namespace Centrex
         {
             try
             {
-                using (CentrexDbContext context = GetDbContext())
+                using (CentrexDbContext context = new CentrexDbContext())
                 {
-                    var clienteEntity = context.Clientes.FirstOrDefault(c => c.taxNumber == Strings.Trim(taxNumber.ToString()));
+                    string trimmedTaxNumber = taxNumber.Trim();
+                    var clienteEntity = context.ClienteEntity.FirstOrDefault(c => c.TaxNumber == trimmedTaxNumber);
 
                     if (clienteEntity is not null)
                     {
@@ -224,83 +200,9 @@ namespace Centrex
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
             }
         }
-
-        // Public Function info_clienteVendedor(ByVal id_cliente As String) As Integer
-        // Dim sqlstr As String
-        // Dim id_vendedor As Integer
-
-        // sqlstr = "SELECT c.id_vendedor " & _
-        // "FROM clientes AS c " & _
-        // "WHERE c.id_vendedor = '" + id_cliente + "'"
-
-        // Try
-        // 'Crea y abre una nueva conexión
-        // abrirdb(serversql, basedb, usuariodb, passdb)
-
-        // 'Propiedades del SqlCommand
-        // Dim comando As New SqlCommand
-        // With comando
-        // .CommandType = CommandType.Text
-        // .CommandText = sqlstr
-        // .Connection = CN
-        // End With
-
-        // Dim da As New SqlDataAdapter 'Crear nuevo SqlDataAdapter
-        // Dim dataset As New DataSet 'Crear nuevo dataset
-
-        // da.SelectCommand = comando
-
-        // 'llenar el dataset
-        // da.Fill(dataset, "Tabla")
-        // id_vendedor = dataset.Tables("tabla").Rows(0).Item(0).ToString
-        // cerrardb()
-        // Return id_vendedor
-        // Catch ex As Exception
-        // MsgBox(ex.Message.ToString)
-        // id_vendedor = -1
-        // cerrardb()
-        // Return id_vendedor
-        // End Try
-        // End Function
-
-        // Public Function existecliente(ByVal n As String, Optional ByVal a As String = "") As Integer
-        // Dim tmp As New cliente
-
-        // Dim sqlstr As String
-        // sqlstr = "SELECT id_cliente FROM clientes WHERE razon_social LIKE '%" + Trim(n.ToString) + Trim(a.ToString) + "%'"
-
-        // Try
-        // 'Crea y abre una nueva conexión
-        // abrirdb(serversql, basedb, usuariodb, passdb)
-
-        // 'Propiedades del SqlCommand
-        // Dim comando As New SqlCommand
-        // With comando
-        // .CommandType = CommandType.Text
-        // .CommandText = sqlstr
-        // .Connection = CN
-        // End With
-
-        // Dim da As New SqlDataAdapter 'Crear nuevo SqlDataAdapter
-        // Dim dataset As New DataSet 'Crear nuevo dataset
-
-        // da.SelectCommand = comando
-
-        // 'llenar el dataset
-        // da.Fill(dataset, "Tabla")
-        // tmp.id_cliente = dataset.Tables("tabla").Rows(0).Item(0).ToString
-        // If tmp.id_cliente = 0 Then Return -1
-        // cerrardb()
-        // Return tmp.id_cliente
-        // Catch ex As Exception
-        // tmp.razon_social = "error"
-        // cerrardb()
-        // Return -1
-        // End Try
-        // End Function
-        // ************************************ FUNCIONES DE CLIENTES ***************************
     }
 }

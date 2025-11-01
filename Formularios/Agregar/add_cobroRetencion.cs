@@ -1,17 +1,13 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Centrex
 {
 
     public partial class add_cobroRetencion
     {
-        private Form formViejo;
         private CentrexDbContext _context;
 
         // Parámetros de operación
@@ -53,7 +49,7 @@ namespace Centrex
                 Show();
                 if (Interaction.MsgBox("¿Está seguro que desea borrar esta retención?", (MsgBoxStyle)((int)Constants.vbYesNo + (int)Constants.vbQuestion), "Centrex") == MsgBoxResult.Yes)
                 {
-                    if (!borrarTmpCobroRetencion(EditaCobroRetencion.IdTmpRetencion))
+                    if (!cobros_retenciones.borrarTmpCobroRetencion(EditaCobroRetencion.IdTmpRetencion))
                     {
                         Interaction.MsgBox("No se ha podido borrar la retención.");
                     }
@@ -61,7 +57,6 @@ namespace Centrex
                 closeandupdate(this);
             }
 
-            // formViejo = Form ' Comentado para evitar error de compilación
             // Form = Me ' Comentado para evitar error de compilación
         }
 
@@ -69,11 +64,11 @@ namespace Centrex
         {
             try
             {
-                var lista = _context.Impuestos
-                    .Where(i => i.EsRetencion == true)
-                    .OrderBy(i => i.Nombre)
-                    .Select(i => new { Id = i.IdImpuesto, Nombre = i.Nombre })
-                    .ToList();
+                var lista = _context.ImpuestoEntity
+       .Where(i => i.EsRetencion == true)
+        .OrderBy(i => i.Nombre)
+         .Select(i => new { Id = i.IdImpuesto, Nombre = i.Nombre })
+        .ToList();
 
                 cmb_retencion.DataSource = lista;
                 cmb_retencion.DisplayMember = "Nombre";
@@ -124,11 +119,11 @@ namespace Centrex
                 if (Edicion)
                 {
                     cb.IdTmpRetencion = EditaCobroRetencion.IdTmpRetencion;
-                    updateTmpCobroRetencion(cb);
+                    cobros_retenciones.updateTmpCobroRetencion(cb);
                 }
                 else
                 {
-                    addTmpCobroRetencion(cb);
+                    cobros_retenciones.addTmpCobroRetencion(cb);
                 }
             }
             catch (Exception ex)
@@ -142,8 +137,11 @@ namespace Centrex
         private void psearch_retencion_Click(object sender, EventArgs e)
         {
             // Reutiliza tu formulario de búsqueda general
-            var frmSearch = new search(Conversions.ToInteger("retenciones"));
+            string tmpTabla = tabla;
+            tabla = "retenciones";
+            var frmSearch = new search("retenciones");
             frmSearch.ShowDialog();
+            tabla = tmpTabla;
 
             if (frmSearch.SelectedIndex > 0)
             {
@@ -153,7 +151,6 @@ namespace Centrex
 
         private void add_cobroRetencion_FormClosed(object sender, FormClosedEventArgs e)
         {
-            // Form = formViejo
             closeandupdate(this);
         }
 
@@ -166,63 +163,6 @@ namespace Centrex
             {
                 cargar_comboRetenciones();
                 cmb_retencion.SelectedValue = frmImpuesto.id_impuesto;
-            }
-        }
-
-        // ----------------------------------------------
-        // FUNCIONES ADAPTADAS A ENTITY FRAMEWORK
-        // ----------------------------------------------
-        private bool addTmpCobroRetencion(TmpCobroRetencionEntity cb)
-        {
-            try
-            {
-                _context.TmpCobrosRetenciones.Add(cb);
-                _context.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox("Error al agregar retención: " + ex.Message, Constants.vbExclamation);
-                return false;
-            }
-        }
-
-        private bool updateTmpCobroRetencion(TmpCobroRetencionEntity cb)
-        {
-            try
-            {
-                var entity = _context.TmpCobrosRetenciones.FirstOrDefault(r => r.IdTmpRetencion == cb.IdTmpRetencion);
-                if (entity is null)
-                    return false;
-
-                entity.IdImpuesto = cb.IdImpuesto;
-                entity.Total = cb.Total;
-                entity.Notas = cb.Notas;
-                _context.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox("Error al actualizar la retención: " + ex.Message, Constants.vbExclamation);
-                return false;
-            }
-        }
-
-        private bool borrarTmpCobroRetencion(int idRetencion)
-        {
-            try
-            {
-                var entity = _context.TmpCobrosRetenciones.FirstOrDefault(r => r.IdTmpRetencion == idRetencion);
-                if (entity is null)
-                    return false;
-                _context.TmpCobrosRetenciones.Remove(entity);
-                _context.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Interaction.MsgBox("Error al borrar la retención: " + ex.Message, Constants.vbExclamation);
-                return false;
             }
         }
     }

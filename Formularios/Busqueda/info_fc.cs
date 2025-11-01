@@ -1,6 +1,5 @@
-using System;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Centrex
 {
@@ -12,16 +11,23 @@ namespace Centrex
         }
         private void info_fc_Load(object sender, EventArgs e)
         {
-            // cargar_combo(cmb_tipoComprobante, "SELECT id_tipoComprobante, comprobante_AFIP FROM tipos_comprobantes ORDER BY comprobante_AFIP ASC", basedb, "comprobante_AFIP", "id_tipoComprobante")
             var argcombo = cmb_Comprobante;
-            generales.Cargar_Combo(ref argcombo, "SELECT id_comprobante, comprobante FROM comprobantes WHERE esElectronica = 1 AND activo = 1 ORDER BY comprobante ASC", VariablesGlobales.basedb, "comprobante", Conversions.ToInteger("id_comprobante"));
+            generales.Cargar_Combo(
+      ref argcombo,
+      entidad: "ComprobanteEntity",
+                displaymember: "Comprobante",
+           valuemember: "IdComprobante",
+  predet: -1,
+    soloActivos: true,
+                filtros: new Dictionary<string, object> { ["EsElectronica"] = true },
+            orden: new List<Tuple<string, bool>> { Tuple.Create("Comprobante", true) });
             cmb_Comprobante = argcombo;
             cmb_Comprobante.Text = "Seleccione un comprobante...";
         }
 
         private void cmd_consultar_Click(object sender, EventArgs e)
         {
-            comprobante c;
+            ComprobanteEntity c;
 
             if (cmb_Comprobante.Text == "Seleccione un comprobante...")
             {
@@ -34,15 +40,16 @@ namespace Centrex
                 return;
             }
 
-            c = comprobantes.info_comprobante(Conversions.ToString(cmb_Comprobante.SelectedValue));
+            c = comprobantes.info_comprobante(Conversions.ToInteger(cmb_Comprobante.SelectedValue));
 
-
-            Consultar_Comprobante(txt_puntoVenta.Text, c.id_tipoComprobante, txt_numeroComprobante.Text);
+            // Usar la función de factura_electronica directamente
+            factura_electronica.Consultar_Comprobante(Conversions.ToInteger(txt_puntoVenta.Text), c.IdTipoComprobante, (int)Conversion.Int(txt_numeroComprobante.Text));
         }
 
         private void cmb_Comprobante_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            txt_puntoVenta.Text = comprobantes.info_comprobante(Conversions.ToString(cmb_Comprobante.SelectedValue)).puntoVenta.ToString();
+            var comprobante = comprobantes.info_comprobante(Conversions.ToInteger(cmb_Comprobante.SelectedValue));
+            txt_puntoVenta.Text = comprobante.PuntoVenta.ToString();
         }
     }
 }
