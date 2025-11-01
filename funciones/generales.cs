@@ -219,6 +219,44 @@ namespace Centrex.Funciones
             }
         }
 
+        public static void activaitems(string tabla)
+        {
+            try
+            {
+                using var context = new CentrexDbContext();
+                var entityInfo = ResolveEntitySet(context, tabla);
+                if (entityInfo is null)
+                {
+                    Interaction.MsgBox($"La entidad '{tabla}' no existe en el contexto.", Constants.vbExclamation, "Centrex");
+                    return;
+                }
+
+                bool cambios = false;
+                foreach (var registro in entityInfo.Query)
+                {
+                    var prop = registro.GetType().GetProperty("Activo", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    if (prop != null && prop.CanWrite)
+                    {
+                        var valor = prop.GetValue(registro);
+                        if (valor is bool activoActual && !activoActual)
+                        {
+                            prop.SetValue(registro, true);
+                            cambios = true;
+                        }
+                    }
+                }
+
+                if (cambios)
+                {
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox("Error al activar ítems: " + ex.Message, MsgBoxStyle.Exclamation, "Centrex");
+            }
+        }
+
 
         /// <summary>
         /// Carga ComboBox usando Entity Framework

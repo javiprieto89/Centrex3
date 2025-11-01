@@ -701,6 +701,103 @@ namespace Centrex.Funciones
             }
         }
 
+        // ============================================================================================
+        // 8️⃣ Funciones auxiliares legacy utilizadas por add_pedido
+        // ============================================================================================
+
+        public static int Info_Ultimo_Pedido_Por_Usuario(int idUsuario)
+        {
+            try
+            {
+                using var ctx = new CentrexDbContext();
+                var pedido = ctx.PedidoEntity
+                    .Where(p => p.IdUsuario == idUsuario)
+                    .OrderByDescending(p => p.IdPedido)
+                    .FirstOrDefault();
+
+                return pedido?.IdPedido ?? -1;
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al obtener último pedido del usuario: {ex.Message}", MsgBoxStyle.Exclamation, "Centrex");
+                return -1;
+            }
+        }
+
+        public static bool BorrarPedido(PedidoEntity p)
+        {
+            try
+            {
+                using var ctx = new CentrexDbContext();
+
+                var tmpItems = ctx.TmpPedidoItemEntity.Where(t => t.IdPedido == p.IdPedido).ToList();
+                if (tmpItems.Count > 0)
+                {
+                    ctx.TmpPedidoItemEntity.RemoveRange(tmpItems);
+                }
+
+                var pedidoItems = ctx.PedidoItemEntity.Where(pi => pi.IdPedido == p.IdPedido).ToList();
+                if (pedidoItems.Count > 0)
+                {
+                    ctx.PedidoItemEntity.RemoveRange(pedidoItems);
+                }
+
+                var pedido = ctx.PedidoEntity.FirstOrDefault(x => x.IdPedido == p.IdPedido);
+                if (pedido != null)
+                {
+                    ctx.PedidoEntity.Remove(pedido);
+                }
+
+                ctx.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al borrar pedido: {ex.Message}", MsgBoxStyle.Exclamation, "Centrex");
+                return false;
+            }
+        }
+
+        public static int Ultima_CC_Pedido_Cliente(int idCliente)
+        {
+            try
+            {
+                using var ctx = new CentrexDbContext();
+                var ultimo = ctx.PedidoEntity
+                    .Where(p => p.IdCliente == idCliente)
+                    .OrderByDescending(p => p.IdPedido)
+                    .Select(p => p.IdCc)
+                    .FirstOrDefault();
+
+                return ultimo ?? -1;
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al obtener última cuenta corriente usada: {ex.Message}", MsgBoxStyle.Exclamation, "Centrex");
+                return -1;
+            }
+        }
+
+        public static void cerrarPedido(PedidoEntity pedido, bool esPresupuesto, bool imprimeRemito)
+        {
+            if (pedido == null)
+                return;
+
+            try
+            {
+                pedido.Cerrado = true;
+                pedido.Activo = false;
+                pedido.FechaEdicion = DateOnly.FromDateTime(DateTime.Now);
+                UpdatePedido(pedido);
+
+                Centrex.factura_electronica.imprimirFactura(pedido.IdPedido, esPresupuesto, imprimeRemito);
+            }
+            catch (Exception ex)
+            {
+                Interaction.MsgBox($"Error al cerrar pedido: {ex.Message}", MsgBoxStyle.Exclamation, "Centrex");
+            }
+        }
+
     }
 }
 
