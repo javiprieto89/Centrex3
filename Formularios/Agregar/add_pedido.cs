@@ -11,13 +11,16 @@ namespace Centrex
     public partial class add_pedido : Form
     {
         private bool emitir = false;
+        private double totalOriginal;
         private double subTotalOriginal;
         public ComprobanteEntity comprobanteSeleccionado = new();
         private double markupOriginal = -1;
+        private int nPedido = -1;
         private bool historico;
         private int numeroPedido_anulado = -1;
         private int idUsuario;
         private Guid idUnico;
+        private ColumnClickEventArgs? orderCol = null;
         private bool suspendEventos = false;
 
         private const string GRID_COL_ID = "ID";
@@ -195,7 +198,7 @@ namespace Centrex
             using var ctx = new CentrexDbContext();
 
             var query = from t in ctx.TmpPedidoItemEntity
-                        where t.IdUsuario == idUsuario && t.IdUnico == idUnico && t.Activo == true
+                        where t.IdUsuario == idUsuario && t.IdUnico == idUnico && t.Activo
                         join i in ctx.ItemEntity on t.IdItem equals i.IdItem into it
                         from i in it.DefaultIfEmpty()
                         orderby t.IdTmpPedidoItem
@@ -217,7 +220,7 @@ namespace Centrex
                 DataMaterializada = data
             };
 
-            await Centrex.Funciones.LoadDataGridDynamic.LoadDataGridWithEntityAsync(dg_items, result);
+            await LoadDataGridWithEntityAsync(dg_items, result);
 
             if (!dg_items.Columns.Contains(GRID_COL_ID))
             {
@@ -258,10 +261,10 @@ namespace Centrex
             txt_comprobanteAsociado.Text = edita_pedido.NumeroComprobanteAnulado.HasValue
                 ? edita_pedido.NumeroComprobanteAnulado.Value.ToString()
                 : string.Empty;
-            chk_presupuesto.Checked = edita_pedido.EsPresupuesto;
+            chk_presupuesto.Checked = edita_pedido.EsPresupuesto ?? false;
             chk_secuencia.Enabled = false;
             subTotalOriginal = double.TryParse(txt_subTotal.Text, out var st) ? st : 0d;
-            chk_esTest.Checked = edita_pedido.EsTest;
+            chk_esTest.Checked = edita_pedido.EsTest ?? false;
 
             markupOriginal = double.TryParse(txt_markup.Text, out var mk) ? mk : 0d;
             lbl_order.Text = edita_pedido.IdPedido.ToString();
@@ -278,7 +281,7 @@ namespace Centrex
                 cmb_comprobante.Enabled = false;
             }
 
-            if (!edita_pedido.Activo || borrado)
+            if (!(edita_pedido.Activo ?? true) || borrado)
             {
                 cmd_recargaprecios.Enabled = false;
                 cmd_emitir.Enabled = false;
@@ -530,16 +533,16 @@ namespace Centrex
                     {
                         itemDescuento.Activo = true;
                         itemDescuento.Cantidad = 1;
-                        itemDescuento.Costo = (decimal)descuento;
-                        itemDescuento.PrecioLista = (decimal)descuento;
+                        itemDescuento.Costo = descuento;
+                        itemDescuento.PrecioLista = descuento;
                         itemDescuento.Descript = $"Descuento: {descuento}%";
                         itemDescuento.EsDescuento = false;
                         itemDescuento.EsMarkup = true;
-                        itemDescuento.Factor = 1m;
+                        itemDescuento.Factor = 1;
                         itemDescuento.IdProveedor = 2;
                         itemDescuento.IdTipo = 4;
                         itemDescuento.Item = "MARKUP";
-                        itemDescuento.PrecioLista = 0m;
+                        itemDescuento.PrecioLista = 0;
                         itemDescuento.IdMarca = 2;
                         additem(itemDescuento);
                         itemDescuento.IdItem = infoItem_lastItem().IdItem;
@@ -630,7 +633,7 @@ namespace Centrex
                     {
                         if (factura_electronica.facturar(ultimoPedido) == 1)
                         {
-                            if (comprobanteSeleccionado.Contabilizar)
+                            if (comprobanteSeleccionado.Contabilizar ?? false)
                             {
                                 var ccC = ccClientes.info_ccCliente((int)cmb_cc.SelectedValue);
                                 if (ccC == null || ccC.Nombre == "error")
@@ -639,8 +642,8 @@ namespace Centrex
                                 }
                                 else
                                 {
-                                    var tipoComprobante = comprobantes.info_tipoComprobante(comprobanteSeleccionado.IdTipoComprobante);
-                                    if (string.Equals(tipoComprobante?.SignoCliente, "+", StringComparison.Ordinal))
+                                    var tc = new TipoComprobante(comprobanteSeleccionado.IdTipoComprobante);
+                                    if (tc.signoCliente == "+")
                                     {
                                         ccC.Saldo += ultimoPedido.Total;
                                     }
@@ -655,7 +658,7 @@ namespace Centrex
                                         Fecha = ultimoPedido.Fecha,
                                         IdPedido = ultimoPedido.IdPedido,
                                         IdTipoComprobante = comprobanteSeleccionado.IdTipoComprobante,
-                                        NumeroComprobante = ultimoPedido.EsPresupuesto
+                                        NumeroComprobante = ultimoPedido.EsPresupuesto ?? false
                                             ? ultimoPedido.IdPresupuesto
                                             : ultimoPedido.NumeroComprobante,
                                         PuntoVenta = ultimoPedido.PuntoVenta,
@@ -674,8 +677,7 @@ namespace Centrex
 
                             if (comprobanteSeleccionado.IdTipoComprobante != 1000 && comprobanteSeleccionado.IdTipoComprobante != 1001)
                             {
-                                // La impresión de formularios se deshabilita temporalmente.
-                                // factura_electronica.imprimirFactura(ultimoPedido.IdPedido, 0, chk_remitos.Checked);
+                                factura_electronica.imprimirFactura(ultimoPedido.IdPedido, 0, chk_remitos.Checked);
                             }
                             else
                             {
@@ -999,7 +1001,7 @@ namespace Centrex
 
             checkCustNoTaxNumber(cliente);
 
-            string condicion = (cliente.IdTipoDocumento == 80 && cliente.EsInscripto) ? "IN" : "NOT IN";
+            string condicion = (cliente.IdTipoDocumento == 80 && (cliente.EsInscripto ?? false)) ? "IN" : "NOT IN";
 
             var tiposRestrictivos = new[] { 1, 2, 3, 4, 5, 63, 34, 39, 60, 201, 202, 203, 1011 };
             var tiposSiempre = new[] { 0, 99, 199, 1000, 10001 };
